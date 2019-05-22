@@ -1,0 +1,19 @@
+{
+  "name": "@esy-coq/compcert",
+  "version": "3.5",
+  "description": "Esy packaging of CompCert",
+  "license": "INRIA Non-Commercial License Agreement",
+  "esy": {
+    "build":[
+      ["./configure", "x86_64-macosx"],
+      ["make"]
+    ],
+    "buildsInSource": true
+  },
+  "dependencies": {
+    "@opam/coq": "8.9.0",
+    "@opam/menhir": "*",
+    "ocaml": "~4.6.2"
+  },
+  "devDependencies": { "@opam/merlin": "*", "ocaml": "~4.6.2" }
+}

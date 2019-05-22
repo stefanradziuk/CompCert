@@ -76,3 +76,7 @@
 .nia.cache
 .nra.cache
 .csdp.cache
+
+# esy
+_esy
+node_modules

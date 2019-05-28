@@ -3,6 +3,6 @@ source venv/bin/activate
 pip install -r compileUtils/requirements.txt
 find . -iname '*.ml' -or -iname '*.mli' | depgraph > depend.dot
 mkdir customlib
-cp compileUtils/dune customlib/dune
+cp compileUtils/dune_for_compcert customlib/dune
 python compileUtils/makeCopyScript.py
 sh moveScript.sh

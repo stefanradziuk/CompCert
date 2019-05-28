@@ -80,3 +80,8 @@
 # esy
 _esy
 node_modules
+
+# weird extraction process
+*.dot
+duneBuildLib
+venv

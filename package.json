@@ -16,7 +16,8 @@
     "@opam/coq": "8.9.0",
     "@opam/menhir": "*",
     "ocaml": "~4.6.2",
-    "@opam/depgraph": "*"
+    "@opam/depgraph": "*",
+    "@opam/dune": ">=1.9"
   },
   "devDependencies": { "@opam/merlin": "*", "ocaml": "~4.6.2" }
 }

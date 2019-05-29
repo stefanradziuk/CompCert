@@ -18,6 +18,9 @@
       }
     }
   },
+  "scripts": {
+    "utop": "dune utop --root=_esy/default/build"
+  },
   "dependencies": {
     "@opam/coq": "8.9.0",
     "@opam/menhir": "*",

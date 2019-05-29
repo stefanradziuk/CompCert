@@ -80,6 +80,8 @@
 # esy
 _esy
 node_modules
+_build
+.vscode
 
 # weird extraction process
 *.dot

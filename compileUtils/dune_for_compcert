@@ -2,5 +2,5 @@
   (name compcert)
   (public_name compcert)
   (modules_without_implementation c dwarfTypes)
-  (libraries menhirLib str)
+  (libraries menhirLib str unix)
   (flags -w -27-9))

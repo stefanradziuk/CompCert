@@ -91,7 +91,7 @@ let rec print_stmt p s =
   | Sskip ->
     fprintf p "/*skip*/;"
   | Sset(id, e2) ->
-      fprintf p "@[<hv 2>%s =@ %a;@]" (temp_name id) print_expr e2
+      fprintf p "@[<hv 2>%s =@ %a;@]" (ident_name id) print_expr e2
   | Sstore(chunk, a1, a2) ->
       fprintf p "@[<hv 2>%s[%a] =@ %a;@]"
               (name_of_chunk chunk) print_expr a1 print_expr a2

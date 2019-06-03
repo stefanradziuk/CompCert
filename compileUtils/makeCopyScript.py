@@ -7,7 +7,7 @@ Gtmp = pgv.AGraph('depend.dot')
 G = nx.DiGraph(Gtmp)
 
 
-needed = ['Cshmgen', 'Csharpminor', 'SimplExpr', 'SimplLocals', 'Frontend', 'PrintClight', 'PrintCsharpminor', 'Cminor']
+needed = ['Cshmgen', 'Csharpminor', 'SimplExpr', 'SimplLocals', 'Frontend', 'PrintClight', 'PrintCsharpminor', 'Cminor', 'Cexec']
 
 current_set = set(needed)
 queue = needed

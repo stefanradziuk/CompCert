@@ -201,7 +201,7 @@ let print_function p id f =
     f.fn_vars;
   List.iter
     (fun id ->
-      fprintf p "register %s;@ " (temp_name id))
+      fprintf p "register %s;@ " (extern_atom id))
     f.fn_temps;
   print_stmt p f.fn_body;
   fprintf p "@;<0 -2>}@]@ @ "

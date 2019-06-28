@@ -4,8 +4,7 @@ import glob
 import os
 
 
-Gtmp = pd.graph_from_dot_file('depend.dot')
-Gtmp = nx.nx_pydot.from_pydot(Gtmp)
+Gtmp = nx.nx_pydot.read_dot('depend.dot')
 G = nx.DiGraph(Gtmp)
 
 

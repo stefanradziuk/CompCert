@@ -1,9 +1,11 @@
-import pygraphviz as pgv
+import pydot as pd
 import networkx as nx
 import glob
 import os
 
-Gtmp = pgv.AGraph('depend.dot')
+
+Gtmp = pd.graph_from_dot_file('depend.dot')
+Gtmp = nx.nx_pydot.from_pydot(Gtmp)
 G = nx.DiGraph(Gtmp)
 
 

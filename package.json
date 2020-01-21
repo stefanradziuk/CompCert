@@ -22,11 +22,11 @@
     "utop": "dune utop --root=_esy/default/build"
   },
   "dependencies": {
-    "@opam/coq": "8.9.0",
+    "@opam/coq": "8.10.2",
     "@opam/menhir": "*",
-    "ocaml": "4.6.2",
+    "ocaml": "^4.8.0",
     "@opam/depgraph": "*",
-    "@opam/dune": ">=1.9"
+    "@opam/dune": "^2.0"
   },
-  "devDependencies": { "@opam/merlin": "*", "@opam/utop": "2.3.0", "@opam/odoc": "*", "ocaml": "4.6.2" }
+  "devDependencies": { "@opam/merlin": "*", "@opam/utop": "*", "@opam/odoc": "*", "ocaml": "^4.8.0" }
 }

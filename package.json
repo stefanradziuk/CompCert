@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@opam/coq": "8.10.2",
-    "@opam/menhir": "*",
+    "@opam/menhir": "<20200123",
     "ocaml": "^4.8.0",
     "@opam/depgraph": "*",
     "@opam/dune": "^2.0"

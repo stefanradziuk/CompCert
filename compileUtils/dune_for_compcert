@@ -4,3 +4,7 @@
   (modules_without_implementation c dwarfTypes)
   (libraries menhirLib str unix)
   (flags -w -27-9))
+
+(install
+  (files compcert.ini)
+  (section share))

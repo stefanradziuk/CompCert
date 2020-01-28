@@ -10,14 +10,14 @@
     "buildsInSource": true,
     "exportedEnv": {
       "COMPCERT_CONFIG": {
-        "val": "#{self.target_dir}/compcert.ini",
+        "val": "#{self.share}/compcert/compcert.ini",
         "scope": "global"
       }
     }
   },
   "scripts": {
     "utop": "dune utop --root=_esy/default/build",
-    "extract": "sh ./compileUtils/extract.sh"
+    "extract": "./compileUtils/extract.sh"
   },
   "dependencies": {
     "@opam/menhir": "<20200123",

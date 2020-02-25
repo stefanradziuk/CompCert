@@ -8,5 +8,6 @@ This file contains an explaination of what this different between this fork of C
   along with the Dune file to build them. (see compileUtils folder)
 - modifies the `configure` file to allow for ingoring if Coq is not installed
   (it is not called when compiling the custom library).
+- modifies the `Makefile` to allow for creation of the 'compcert.ini' file only.
 - Adds a snapshot of the extracted files according to the custom build script in `customlib/`
 - Adds a package.json file + esy.lock to easily package the lib with esy.

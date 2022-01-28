@@ -404,6 +404,22 @@ module Make =
 
   let size x =
     coq_Zsize (unsigned x)
+
+  (** val unsigned_bitfield_extract : coq_Z -> coq_Z -> int -> int **)
+
+  let unsigned_bitfield_extract pos width n =
+    zero_ext width (shru n (repr pos))
+
+  (** val signed_bitfield_extract : coq_Z -> coq_Z -> int -> int **)
+
+  let signed_bitfield_extract pos width n =
+    sign_ext width (shru n (repr pos))
+
+  (** val bitfield_insert : coq_Z -> coq_Z -> int -> int -> int **)
+
+  let bitfield_insert pos width n p =
+    let mask = shl (repr (Z.sub (two_p width) (Zpos Coq_xH))) (repr pos) in
+    coq_or (shl (zero_ext width p) (repr pos)) (coq_and n (not mask))
  end
 
 module Wordsize_32 =

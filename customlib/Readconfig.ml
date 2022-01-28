@@ -1,4 +1,4 @@
-# 16 "lib/Readconfig.mll"
+# 17 "lib/Readconfig.mll"
  
 
 (* Recording key=val bindings *)
@@ -6,7 +6,7 @@
 let key_val_tbl : (string, string list) Hashtbl.t = Hashtbl.create 17
 
 let key_val key =
-  try Some(Hashtbl.find key_val_tbl key) with Not_found -> None
+  Hashtbl.find_opt key_val_tbl key
 
 (* Auxiliaries for parsing *)
 
@@ -461,29 +461,29 @@ let rec begline lexbuf =
 and __ocaml_lex_begline_rec lexbuf __ocaml_lex_state =
   match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 58 "lib/Readconfig.mll"
+# 59 "lib/Readconfig.mll"
       ( Lexing.new_line lexbuf; begline lexbuf )
 # 467 "lib/Readconfig.ml"
 
   | 1 ->
 let
-# 59 "lib/Readconfig.mll"
+# 60 "lib/Readconfig.mll"
                           key
 # 473 "lib/Readconfig.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(0) lexbuf.Lexing.lex_mem.(1) in
-# 60 "lib/Readconfig.mll"
+# 61 "lib/Readconfig.mll"
       ( let words = unquoted false [] lexbuf in
         Hashtbl.add key_val_tbl key (List.rev words);
         begline lexbuf )
 # 479 "lib/Readconfig.ml"
 
   | 2 ->
-# 64 "lib/Readconfig.mll"
+# 65 "lib/Readconfig.mll"
       ( () )
 # 484 "lib/Readconfig.ml"
 
   | 3 ->
-# 66 "lib/Readconfig.mll"
+# 67 "lib/Readconfig.mll"
       ( ill_formed_line lexbuf )
 # 489 "lib/Readconfig.ml"
 
@@ -495,52 +495,52 @@ and unquoted inword words lexbuf =
 and __ocaml_lex_unquoted_rec inword words lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 69 "lib/Readconfig.mll"
+# 70 "lib/Readconfig.mll"
                   ( Lexing.new_line lexbuf; stash inword words )
 # 501 "lib/Readconfig.ml"
 
   | 1 ->
-# 70 "lib/Readconfig.mll"
+# 71 "lib/Readconfig.mll"
                   ( unquoted false (stash inword words) lexbuf )
 # 506 "lib/Readconfig.ml"
 
   | 2 ->
-# 71 "lib/Readconfig.mll"
+# 72 "lib/Readconfig.mll"
                   ( Lexing.new_line lexbuf; unquoted inword words lexbuf )
 # 511 "lib/Readconfig.ml"
 
   | 3 ->
 let
-# 72 "lib/Readconfig.mll"
+# 73 "lib/Readconfig.mll"
                c
 # 517 "lib/Readconfig.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 72 "lib/Readconfig.mll"
+# 73 "lib/Readconfig.mll"
                   ( Buffer.add_char buf c; unquoted true words lexbuf )
 # 521 "lib/Readconfig.ml"
 
   | 4 ->
-# 73 "lib/Readconfig.mll"
+# 74 "lib/Readconfig.mll"
                   ( lone_backslash lexbuf )
 # 526 "lib/Readconfig.ml"
 
   | 5 ->
-# 74 "lib/Readconfig.mll"
+# 75 "lib/Readconfig.mll"
                   ( singlequote lexbuf; unquoted true words lexbuf )
 # 531 "lib/Readconfig.ml"
 
   | 6 ->
-# 75 "lib/Readconfig.mll"
+# 76 "lib/Readconfig.mll"
                   ( doublequote lexbuf; unquoted true words lexbuf )
 # 536 "lib/Readconfig.ml"
 
   | 7 ->
 let
-# 76 "lib/Readconfig.mll"
+# 77 "lib/Readconfig.mll"
          c
 # 542 "lib/Readconfig.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 76 "lib/Readconfig.mll"
+# 77 "lib/Readconfig.mll"
                   ( Buffer.add_char buf c; unquoted true words lexbuf )
 # 546 "lib/Readconfig.ml"
 
@@ -552,28 +552,28 @@ and singlequote lexbuf =
 and __ocaml_lex_singlequote_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 79 "lib/Readconfig.mll"
+# 80 "lib/Readconfig.mll"
                   ( unterminated_quote lexbuf )
 # 558 "lib/Readconfig.ml"
 
   | 1 ->
-# 80 "lib/Readconfig.mll"
+# 81 "lib/Readconfig.mll"
                   ( () )
 # 563 "lib/Readconfig.ml"
 
   | 2 ->
-# 81 "lib/Readconfig.mll"
+# 82 "lib/Readconfig.mll"
                   ( Lexing.new_line lexbuf;
                     Buffer.add_char buf '\n'; singlequote lexbuf )
 # 569 "lib/Readconfig.ml"
 
   | 3 ->
 let
-# 83 "lib/Readconfig.mll"
+# 84 "lib/Readconfig.mll"
          c
 # 575 "lib/Readconfig.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 83 "lib/Readconfig.mll"
+# 84 "lib/Readconfig.mll"
                   ( Buffer.add_char buf c; singlequote lexbuf )
 # 579 "lib/Readconfig.ml"
 
@@ -585,43 +585,43 @@ and doublequote lexbuf =
 and __ocaml_lex_doublequote_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 86 "lib/Readconfig.mll"
+# 87 "lib/Readconfig.mll"
                   ( unterminated_quote lexbuf )
 # 591 "lib/Readconfig.ml"
 
   | 1 ->
-# 87 "lib/Readconfig.mll"
+# 88 "lib/Readconfig.mll"
                   ( () )
 # 596 "lib/Readconfig.ml"
 
   | 2 ->
-# 88 "lib/Readconfig.mll"
+# 89 "lib/Readconfig.mll"
                   ( Lexing.new_line lexbuf; doublequote lexbuf )
 # 601 "lib/Readconfig.ml"
 
   | 3 ->
 let
-# 89 "lib/Readconfig.mll"
+# 90 "lib/Readconfig.mll"
                                  c
 # 607 "lib/Readconfig.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 90 "lib/Readconfig.mll"
+# 91 "lib/Readconfig.mll"
                   ( Buffer.add_char buf c; doublequote lexbuf )
 # 611 "lib/Readconfig.ml"
 
   | 4 ->
-# 91 "lib/Readconfig.mll"
+# 92 "lib/Readconfig.mll"
                   ( Lexing.new_line lexbuf;
                     Buffer.add_char buf '\n'; doublequote lexbuf )
 # 617 "lib/Readconfig.ml"
 
   | 5 ->
 let
-# 93 "lib/Readconfig.mll"
+# 94 "lib/Readconfig.mll"
          c
 # 623 "lib/Readconfig.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 93 "lib/Readconfig.mll"
+# 94 "lib/Readconfig.mll"
                   ( Buffer.add_char buf c; doublequote lexbuf )
 # 627 "lib/Readconfig.ml"
 
@@ -630,7 +630,7 @@ let
 
 ;;
 
-# 95 "lib/Readconfig.mll"
+# 96 "lib/Readconfig.mll"
  
 
 (* The entry point *)

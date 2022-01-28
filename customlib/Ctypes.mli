@@ -45,6 +45,10 @@ and typelist =
 
 val intsize_eq : intsize -> intsize -> bool
 
+val signedness_eq : signedness -> signedness -> bool
+
+val attr_eq : attr -> attr -> bool
+
 val type_eq : coq_type -> coq_type -> bool
 
 val typelist_eq : typelist -> typelist -> bool
@@ -59,20 +63,36 @@ val attr_union : attr -> attr -> attr
 
 val merge_attributes : coq_type -> attr -> coq_type
 
+val bitsize_intsize : intsize -> coq_Z
+
 type struct_or_union =
 | Struct
 | Union
 
-type members = (ident * coq_type) list
+type member =
+| Member_plain of ident * coq_type
+| Member_bitfield of ident * intsize * signedness * attr * coq_Z * bool
+
+type members = member list
 
 type composite_definition =
 | Composite of ident * struct_or_union * members * attr
+
+val name_member : member -> ident
+
+val type_member : member -> coq_type
+
+val member_is_padding : member -> bool
 
 type composite = { co_su : struct_or_union; co_members : members;
                    co_attr : attr; co_sizeof : coq_Z; co_alignof : coq_Z;
                    co_rank : nat }
 
 type composite_env = composite PTree.t
+
+type bitfield =
+| Full
+| Bits of intsize * signedness * coq_Z * coq_Z
 
 val type_int32s : coq_type
 
@@ -90,17 +110,35 @@ val alignof : composite_env -> coq_type -> coq_Z
 
 val sizeof : composite_env -> coq_type -> coq_Z
 
+val bitalignof : composite_env -> coq_type -> coq_Z
+
+val bitsizeof : composite_env -> coq_type -> coq_Z
+
+val bitalignof_intsize : intsize -> coq_Z
+
+val next_field : composite_env -> coq_Z -> member -> coq_Z
+
+val layout_field : composite_env -> coq_Z -> member -> (coq_Z * bitfield) res
+
 val alignof_composite : composite_env -> members -> coq_Z
 
-val sizeof_struct : composite_env -> coq_Z -> members -> coq_Z
+val bitsizeof_struct : composite_env -> coq_Z -> members -> coq_Z
+
+val bytes_of_bits : coq_Z -> coq_Z
+
+val sizeof_struct : composite_env -> members -> coq_Z
 
 val sizeof_union : composite_env -> members -> coq_Z
 
-val field_offset_rec : composite_env -> ident -> members -> coq_Z -> coq_Z res
-
-val field_offset : composite_env -> ident -> members -> coq_Z res
-
 val field_type : ident -> members -> coq_type res
+
+val field_offset_rec :
+  composite_env -> ident -> members -> coq_Z -> (coq_Z * bitfield) res
+
+val field_offset : composite_env -> ident -> members -> (coq_Z * bitfield) res
+
+val union_field_offset :
+  composite_env -> ident -> members -> (coq_Z * bitfield) res
 
 type mode =
 | By_value of memory_chunk

@@ -100,7 +100,7 @@ module N =
 
   (** val ldiff : coq_N -> coq_N -> coq_N **)
 
-  let rec ldiff n m =
+  let ldiff n m =
     match n with
     | N0 -> N0
     | Npos p -> (match m with

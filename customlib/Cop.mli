@@ -1,5 +1,6 @@
 open AST
 open Archi
+open BinInt
 open BinNums
 open Coqlib
 open Ctypes
@@ -249,3 +250,14 @@ val sem_binary_operation :
   coq_type -> Mem.mem -> coq_val option
 
 val incrdecr_type : coq_type -> coq_type
+
+val chunk_for_carrier : intsize -> memory_chunk
+
+val bitsize_carrier : intsize -> coq_Z
+
+val first_bit : intsize -> coq_Z -> coq_Z -> coq_Z
+
+val bitfield_extract :
+  intsize -> signedness -> coq_Z -> coq_Z -> Int.int -> Int.int
+
+val bitfield_normalize : intsize -> signedness -> coq_Z -> Int.int -> Int.int

@@ -20,3 +20,5 @@ val choose_nan_64 : (bool * positive) list -> bool * positive
 val choose_nan_32 : (bool * positive) list -> bool * positive
 
 val float_of_single_preserves_sNaN : bool
+
+val win64 : bool

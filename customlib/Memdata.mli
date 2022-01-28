@@ -2,7 +2,6 @@ open AST
 open Archi
 open BinInt
 open BinNums
-open Coqlib
 open Datatypes
 open Floats
 open Integers

@@ -64,3 +64,9 @@ let choose_nan_32 = function
 
 let float_of_single_preserves_sNaN =
   false
+
+(** val win64 : bool **)
+
+let win64 = match Configuration.system with
+    | "cygwin" when ptr64 -> true
+    | _ -> false

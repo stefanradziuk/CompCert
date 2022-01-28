@@ -134,42 +134,42 @@ let rec tokenize acc lexbuf =
 and __ocaml_lex_tokenize_rec acc lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 22 "lib/Tokenize.mll"
+# 23 "lib/Tokenize.mll"
                         ( List.rev acc )
 # 140 "lib/Tokenize.ml"
 
   | 1 ->
-# 23 "lib/Tokenize.mll"
+# 24 "lib/Tokenize.mll"
                              ( tokenize acc lexbuf )
 # 145 "lib/Tokenize.ml"
 
   | 2 ->
-# 24 "lib/Tokenize.mll"
+# 25 "lib/Tokenize.mll"
                         ( tok_dquote acc (Buffer.create 16) lexbuf )
 # 150 "lib/Tokenize.ml"
 
   | 3 ->
-# 25 "lib/Tokenize.mll"
+# 26 "lib/Tokenize.mll"
                         ( tok_squote acc (Buffer.create 16) lexbuf )
 # 155 "lib/Tokenize.ml"
 
   | 4 ->
 let
-# 26 "lib/Tokenize.mll"
+# 27 "lib/Tokenize.mll"
                                s
 # 161 "lib/Tokenize.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 27 "lib/Tokenize.mll"
+# 28 "lib/Tokenize.mll"
                         ( tokenize (s :: acc) lexbuf )
 # 165 "lib/Tokenize.ml"
 
   | 5 ->
 let
-# 28 "lib/Tokenize.mll"
+# 29 "lib/Tokenize.mll"
          c
 # 171 "lib/Tokenize.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 28 "lib/Tokenize.mll"
+# 29 "lib/Tokenize.mll"
                         ( tokenize (String.make 1 c :: acc) lexbuf )
 # 175 "lib/Tokenize.ml"
 
@@ -181,42 +181,42 @@ and tok_dquote acc buf lexbuf =
 and __ocaml_lex_tok_dquote_rec acc buf lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 31 "lib/Tokenize.mll"
+# 32 "lib/Tokenize.mll"
                         ( tokenize (Buffer.contents buf :: acc) lexbuf )
 # 187 "lib/Tokenize.ml"
 
   | 1 ->
-# 32 "lib/Tokenize.mll"
+# 33 "lib/Tokenize.mll"
                         ( Buffer.add_char buf '\t'; tok_dquote acc buf lexbuf )
 # 192 "lib/Tokenize.ml"
 
   | 2 ->
-# 33 "lib/Tokenize.mll"
+# 34 "lib/Tokenize.mll"
                         ( Buffer.add_char buf '\n'; tok_dquote acc buf lexbuf )
 # 197 "lib/Tokenize.ml"
 
   | 3 ->
-# 34 "lib/Tokenize.mll"
+# 35 "lib/Tokenize.mll"
                         ( Buffer.add_char buf '\r'; tok_dquote acc buf lexbuf )
 # 202 "lib/Tokenize.ml"
 
   | 4 ->
 let
-# 35 "lib/Tokenize.mll"
+# 36 "lib/Tokenize.mll"
                            c
 # 208 "lib/Tokenize.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 36 "lib/Tokenize.mll"
+# 37 "lib/Tokenize.mll"
                         ( Buffer.add_char buf c; tok_dquote acc buf lexbuf )
 # 212 "lib/Tokenize.ml"
 
   | 5 ->
 let
-# 37 "lib/Tokenize.mll"
+# 38 "lib/Tokenize.mll"
          c
 # 218 "lib/Tokenize.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 37 "lib/Tokenize.mll"
+# 38 "lib/Tokenize.mll"
                         ( Buffer.add_char buf c; tok_dquote acc buf lexbuf )
 # 222 "lib/Tokenize.ml"
 
@@ -228,17 +228,17 @@ and tok_squote acc buf lexbuf =
 and __ocaml_lex_tok_squote_rec acc buf lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 40 "lib/Tokenize.mll"
+# 41 "lib/Tokenize.mll"
                         ( tokenize (Buffer.contents buf :: acc) lexbuf )
 # 234 "lib/Tokenize.ml"
 
   | 1 ->
 let
-# 41 "lib/Tokenize.mll"
+# 42 "lib/Tokenize.mll"
          c
 # 240 "lib/Tokenize.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 41 "lib/Tokenize.mll"
+# 42 "lib/Tokenize.mll"
                         ( Buffer.add_char buf c; tok_squote acc buf lexbuf )
 # 244 "lib/Tokenize.ml"
 
@@ -247,7 +247,7 @@ let
 
 ;;
 
-# 43 "lib/Tokenize.mll"
+# 44 "lib/Tokenize.mll"
  
 let string s =
   tokenize [] (Lexing.from_string s)

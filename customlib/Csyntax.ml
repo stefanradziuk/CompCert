@@ -27,7 +27,7 @@ type expr =
 | Ecomma of expr * expr * coq_type
 | Ecall of expr * exprlist * coq_type
 | Ebuiltin of external_function * typelist * exprlist * coq_type
-| Eloc of block * Ptrofs.int * coq_type
+| Eloc of block * Ptrofs.int * bitfield * coq_type
 | Eparen of expr * coq_type * coq_type
 and exprlist =
 | Enil
@@ -81,7 +81,7 @@ let typeof = function
 | Ecomma (_, _, ty) -> ty
 | Ecall (_, _, ty) -> ty
 | Ebuiltin (_, _, _, ty) -> ty
-| Eloc (_, _, ty) -> ty
+| Eloc (_, _, _, ty) -> ty
 | Eparen (_, _, ty) -> ty
 
 type label = ident

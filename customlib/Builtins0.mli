@@ -27,16 +27,19 @@ val mkbuiltin_v2p :
 
 type valty = __
 
-val inj_num : typ -> valty -> coq_val
+type valretty = __
+
+val inj_num : rettype -> valretty -> coq_val
 
 val proj_num : typ -> 'a1 -> coq_val -> (valty -> 'a1) -> 'a1
 
-val mkbuiltin_n1t : typ -> typ -> (valty -> valty) -> builtin_sem
+val mkbuiltin_n1t : typ -> rettype -> (valty -> valretty) -> builtin_sem
 
 val mkbuiltin_n2t :
-  typ -> typ -> typ -> (valty -> valty -> valty) -> builtin_sem
+  typ -> typ -> rettype -> (valty -> valty -> valretty) -> builtin_sem
 
-val mkbuiltin_n1p : typ -> typ -> (valty -> valty option) -> builtin_sem
+val mkbuiltin_n1p :
+  typ -> rettype -> (valty -> valretty option) -> builtin_sem
 
 val lookup_builtin :
   ('a1 -> signature) -> char list -> signature -> (char list * 'a1) list ->
@@ -45,6 +48,7 @@ val lookup_builtin :
 type standard_builtin =
 | BI_select of typ
 | BI_fabs
+| BI_fabsf
 | BI_fsqrt
 | BI_negl
 | BI_addl
@@ -53,6 +57,7 @@ type standard_builtin =
 | BI_i16_bswap
 | BI_i32_bswap
 | BI_i64_bswap
+| BI_unreachable
 | BI_i64_umulh
 | BI_i64_smulh
 | BI_i64_sdiv

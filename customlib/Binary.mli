@@ -4,9 +4,9 @@ open BinPos
 open Bool
 open Bracket
 open Datatypes
-open Digits
 open FLT
 open Round
+open SpecFloatCompat
 open Zaux
 open Zbool
 open Zpower

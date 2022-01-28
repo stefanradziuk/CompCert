@@ -37,6 +37,11 @@ let zle =
 let align n amount =
   Z.mul (Z.div (Z.sub (Z.add n amount) (Zpos Coq_xH)) amount) amount
 
+(** val floor : coq_Z -> coq_Z -> coq_Z **)
+
+let floor n amount =
+  Z.mul (Z.div n amount) amount
+
 (** val option_eq :
     ('a1 -> 'a1 -> bool) -> 'a1 option -> 'a1 option -> bool **)
 
@@ -108,12 +113,5 @@ let rec list_norepet_dec eqA_dec = function
   if list_norepet_dec eqA_dec l0
   then if in_dec eqA_dec y l0 then false else true
   else false
-
-(** val list_repeat : nat -> 'a1 -> 'a1 list **)
-
-let rec list_repeat n x =
-  match n with
-  | O -> []
-  | S m -> x :: (list_repeat m x)
 
 

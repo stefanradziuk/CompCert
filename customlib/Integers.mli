@@ -149,6 +149,12 @@ module Make :
   val no_overlap : int -> coq_Z -> int -> coq_Z -> bool
 
   val size : int -> coq_Z
+
+  val unsigned_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val signed_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val bitfield_insert : coq_Z -> coq_Z -> int -> int -> int
  end
 
 module Wordsize_32 :
@@ -280,6 +286,12 @@ module Int :
   val no_overlap : int -> coq_Z -> int -> coq_Z -> bool
 
   val size : int -> coq_Z
+
+  val unsigned_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val signed_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val bitfield_insert : coq_Z -> coq_Z -> int -> int -> int
  end
 
 module Wordsize_8 :
@@ -411,6 +423,12 @@ module Byte :
   val no_overlap : int -> coq_Z -> int -> coq_Z -> bool
 
   val size : int -> coq_Z
+
+  val unsigned_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val signed_bitfield_extract : coq_Z -> coq_Z -> int -> int
+
+  val bitfield_insert : coq_Z -> coq_Z -> int -> int -> int
  end
 
 module Wordsize_64 :

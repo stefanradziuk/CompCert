@@ -17,11 +17,6 @@ let radix_val r =
 let radix2 =
   Zpos (Coq_xO Coq_xH)
 
-(** val cond_Zopp : bool -> coq_Z -> coq_Z **)
-
-let cond_Zopp b m =
-  if b then Z.opp m else m
-
 (** val coq_Zpos_div_eucl_aux1 : positive -> positive -> coq_Z * coq_Z **)
 
 let rec coq_Zpos_div_eucl_aux1 a b = match b with
@@ -52,7 +47,9 @@ let coq_Zfast_div_eucl a b =
   | Z0 -> (Z0, Z0)
   | Zpos a' ->
     (match b with
-     | Z0 -> (Z0, Z0)
+     | Z0 -> (Z0, (match Z.modulo (Zpos Coq_xH) Z0 with
+                   | Z0 -> Z0
+                   | _ -> a))
      | Zpos b' -> coq_Zpos_div_eucl_aux a' b'
      | Zneg b' ->
        let (q, r) = coq_Zpos_div_eucl_aux a' b' in
@@ -61,7 +58,9 @@ let coq_Zfast_div_eucl a b =
         | _ -> ((Z.opp (Z.add q (Zpos Coq_xH))), (Z.add b r))))
   | Zneg a' ->
     (match b with
-     | Z0 -> (Z0, Z0)
+     | Z0 -> (Z0, (match Z.modulo (Zpos Coq_xH) Z0 with
+                   | Z0 -> Z0
+                   | _ -> a))
      | Zpos b' ->
        let (q, r) = coq_Zpos_div_eucl_aux a' b' in
        (match r with
@@ -75,11 +74,3 @@ let rec iter_nat f n x =
   match n with
   | O -> x
   | S n' -> iter_nat f n' (f x)
-
-(** val iter_pos : ('a1 -> 'a1) -> positive -> 'a1 -> 'a1 **)
-
-let rec iter_pos f n x =
-  match n with
-  | Coq_xI n' -> iter_pos f n' (iter_pos f n' (f x))
-  | Coq_xO n' -> iter_pos f n' (iter_pos f n' x)
-  | Coq_xH -> f x

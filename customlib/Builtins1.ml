@@ -24,14 +24,14 @@ let platform_builtin_sig _ =
 
 let platform_builtin_sem = function
 | BI_fmin ->
-  mkbuiltin_n2t Tfloat Tfloat Tfloat (fun f1 f2 ->
+  mkbuiltin_n2t Tfloat Tfloat (Tret Tfloat) (fun f1 f2 ->
     match Float.compare (Obj.magic f1) (Obj.magic f2) with
     | Some c -> (match c with
                  | Gt -> f2
                  | _ -> f1)
     | None -> f2)
 | BI_fmax ->
-  mkbuiltin_n2t Tfloat Tfloat Tfloat (fun f1 f2 ->
+  mkbuiltin_n2t Tfloat Tfloat (Tret Tfloat) (fun f1 f2 ->
     match Float.compare (Obj.magic f1) (Obj.magic f2) with
     | Some c -> (match c with
                  | Lt -> f2

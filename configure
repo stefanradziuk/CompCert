@@ -31,6 +31,7 @@ ignore_coq_version=false
 ignore_coq=false
 library_Flocq=local
 library_MenhirLib=local
+check_menhirlib=true
 
 usage='Usage: ./configure [options] target
 For help on options and targets, do: ./configure -help
@@ -99,6 +100,7 @@ Options:
   -install-coqdev      Also install the Coq development (implied by -clightgen)
   -ignore-coq-version  Accept to use experimental or unsupported versions of Coq
   -ignore-coq          Accept that Coq is not there. This is for Gillian Usage
+  -ignore-menhirlib
 '
 
 #
@@ -135,7 +137,9 @@ while : ; do
     -ignore-coq-version|--ignore-coq-version)
         ignore_coq_version=true;;
     -ignore-coq|--ignore-coq)
-        ingore_coq=true;;
+        ignore_coq=true;;
+    -ignore-menhirlib|--ignore-menhirlib)
+        check_menhirlib=false;;
     -install-coqdev|--install-coqdev|-install-coq-dev|--install-coq-dev)
         install_coqdev=true;;
     -use-external-Flocq|--use-external-Flocq)
@@ -521,10 +525,10 @@ case "$coq_ver" in
   "")
         echo "NOT FOUND"
         if $ignore_coq; then
+            echo "Ignoring it, will not be able to prove anything."
+        else
             echo "Error: make sure Coq version 8.13.2 is installed."
             missingtools=true
-        else
-            echo "Ignoring it, will not be able to prove anything."
         fi;;
 esac
 
@@ -578,12 +582,17 @@ case "$menhir_ver" in
           menhir_dir=$(menhir --suggest-menhirLib) || \
           menhir_dir=""
           menhir_dir=$(echo "$menhir_dir" | tr -d '\r' | tr '\\' '/')
-          if test ! -d "$menhir_dir"; then
-              echo "Error: cannot determine the location of the Menhir API library."
-              echo "This can be due to an incorrect Menhir package."
-              echo "Consider using the OPAM package for Menhir."
-              missingtools=true
+          if $check_menhirlib; then
+            if test ! -d "$menhir_dir"; then
+                echo "Error: cannot determine the location of the Menhir API library."
+                echo "This can be due to an incorrect Menhir package."
+                echo "Consider using the OPAM package for Menhir."
+                missingtools=true
+            fi
+          else
+                echo "Ignoring check for menhirlib"
           fi
+          
       else
           echo "version $menhir_ver -- UNSUPPORTED"
           echo "Error: CompCert requires a version greater or equal to $MENHIR_REQUIRED."

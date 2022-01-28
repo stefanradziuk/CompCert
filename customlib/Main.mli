@@ -72,17 +72,19 @@ module Make :
     val pop : Aut.Gram.symbol list -> stack -> 'a1 arrows_right -> stack * 'a1
 
     type step_result =
-    | Fail_sr
+    | Fail_sr_full of Aut.state * Aut.Gram.token
     | Accept_sr of Aut.Gram.symbol_semantic_type * buffer
     | Progress_sr of stack * buffer
 
     val step_result_rect :
-      Aut.initstate -> 'a1 -> (Aut.Gram.symbol_semantic_type -> buffer ->
-      'a1) -> (stack -> buffer -> 'a1) -> step_result -> 'a1
+      Aut.initstate -> (Aut.state -> Aut.Gram.token -> 'a1) ->
+      (Aut.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1
 
     val step_result_rec :
-      Aut.initstate -> 'a1 -> (Aut.Gram.symbol_semantic_type -> buffer ->
-      'a1) -> (stack -> buffer -> 'a1) -> step_result -> 'a1
+      Aut.initstate -> (Aut.state -> Aut.Gram.token -> 'a1) ->
+      (Aut.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1
 
     val reduce_step :
       Aut.initstate -> stack -> Aut.Gram.production -> buffer -> step_result
@@ -92,15 +94,17 @@ module Make :
     val parse_fix : Aut.initstate -> stack -> buffer -> nat -> step_result
 
     type 'a parse_result =
-    | Fail_pr
+    | Fail_pr_full of Aut.state * Aut.Gram.token
     | Timeout_pr
     | Parsed_pr of 'a * buffer
 
     val parse_result_rect :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2
+      (Aut.state -> Aut.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2)
+      -> 'a1 parse_result -> 'a2
 
     val parse_result_rec :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2
+      (Aut.state -> Aut.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2)
+      -> 'a1 parse_result -> 'a2
 
     val parse :
       Aut.initstate -> buffer -> nat -> Aut.Gram.symbol_semantic_type

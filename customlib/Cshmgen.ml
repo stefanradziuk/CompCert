@@ -1,10 +1,12 @@
 open AST
 open Archi
+open BinInt
 open BinNums
 open Clight
 open Cminor
 open Conventions1
 open Cop
+open Coqlib
 open Csharpminor
 open Ctypes
 open Datatypes
@@ -13,6 +15,7 @@ open Floats
 open Integers
 open List0
 open Maps
+open Zpower
 
 (** val make_intconst : Int.int -> expr **)
 
@@ -474,16 +477,64 @@ let make_cmp c e1 ty1 e2 ty2 =
     make_binarith (Ocmp c) (Ocmpu c) (Ocmpf c) (Ocmpfs c) (Ocmpl c) (Ocmplu
       c) e1 ty1 e2 ty2
 
-(** val make_load : expr -> coq_type -> expr res **)
+(** val make_extract_bitfield :
+    intsize -> signedness -> coq_Z -> coq_Z -> expr -> expr res **)
 
-let make_load addr ty_res =
-  match access_mode ty_res with
-  | By_value chunk -> OK (Eload (chunk, addr))
-  | By_nothing ->
-    Error
-      (msg
-        ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('l'::('o'::('a'::('d'::[]))))))))))))))))))
-  | _ -> OK addr
+let make_extract_bitfield sz sg pos width addr =
+  if (&&) ((&&) ((fun x -> x) (zle Z0 pos)) ((fun x -> x) (zlt Z0 width)))
+       ((fun x -> x) (zle (Z.add pos width) (bitsize_carrier sz)))
+  then let amount1 =
+         Int.repr (Z.sub (Z.sub Int.zwordsize (first_bit sz pos width)) width)
+       in
+       let amount2 = Int.repr (Z.sub Int.zwordsize width) in
+       let e1 = Eload ((chunk_for_carrier sz), addr) in
+       let e2 = Ebinop (Cminor.Oshl, e1, (make_intconst amount1)) in
+       let e3 = Ebinop
+         ((if (||) ((fun x -> x) (intsize_eq sz IBool))
+                ((fun x -> x) (signedness_eq sg Unsigned))
+           then Oshru
+           else Cminor.Oshr), e2, (make_intconst amount2))
+       in
+       OK e3
+  else Error
+         (msg
+           ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('e'::('x'::('t'::('r'::('a'::('c'::('t'::('_'::('b'::('i'::('t'::('f'::('i'::('e'::('l'::('d'::[])))))))))))))))))))))))))
+
+(** val make_load : expr -> coq_type -> bitfield -> expr res **)
+
+let make_load addr ty_res = function
+| Full ->
+  (match access_mode ty_res with
+   | By_value chunk -> OK (Eload (chunk, addr))
+   | By_nothing ->
+     Error
+       (msg
+         ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('l'::('o'::('a'::('d'::[]))))))))))))))))))
+   | _ -> OK addr)
+| Bits (sz, sg, pos, width) -> make_extract_bitfield sz sg pos width addr
+
+(** val make_store_bitfield :
+    intsize -> signedness -> coq_Z -> coq_Z -> expr -> expr -> stmt res **)
+
+let make_store_bitfield sz _ pos width addr val0 =
+  if (&&) ((&&) ((fun x -> x) (zle Z0 pos)) ((fun x -> x) (zlt Z0 width)))
+       ((fun x -> x) (zle (Z.add pos width) (bitsize_carrier sz)))
+  then let amount = first_bit sz pos width in
+       let mask =
+         Int.shl (Int.repr (Z.sub (two_p width) (Zpos Coq_xH)))
+           (Int.repr amount)
+       in
+       let e1 = Eload ((chunk_for_carrier sz), addr) in
+       let e2 = Ebinop (Cminor.Oshl, val0, (make_intconst (Int.repr amount)))
+       in
+       let e3 = Ebinop (Cminor.Oor, (Ebinop (Cminor.Oand, e2,
+         (make_intconst mask))), (Ebinop (Cminor.Oand, e1,
+         (make_intconst (Int.not mask)))))
+       in
+       OK (Sstore ((chunk_for_carrier sz), addr, e3))
+  else Error
+         (msg
+           ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('s'::('t'::('o'::('r'::('e'::('_'::('b'::('i'::('t'::('f'::('i'::('e'::('l'::('d'::[]))))))))))))))))))))))))))))
 
 (** val make_memcpy :
     composite_env -> expr -> expr -> coq_type -> stmt res **)
@@ -495,16 +546,20 @@ let make_memcpy ce dst src ty =
       (dst :: (src :: []))))
   | Error msg0 -> Error msg0
 
-(** val make_store : composite_env -> expr -> coq_type -> expr -> stmt res **)
+(** val make_store :
+    composite_env -> expr -> coq_type -> bitfield -> expr -> stmt res **)
 
-let make_store ce addr ty rhs =
-  match access_mode ty with
-  | By_value chunk -> OK (Sstore (chunk, addr, rhs))
-  | By_copy -> make_memcpy ce addr rhs ty
-  | _ ->
-    Error
-      (msg
-        ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('s'::('t'::('o'::('r'::('e'::[])))))))))))))))))))
+let make_store ce addr ty bf rhs =
+  match bf with
+  | Full ->
+    (match access_mode ty with
+     | By_value chunk -> OK (Sstore (chunk, addr, rhs))
+     | By_copy -> make_memcpy ce addr rhs ty
+     | _ ->
+       Error
+         (msg
+           ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('s'::('t'::('o'::('r'::('e'::[]))))))))))))))))))))
+  | Bits (sz, sg, pos, width) -> make_store_bitfield sz sg pos width addr rhs
 
 (** val transl_unop : Cop.unary_operation -> expr -> coq_type -> expr res **)
 
@@ -539,29 +594,37 @@ let transl_binop ce op a ta b tb =
   | Oge -> make_cmp Cge a ta b tb
 
 (** val make_field_access :
-    composite_env -> coq_type -> ident -> expr -> expr res **)
+    composite_env -> coq_type -> ident -> expr -> (expr * bitfield) res **)
 
 let make_field_access ce ty f a =
-  match ty with
-  | Tstruct (id, _) ->
-    (match PTree.get id ce with
-     | Some co ->
-       (match field_offset ce f co.co_members with
-        | OK x ->
-          OK
-            (if ptr64
-             then Ebinop (Oaddl, a, (make_longconst (Int64.repr x)))
-             else Ebinop (Cminor.Oadd, a, (make_intconst (Int.repr x))))
-        | Error msg0 -> Error msg0)
-     | None ->
-       Error ((MSG
-         ('U'::('n'::('d'::('e'::('f'::('i'::('n'::('e'::('d'::(' '::('s'::('t'::('r'::('u'::('c'::('t'::(' '::[])))))))))))))))))) :: ((CTX
-         id) :: [])))
-  | Tunion (_, _) -> OK a
-  | _ ->
-    Error
-      (msg
-        ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('f'::('i'::('e'::('l'::('d'::('_'::('a'::('c'::('c'::('e'::('s'::('s'::[]))))))))))))))))))))))))))
+  match match ty with
+        | Tstruct (id, _) ->
+          (match PTree.get id ce with
+           | Some co -> field_offset ce f co.co_members
+           | None ->
+             Error ((MSG
+               ('U'::('n'::('d'::('e'::('f'::('i'::('n'::('e'::('d'::(' '::('s'::('t'::('r'::('u'::('c'::('t'::(' '::[])))))))))))))))))) :: ((CTX
+               id) :: [])))
+        | Tunion (id, _) ->
+          (match PTree.get id ce with
+           | Some co -> union_field_offset ce f co.co_members
+           | None ->
+             Error ((MSG
+               ('U'::('n'::('d'::('e'::('f'::('i'::('n'::('e'::('d'::(' '::('u'::('n'::('i'::('o'::('n'::(' '::[]))))))))))))))))) :: ((CTX
+               id) :: [])))
+        | _ ->
+          Error
+            (msg
+              ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('m'::('a'::('k'::('e'::('_'::('f'::('i'::('e'::('l'::('d'::('_'::('a'::('c'::('c'::('e'::('s'::('s'::[])))))))))))))))))))))))))) with
+  | OK p ->
+    let (x, y) = p in
+    let a' =
+      if ptr64
+      then Ebinop (Oaddl, a, (make_longconst (Int64.repr x)))
+      else Ebinop (Cminor.Oadd, a, (make_intconst (Int.repr x)))
+    in
+    OK (a', y)
+  | Error msg0 -> Error msg0
 
 (** val transl_expr : composite_env -> Clight.expr -> expr res **)
 
@@ -570,13 +633,23 @@ let rec transl_expr ce = function
 | Econst_float (n, _) -> OK (make_floatconst n)
 | Econst_single (n, _) -> OK (make_singleconst n)
 | Econst_long (n, _) -> OK (make_longconst n)
-| Clight.Evar (id, ty) -> make_load (Eaddrof id) ty
+| Clight.Evar (id, ty) -> make_load (Eaddrof id) ty Full
 | Etempvar (id, _) -> OK (Evar id)
 | Ederef (b, ty) ->
   (match transl_expr ce b with
-   | OK x -> make_load x ty
+   | OK x -> make_load x ty Full
    | Error msg0 -> Error msg0)
-| Clight.Eaddrof (b, _) -> transl_lvalue ce b
+| Clight.Eaddrof (b, _) ->
+  (match transl_lvalue ce b with
+   | OK p ->
+     let (x, y) = p in
+     (match y with
+      | Full -> OK x
+      | Bits (_, _, _, _) ->
+        Error
+          (msg
+            ('C'::('s'::('h'::('m'::('g'::('e'::('n'::('.'::('t'::('r'::('a'::('n'::('s'::('l'::('_'::('e'::('x'::('p'::('r'::(':'::(' '::('a'::('d'::('d'::('r'::('o'::('f'::(' '::('b'::('i'::('t'::('f'::('i'::('e'::('l'::('d'::[]))))))))))))))))))))))))))))))))))))))
+   | Error msg0 -> Error msg0)
 | Clight.Eunop (op, b, _) ->
   (match transl_expr ce b with
    | OK x -> transl_unop op x (typeof b)
@@ -596,7 +669,7 @@ let rec transl_expr ce = function
   (match transl_expr ce b with
    | OK x ->
      (match make_field_access ce (typeof b) i x with
-      | OK x0 -> make_load x0 ty
+      | OK p -> let (x0, y) = p in make_load x0 ty y
       | Error msg0 -> Error msg0)
    | Error msg0 -> Error msg0)
 | Esizeof (ty', _) ->
@@ -608,11 +681,15 @@ let rec transl_expr ce = function
    | OK x -> OK (make_ptrofsconst x)
    | Error msg0 -> Error msg0)
 
-(** val transl_lvalue : composite_env -> Clight.expr -> expr res **)
+(** val transl_lvalue :
+    composite_env -> Clight.expr -> (expr * bitfield) res **)
 
 and transl_lvalue ce = function
-| Clight.Evar (id, _) -> OK (Eaddrof id)
-| Ederef (b, _) -> transl_expr ce b
+| Clight.Evar (id, _) -> OK ((Eaddrof id), Full)
+| Ederef (b, _) ->
+  (match transl_expr ce b with
+   | OK x -> OK (x, Full)
+   | Error msg0 -> Error msg0)
 | Efield (b, i, _) ->
   (match transl_expr ce b with
    | OK x -> make_field_access ce (typeof b) i x
@@ -707,11 +784,12 @@ let rec transl_statement ce tyret nbrk ncnt = function
 | Clight.Sskip -> OK Sskip
 | Clight.Sassign (b, c) ->
   (match transl_lvalue ce b with
-   | OK x ->
+   | OK p ->
+     let (x, y) = p in
      (match transl_expr ce c with
       | OK x0 ->
         (match make_cast (typeof c) (typeof b) x0 with
-         | OK x1 -> make_store ce x (typeof b) x1
+         | OK x1 -> make_store ce x (typeof b) y x1
          | Error msg0 -> Error msg0)
       | Error msg0 -> Error msg0)
    | Error msg0 -> Error msg0)

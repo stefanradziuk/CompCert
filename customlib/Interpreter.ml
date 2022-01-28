@@ -109,25 +109,27 @@ module Make =
          pop q stack_rec (Obj.magic action sem_conv))
 
   type step_result =
-  | Fail_sr
+  | Fail_sr_full of A.state * A.Gram.token
   | Accept_sr of A.Gram.symbol_semantic_type * buffer
   | Progress_sr of stack * buffer
 
   (** val step_result_rect :
-      A.initstate -> 'a1 -> (A.Gram.symbol_semantic_type -> buffer -> 'a1) ->
-      (stack -> buffer -> 'a1) -> step_result -> 'a1 **)
+      A.initstate -> (A.state -> A.Gram.token -> 'a1) ->
+      (A.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1 **)
 
   let step_result_rect _ f f0 f1 = function
-  | Fail_sr -> f
+  | Fail_sr_full (x, x0) -> f x x0
   | Accept_sr (x, x0) -> f0 x x0
   | Progress_sr (x, x0) -> f1 x x0
 
   (** val step_result_rec :
-      A.initstate -> 'a1 -> (A.Gram.symbol_semantic_type -> buffer -> 'a1) ->
-      (stack -> buffer -> 'a1) -> step_result -> 'a1 **)
+      A.initstate -> (A.state -> A.Gram.token -> 'a1) ->
+      (A.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1 **)
 
   let step_result_rec _ f f0 f1 = function
-  | Fail_sr -> f
+  | Fail_sr_full (x, x0) -> f x x0
   | Accept_sr (x, x0) -> f0 x x0
   | Progress_sr (x, x0) -> f1 x x0
 
@@ -162,7 +164,8 @@ module Make =
          Progress_sr (((Coq_existT (state_new, sem_conv)) :: stk),
          (buf_tail buffer0))
        | A.Reduce_act prod -> reduce_step init stk prod buffer0
-       | A.Fail_act -> Fail_sr)
+       | A.Fail_act ->
+         Fail_sr_full ((state_of_stack init stk), (buf_head buffer0)))
 
   (** val parse_fix : A.initstate -> stack -> buffer -> nat -> step_result **)
 
@@ -174,23 +177,25 @@ module Make =
      | x -> x)
 
   type 'a parse_result =
-  | Fail_pr
+  | Fail_pr_full of A.state * A.Gram.token
   | Timeout_pr
   | Parsed_pr of 'a * buffer
 
   (** val parse_result_rect :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2 **)
+      (A.state -> A.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2) ->
+      'a1 parse_result -> 'a2 **)
 
   let parse_result_rect f f0 f1 = function
-  | Fail_pr -> f
+  | Fail_pr_full (x, x0) -> f x x0
   | Timeout_pr -> f0
   | Parsed_pr (x, x0) -> f1 x x0
 
   (** val parse_result_rec :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2 **)
+      (A.state -> A.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2) ->
+      'a1 parse_result -> 'a2 **)
 
   let parse_result_rec f f0 f1 = function
-  | Fail_pr -> f
+  | Fail_pr_full (x, x0) -> f x x0
   | Timeout_pr -> f0
   | Parsed_pr (x, x0) -> f1 x x0
 
@@ -199,7 +204,7 @@ module Make =
 
   let parse init buffer0 log_n_steps =
     match parse_fix init [] buffer0 log_n_steps with
-    | Fail_sr -> Fail_pr
+    | Fail_sr_full (st, tok) -> Fail_pr_full (st, tok)
     | Accept_sr (sem, buffer') -> Parsed_pr (sem, buffer')
     | Progress_sr (_, _) -> Timeout_pr
  end

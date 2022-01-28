@@ -17,6 +17,8 @@ val zle : coq_Z -> coq_Z -> bool
 
 val align : coq_Z -> coq_Z -> coq_Z
 
+val floor : coq_Z -> coq_Z -> coq_Z
+
 val option_eq : ('a1 -> 'a1 -> bool) -> 'a1 option -> 'a1 option -> bool
 
 val option_map : ('a1 -> 'a2) -> 'a1 option -> 'a2 option
@@ -36,7 +38,5 @@ val list_fold_right : ('a1 -> 'a2 -> 'a2) -> 'a1 list -> 'a2 -> 'a2
 val list_disjoint_dec : ('a1 -> 'a1 -> bool) -> 'a1 list -> 'a1 list -> bool
 
 val list_norepet_dec : ('a1 -> 'a1 -> bool) -> 'a1 list -> bool
-
-val list_repeat : nat -> 'a1 -> 'a1 list
 
 

@@ -27,7 +27,7 @@ type expr =
 | Ecomma of expr * expr * coq_type
 | Ecall of expr * exprlist * coq_type
 | Ebuiltin of external_function * typelist * exprlist * coq_type
-| Eloc of block * Ptrofs.int * coq_type
+| Eloc of block * Ptrofs.int * bitfield * coq_type
 | Eparen of expr * coq_type * coq_type
 and exprlist =
 | Enil

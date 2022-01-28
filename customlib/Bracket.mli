@@ -1,11 +1,8 @@
 open BinInt
 open BinNums
 open Datatypes
+open SpecFloatCompat
 open Zbool
-
-type location =
-| Coq_loc_Exact
-| Coq_loc_Inexact of comparison
 
 val new_location_even : coq_Z -> coq_Z -> location -> location
 

@@ -1,5 +1,6 @@
 open AST
 open Archi
+open BinInt
 open BinNums
 open Coqlib
 open Ctypes
@@ -1220,3 +1221,40 @@ let incrdecr_type ty =
   | Tfloat (sz, _) -> Tfloat (sz, noattr)
   | Tpointer (ty0, a) -> Tpointer (ty0, a)
   | _ -> Tvoid
+
+(** val chunk_for_carrier : intsize -> memory_chunk **)
+
+let chunk_for_carrier = function
+| I16 -> Mint16unsigned
+| I32 -> Mint32
+| _ -> Mint8unsigned
+
+(** val bitsize_carrier : intsize -> coq_Z **)
+
+let bitsize_carrier = function
+| I16 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))
+| I32 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH)))))
+| _ -> Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH)))
+
+(** val first_bit : intsize -> coq_Z -> coq_Z -> coq_Z **)
+
+let first_bit sz pos width =
+  if big_endian then Z.sub (Z.sub (bitsize_carrier sz) pos) width else pos
+
+(** val bitfield_extract :
+    intsize -> signedness -> coq_Z -> coq_Z -> Int.int -> Int.int **)
+
+let bitfield_extract sz sg pos width c =
+  if (||) ((fun x -> x) (intsize_eq sz IBool))
+       ((fun x -> x) (signedness_eq sg Unsigned))
+  then Int.unsigned_bitfield_extract (first_bit sz pos width) width c
+  else Int.signed_bitfield_extract (first_bit sz pos width) width c
+
+(** val bitfield_normalize :
+    intsize -> signedness -> coq_Z -> Int.int -> Int.int **)
+
+let bitfield_normalize sz sg width n =
+  if (||) ((fun x -> x) (intsize_eq sz IBool))
+       ((fun x -> x) (signedness_eq sg Unsigned))
+  then Int.zero_ext width n
+  else Int.sign_ext width n

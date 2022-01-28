@@ -1,7 +1,7 @@
 open BinInt
 open BinNums
-open Bracket
 open Datatypes
+open SpecFloatCompat
 
 val cond_incr : bool -> coq_Z -> coq_Z
 

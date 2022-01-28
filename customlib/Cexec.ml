@@ -29,10 +29,11 @@ let is_val = function
 | Eval (v, ty) -> Some (v, ty)
 | _ -> None
 
-(** val is_loc : expr -> ((block * Ptrofs.int) * coq_type) option **)
+(** val is_loc :
+    expr -> (((block * Ptrofs.int) * bitfield) * coq_type) option **)
 
 let is_loc = function
-| Eloc (b, ofs, ty) -> Some ((b, ofs), ty)
+| Eloc (b, ofs, bf, ty) -> Some (((b, ofs), bf), ty)
 | _ -> None
 
 (** val is_val_list : exprlist -> (coq_val * coq_type) list option **)
@@ -130,7 +131,7 @@ let do_volatile_load ge w chunk m b ofs =
 
 (** val do_volatile_store :
     genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int ->
-    coq_val -> ((world * trace) * Mem.mem) option **)
+    coq_val -> (((world * trace) * Mem.mem) * coq_val) option **)
 
 let do_volatile_store ge w chunk m b ofs v =
   if Genv.block_is_volatile ge.genv_genv b
@@ -141,28 +142,54 @@ let do_volatile_store ge w chunk m b ofs v =
            | Some ev ->
              (match nextworld_vstore w chunk id ofs ev with
               | Some w' ->
-                Some ((w', ((Event_vstore (chunk, id, ofs, ev)) :: [])), m)
+                Some (((w', ((Event_vstore (chunk, id, ofs, ev)) :: [])), m),
+                  v)
               | None -> None)
            | None -> None)
         | None -> None)
   else (match Mem.store chunk m b (Ptrofs.unsigned ofs) v with
-        | Some m' -> Some ((w, coq_E0), m')
+        | Some m' -> Some (((w, coq_E0), m'), v)
         | None -> None)
 
 (** val do_deref_loc :
-    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int ->
-    ((world * trace) * coq_val) option **)
+    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield
+    -> ((world * trace) * coq_val) option **)
 
-let do_deref_loc ge w ty m b ofs =
-  match access_mode ty with
-  | By_value chunk ->
-    if type_is_volatile ty
-    then do_volatile_load ge w chunk m b ofs
-    else (match Mem.loadv chunk m (Vptr (b, ofs)) with
-          | Some v -> Some ((w, coq_E0), v)
-          | None -> None)
-  | By_nothing -> None
-  | _ -> Some ((w, coq_E0), (Vptr (b, ofs)))
+let do_deref_loc ge w ty m b ofs = function
+| Full ->
+  (match access_mode ty with
+   | By_value chunk ->
+     if type_is_volatile ty
+     then do_volatile_load ge w chunk m b ofs
+     else (match Mem.loadv chunk m (Vptr (b, ofs)) with
+           | Some v -> Some ((w, coq_E0), v)
+           | None -> None)
+   | By_nothing -> None
+   | _ -> Some ((w, coq_E0), (Vptr (b, ofs))))
+| Bits (sz, sg, pos, width) ->
+  (match ty with
+   | Tint (sz1, sg1, _) ->
+     if (&&)
+          ((&&)
+            ((&&)
+              ((&&)
+                ((&&) ((fun x -> x) (intsize_eq sz1 sz))
+                  ((fun x -> x)
+                    (signedness_eq sg1
+                      (if zlt width (bitsize_intsize sz) then Signed else sg))))
+                ((fun x -> x) (zle Z0 pos))) ((fun x -> x) (zlt Z0 width)))
+            ((fun x -> x) (zle width (bitsize_intsize sz))))
+          ((fun x -> x) (zle (Z.add pos width) (bitsize_carrier sz)))
+     then (match Mem.loadv (chunk_for_carrier sz) m (Vptr (b, ofs)) with
+           | Some v ->
+             (match v with
+              | Vint c ->
+                Some ((w, coq_E0), (Vint
+                  (bitfield_extract sz sg pos width c)))
+              | _ -> None)
+           | None -> None)
+     else None
+   | _ -> None)
 
 (** val check_assign_copy :
     genv -> coq_type -> block -> Ptrofs.int -> block -> Ptrofs.int -> bool **)
@@ -198,31 +225,67 @@ let check_assign_copy ge ty b ofs b' ofs' =
   else false
 
 (** val do_assign_loc :
-    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> coq_val ->
-    ((world * trace) * Mem.mem) option **)
+    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield
+    -> coq_val -> (((world * trace) * Mem.mem) * coq_val) option **)
 
-let do_assign_loc ge w ty m b ofs v =
-  match access_mode ty with
-  | By_value chunk ->
-    if type_is_volatile ty
-    then do_volatile_store ge w chunk m b ofs v
-    else (match Mem.storev chunk m (Vptr (b, ofs)) v with
-          | Some m' -> Some ((w, coq_E0), m')
-          | None -> None)
-  | By_copy ->
-    (match v with
-     | Vptr (b', ofs') ->
-       if check_assign_copy ge ty b ofs b' ofs'
-       then (match Mem.loadbytes m b' (Ptrofs.unsigned ofs')
-                     (sizeof ge.genv_cenv ty) with
-             | Some bytes ->
-               (match Mem.storebytes m b (Ptrofs.unsigned ofs) bytes with
-                | Some m' -> Some ((w, coq_E0), m')
-                | None -> None)
+let do_assign_loc ge w ty m b ofs bf v =
+  match bf with
+  | Full ->
+    (match access_mode ty with
+     | By_value chunk ->
+       if type_is_volatile ty
+       then do_volatile_store ge w chunk m b ofs v
+       else (match Mem.storev chunk m (Vptr (b, ofs)) v with
+             | Some m' -> Some (((w, coq_E0), m'), v)
              | None -> None)
-       else None
+     | By_copy ->
+       (match v with
+        | Vptr (b', ofs') ->
+          if check_assign_copy ge ty b ofs b' ofs'
+          then (match Mem.loadbytes m b' (Ptrofs.unsigned ofs')
+                        (sizeof ge.genv_cenv ty) with
+                | Some bytes ->
+                  (match Mem.storebytes m b (Ptrofs.unsigned ofs) bytes with
+                   | Some m' -> Some (((w, coq_E0), m'), v)
+                   | None -> None)
+                | None -> None)
+          else None
+        | _ -> None)
      | _ -> None)
-  | _ -> None
+  | Bits (sz, sg, pos, width) ->
+    if (&&)
+         ((&&)
+           ((&&) ((fun x -> x) (zle Z0 pos)) ((fun x -> x) (zlt Z0 width)))
+           ((fun x -> x) (zle width (bitsize_intsize sz))))
+         ((fun x -> x) (zle (Z.add pos width) (bitsize_carrier sz)))
+    then (match ty with
+          | Tint (sz1, sg1, _) ->
+            (match v with
+             | Vint n ->
+               (match Mem.loadv (chunk_for_carrier sz) m (Vptr (b, ofs)) with
+                | Some v0 ->
+                  (match v0 with
+                   | Vint c ->
+                     if (&&) ((fun x -> x) (intsize_eq sz1 sz))
+                          ((fun x -> x)
+                            (signedness_eq sg1
+                              (if zlt width (bitsize_intsize sz)
+                               then Signed
+                               else sg)))
+                     then (match Mem.storev (chunk_for_carrier sz) m (Vptr
+                                   (b, ofs)) (Vint
+                                   (Int.bitfield_insert
+                                     (first_bit sz pos width) width c n)) with
+                           | Some m' ->
+                             Some (((w, coq_E0), m'), (Vint
+                               (bitfield_normalize sz sg width n)))
+                           | None -> None)
+                     else None
+                   | _ -> None)
+                | None -> None)
+             | _ -> None)
+          | _ -> None)
+    else None
 
 (** val do_ef_volatile_load :
     genv -> memory_chunk -> world -> coq_val list -> Mem.mem ->
@@ -258,7 +321,9 @@ let do_ef_volatile_store ge chunk w vargs m =
           (match l0 with
            | [] ->
              (match do_volatile_store ge w chunk m b ofs v with
-              | Some p -> let (p0, m') = p in Some ((p0, Vundef), m')
+              | Some p ->
+                let (p0, _) = p in
+                let (p1, m') = p0 in Some ((p1, Vundef), m')
               | None -> None)
            | _ :: _ -> None))
      | _ -> None)
@@ -539,14 +604,14 @@ let step_expr ge do_external_function do_inline_assembly e w =
             if type_eq ty ty'
             then topred (Lred
                    (('r'::('e'::('d'::('_'::('v'::('a'::('r'::('_'::('l'::('o'::('c'::('a'::('l'::[]))))))))))))),
-                   (Eloc (b, Ptrofs.zero, ty)), m))
+                   (Eloc (b, Ptrofs.zero, Full, ty)), m))
             else stuck
           | None ->
             (match Genv.find_symbol ge.genv_genv x with
              | Some b ->
                topred (Lred
                  (('r'::('e'::('d'::('_'::('v'::('a'::('r'::('_'::('g'::('l'::('o'::('b'::('a'::('l'::[])))))))))))))),
-                 (Eloc (b, Ptrofs.zero, ty)), m))
+                 (Eloc (b, Ptrofs.zero, Full, ty)), m))
              | None -> stuck))
        | Efield (r, f, ty) ->
          (match is_val r with
@@ -559,19 +624,25 @@ let step_expr ge do_external_function do_inline_assembly e w =
                   (match PTree.get id ge.genv_cenv with
                    | Some co ->
                      (match field_offset ge.genv_cenv f co.co_members with
-                      | OK delta ->
+                      | OK p0 ->
+                        let (delta, bf) = p0 in
                         topred (Lred
                           (('r'::('e'::('d'::('_'::('f'::('i'::('e'::('l'::('d'::('_'::('s'::('t'::('r'::('u'::('c'::('t'::[])))))))))))))))),
-                          (Eloc (b, (Ptrofs.add ofs (Ptrofs.repr delta)),
+                          (Eloc (b, (Ptrofs.add ofs (Ptrofs.repr delta)), bf,
                           ty)), m))
                       | Error _ -> stuck)
                    | None -> stuck)
                 | Tunion (id, _) ->
                   (match PTree.get id ge.genv_cenv with
-                   | Some _ ->
-                     topred (Lred
-                       (('r'::('e'::('d'::('_'::('f'::('i'::('e'::('l'::('d'::('_'::('u'::('n'::('i'::('o'::('n'::[]))))))))))))))),
-                       (Eloc (b, ofs, ty)), m))
+                   | Some co ->
+                     (match union_field_offset ge.genv_cenv f co.co_members with
+                      | OK p0 ->
+                        let (delta, bf) = p0 in
+                        topred (Lred
+                          (('r'::('e'::('d'::('_'::('f'::('i'::('e'::('l'::('d'::('_'::('u'::('n'::('i'::('o'::('n'::[]))))))))))))))),
+                          (Eloc (b, (Ptrofs.add ofs (Ptrofs.repr delta)), bf,
+                          ty)), m))
+                      | Error _ -> stuck)
                    | None -> stuck)
                 | _ -> stuck)
              | _ -> stuck)
@@ -584,10 +655,10 @@ let step_expr ge do_external_function do_inline_assembly e w =
              | Vptr (b, ofs) ->
                topred (Lred
                  (('r'::('e'::('d'::('_'::('d'::('e'::('r'::('e'::('f'::[]))))))))),
-                 (Eloc (b, ofs, ty)), m))
+                 (Eloc (b, ofs, Full, ty)), m))
              | _ -> stuck)
           | None -> incontext (fun x -> Ederef (x, ty)) (step_expr0 RV r m))
-       | Eloc (_, _, _) -> []
+       | Eloc (_, _, _, _) -> []
        | _ -> stuck)
     | RV ->
       (match a with
@@ -596,12 +667,13 @@ let step_expr ge do_external_function do_inline_assembly e w =
          (match is_loc l with
           | Some p ->
             let (p0, ty') = p in
-            let (b, ofs) = p0 in
+            let (p1, bf) = p0 in
+            let (b, ofs) = p1 in
             if type_eq ty ty'
-            then (match do_deref_loc ge w ty m b ofs with
-                  | Some p1 ->
-                    let (p2, v) = p1 in
-                    let (_, t0) = p2 in
+            then (match do_deref_loc ge w ty m b ofs bf with
+                  | Some p2 ->
+                    let (p3, v) = p2 in
+                    let (_, t0) = p3 in
                     topred (Rred
                       (('r'::('e'::('d'::('_'::('r'::('v'::('a'::('l'::('o'::('f'::[])))))))))),
                       (Eval (v, ty)), m, t0))
@@ -612,10 +684,14 @@ let step_expr ge do_external_function do_inline_assembly e w =
          (match is_loc l with
           | Some p ->
             let (p0, _) = p in
-            let (b, ofs) = p0 in
-            topred (Rred
-              (('r'::('e'::('d'::('_'::('a'::('d'::('d'::('r'::('o'::('f'::[])))))))))),
-              (Eval ((Vptr (b, ofs)), ty)), m, coq_E0))
+            let (p1, bf) = p0 in
+            let (b, ofs) = p1 in
+            (match bf with
+             | Full ->
+               topred (Rred
+                 (('r'::('e'::('d'::('_'::('a'::('d'::('d'::('r'::('o'::('f'::[])))))))))),
+                 (Eval ((Vptr (b, ofs)), ty)), m, coq_E0))
+             | Bits (_, _, _, _) -> stuck)
           | None -> incontext (fun x -> Eaddrof (x, ty)) (step_expr0 LV l m))
        | Eunop (op, r1, ty) ->
          (match is_val r1 with
@@ -719,20 +795,22 @@ let step_expr ge do_external_function do_inline_assembly e w =
          (match is_loc l1 with
           | Some p ->
             let (p0, ty1) = p in
-            let (b, ofs) = p0 in
+            let (p1, bf) = p0 in
+            let (b, ofs) = p1 in
             (match is_val r2 with
-             | Some p1 ->
-               let (v2, ty2) = p1 in
+             | Some p2 ->
+               let (v2, ty2) = p2 in
                if type_eq ty1 ty
                then (match sem_cast v2 ty2 ty1 m with
                      | Some v ->
-                       (match do_assign_loc ge w ty1 m b ofs v with
-                        | Some p2 ->
-                          let (p3, m') = p2 in
-                          let (_, t0) = p3 in
+                       (match do_assign_loc ge w ty1 m b ofs bf v with
+                        | Some p3 ->
+                          let (p4, v') = p3 in
+                          let (p5, m') = p4 in
+                          let (_, t0) = p5 in
                           topred (Rred
                             (('r'::('e'::('d'::('_'::('a'::('s'::('s'::('i'::('g'::('n'::[])))))))))),
-                            (Eval (v, ty)), m', t0))
+                            (Eval (v', ty)), m', t0))
                         | None -> stuck)
                      | None -> stuck)
                else stuck
@@ -746,17 +824,19 @@ let step_expr ge do_external_function do_inline_assembly e w =
          (match is_loc l1 with
           | Some p ->
             let (p0, ty1) = p in
-            let (b, ofs) = p0 in
+            let (p1, bf) = p0 in
+            let (b, ofs) = p1 in
             (match is_val r2 with
-             | Some p1 ->
-               let (v2, ty2) = p1 in
+             | Some p2 ->
+               let (v2, ty2) = p2 in
                if type_eq ty1 ty
-               then (match do_deref_loc ge w ty1 m b ofs with
-                     | Some p2 ->
-                       let (p3, v1) = p2 in
-                       let (_, t0) = p3 in
-                       let r' = Eassign ((Eloc (b, ofs, ty1)), (Ebinop (op,
-                         (Eval (v1, ty1)), (Eval (v2, ty2)), tyres)), ty1)
+               then (match do_deref_loc ge w ty1 m b ofs bf with
+                     | Some p3 ->
+                       let (p4, v1) = p3 in
+                       let (_, t0) = p4 in
+                       let r' = Eassign ((Eloc (b, ofs, bf, ty1)), (Ebinop
+                         (op, (Eval (v1, ty1)), (Eval (v2, ty2)), tyres)),
+                         ty1)
                        in
                        topred (Rred
                          (('r'::('e'::('d'::('_'::('a'::('s'::('s'::('i'::('g'::('n'::('o'::('p'::[])))))))))))),
@@ -775,17 +855,18 @@ let step_expr ge do_external_function do_inline_assembly e w =
          (match is_loc l with
           | Some p ->
             let (p0, ty1) = p in
-            let (b, ofs) = p0 in
+            let (p1, bf) = p0 in
+            let (b, ofs) = p1 in
             if type_eq ty1 ty
-            then (match do_deref_loc ge w ty m b ofs with
-                  | Some p1 ->
-                    let (p2, v1) = p1 in
-                    let (_, t0) = p2 in
+            then (match do_deref_loc ge w ty m b ofs bf with
+                  | Some p2 ->
+                    let (p3, v1) = p2 in
+                    let (_, t0) = p3 in
                     let op = match id with
                              | Incr -> Oadd
                              | Decr -> Osub in
-                    let r' = Ecomma ((Eassign ((Eloc (b, ofs, ty)), (Ebinop
-                      (op, (Eval (v1, ty)), (Eval ((Vint Int.one),
+                    let r' = Ecomma ((Eassign ((Eloc (b, ofs, bf, ty)),
+                      (Ebinop (op, (Eval (v1, ty)), (Eval ((Vint Int.one),
                       type_int32s)), (incrdecr_type ty))), ty)), (Eval (v1,
                       ty)), ty)
                     in
@@ -902,10 +983,11 @@ let rec sem_bind_parameters ge w e m l lv =
         | Some p0 ->
           let (b, ty') = p0 in
           if type_eq ty ty'
-          then (match do_assign_loc ge w ty m b Ptrofs.zero v1 with
+          then (match do_assign_loc ge w ty m b Ptrofs.zero Full v1 with
                 | Some p1 ->
-                  let (p2, m1) = p1 in
-                  let (_, t0) = p2 in
+                  let (p2, _) = p1 in
+                  let (p3, m1) = p2 in
+                  let (_, t0) = p3 in
                   (match t0 with
                    | [] -> sem_bind_parameters ge w e m1 params lv0
                    | _ :: _ -> None)

@@ -61,6 +61,7 @@ and parameter =
 | PARAM of spec_elem list * String.t option * decl_type * attribute list * loc
 and field_group =
 | Field_group of spec_elem list * (name option * expression option) list * loc
+| Field_group_static_assert of expression * loc * constant * loc * loc
 and name =
 | Name of String.t * decl_type * attribute list * loc
 and init_name =
@@ -159,6 +160,7 @@ type definition =
 | FUNDEF of spec_elem list * name * definition list * statement * loc
 | DECDEF of init_name_group * loc
 | PRAGMA of String.t * loc
+| STATIC_ASSERT of expression * loc * constant * loc * loc
 and statement =
 | NOP of loc
 | COMPUTATION of expression * loc

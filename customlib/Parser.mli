@@ -28,6 +28,7 @@ module Coq__1 : sig
  | SUB_ASSIGN of loc
  | STRUCT of loc
  | STRING_LITERAL of ((bool * char_code list) * loc)
+ | STATIC_ASSERT of loc
  | STATIC of loc
  | STAR of loc
  | SLASH of loc
@@ -196,6 +197,7 @@ module Gram :
   | SLASH't
   | STAR't
   | STATIC't
+  | STATIC_ASSERT't
   | STRING_LITERAL't
   | STRUCT't
   | SUB_ASSIGN't
@@ -293,6 +295,7 @@ module Gram :
   | Coq_specifier_qualifier_list'nt
   | Coq_statement_dangerous'nt
   | Coq_statement_safe'nt
+  | Coq_static_assert_declaration'nt
   | Coq_storage_class_specifier'nt
   | Coq_struct_declaration'nt
   | Coq_struct_declaration_list'nt
@@ -392,6 +395,7 @@ module Gram :
   | Prod'struct_declarator'0
   | Prod'struct_declaration_list'1
   | Prod'struct_declaration_list'0
+  | Prod'struct_declaration'2
   | Prod'struct_declaration'1
   | Prod'struct_declaration'0
   | Prod'storage_class_specifier'4
@@ -399,6 +403,7 @@ module Gram :
   | Prod'storage_class_specifier'2
   | Prod'storage_class_specifier'1
   | Prod'storage_class_specifier'0
+  | Prod'static_assert_declaration'0
   | Prod'statement_safe'6
   | Prod'statement_safe'5
   | Prod'statement_safe'4
@@ -594,6 +599,7 @@ module Gram :
   | Prod'declaration_specifiers'0
   | Prod'declaration_list'1
   | Prod'declaration_list'0
+  | Prod'declaration'2
   | Prod'declaration'1
   | Prod'declaration'0
   | Prod'constant_expression'0
@@ -797,6 +803,7 @@ module Aut :
     | SLASH't
     | STAR't
     | STATIC't
+    | STATIC_ASSERT't
     | STRING_LITERAL't
     | STRUCT't
     | SUB_ASSIGN't
@@ -894,6 +901,7 @@ module Aut :
     | Coq_specifier_qualifier_list'nt
     | Coq_statement_dangerous'nt
     | Coq_statement_safe'nt
+    | Coq_static_assert_declaration'nt
     | Coq_storage_class_specifier'nt
     | Coq_struct_declaration'nt
     | Coq_struct_declaration_list'nt
@@ -995,6 +1003,7 @@ module Aut :
     | Prod'struct_declarator'0
     | Prod'struct_declaration_list'1
     | Prod'struct_declaration_list'0
+    | Prod'struct_declaration'2
     | Prod'struct_declaration'1
     | Prod'struct_declaration'0
     | Prod'storage_class_specifier'4
@@ -1002,6 +1011,7 @@ module Aut :
     | Prod'storage_class_specifier'2
     | Prod'storage_class_specifier'1
     | Prod'storage_class_specifier'0
+    | Prod'static_assert_declaration'0
     | Prod'statement_safe'6
     | Prod'statement_safe'5
     | Prod'statement_safe'4
@@ -1197,6 +1207,7 @@ module Aut :
     | Prod'declaration_specifiers'0
     | Prod'declaration_list'1
     | Prod'declaration_list'0
+    | Prod'declaration'2
     | Prod'declaration'1
     | Prod'declaration'0
     | Prod'constant_expression'0
@@ -1397,6 +1408,7 @@ module Aut :
     | SLASH't
     | STAR't
     | STATIC't
+    | STATIC_ASSERT't
     | STRING_LITERAL't
     | STRUCT't
     | SUB_ASSIGN't
@@ -1494,6 +1506,7 @@ module Aut :
     | Coq_specifier_qualifier_list'nt
     | Coq_statement_dangerous'nt
     | Coq_statement_safe'nt
+    | Coq_static_assert_declaration'nt
     | Coq_storage_class_specifier'nt
     | Coq_struct_declaration'nt
     | Coq_struct_declaration_list'nt
@@ -1595,6 +1608,7 @@ module Aut :
     | Prod'struct_declarator'0
     | Prod'struct_declaration_list'1
     | Prod'struct_declaration_list'0
+    | Prod'struct_declaration'2
     | Prod'struct_declaration'1
     | Prod'struct_declaration'0
     | Prod'storage_class_specifier'4
@@ -1602,6 +1616,7 @@ module Aut :
     | Prod'storage_class_specifier'2
     | Prod'storage_class_specifier'1
     | Prod'storage_class_specifier'0
+    | Prod'static_assert_declaration'0
     | Prod'statement_safe'6
     | Prod'statement_safe'5
     | Prod'statement_safe'4
@@ -1797,6 +1812,7 @@ module Aut :
     | Prod'declaration_specifiers'0
     | Prod'declaration_list'1
     | Prod'declaration_list'0
+    | Prod'declaration'2
     | Prod'declaration'1
     | Prod'declaration'0
     | Prod'constant_expression'0
@@ -1918,6 +1934,15 @@ module Aut :
   val first_nterm : Coq__2.nonterminal -> Coq__2.terminal list
 
   type noninitstate' =
+  | Nis'621
+  | Nis'620
+  | Nis'619
+  | Nis'618
+  | Nis'617
+  | Nis'616
+  | Nis'615
+  | Nis'614
+  | Nis'613
   | Nis'612
   | Nis'611
   | Nis'610
@@ -2164,7 +2189,6 @@ module Aut :
   | Nis'369
   | Nis'368
   | Nis'367
-  | Nis'366
   | Nis'365
   | Nis'364
   | Nis'363
@@ -2172,6 +2196,7 @@ module Aut :
   | Nis'361
   | Nis'360
   | Nis'359
+  | Nis'358
   | Nis'357
   | Nis'356
   | Nis'355
@@ -2602,6 +2627,8 @@ module Aut :
   val past_state_of_non_init_state : noninitstate -> (state -> bool) list
 
   val items_of_state : state -> item list
+
+  val coq_N_of_state : state -> coq_N
  end
 
 module MenhirLibParser :
@@ -2665,17 +2692,19 @@ module MenhirLibParser :
     val pop : Aut.Gram.symbol list -> stack -> 'a1 arrows_right -> stack * 'a1
 
     type step_result =
-    | Fail_sr
+    | Fail_sr_full of Aut.state * Aut.Gram.token
     | Accept_sr of Aut.Gram.symbol_semantic_type * buffer
     | Progress_sr of stack * buffer
 
     val step_result_rect :
-      Aut.initstate -> 'a1 -> (Aut.Gram.symbol_semantic_type -> buffer ->
-      'a1) -> (stack -> buffer -> 'a1) -> step_result -> 'a1
+      Aut.initstate -> (Aut.state -> Aut.Gram.token -> 'a1) ->
+      (Aut.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1
 
     val step_result_rec :
-      Aut.initstate -> 'a1 -> (Aut.Gram.symbol_semantic_type -> buffer ->
-      'a1) -> (stack -> buffer -> 'a1) -> step_result -> 'a1
+      Aut.initstate -> (Aut.state -> Aut.Gram.token -> 'a1) ->
+      (Aut.Gram.symbol_semantic_type -> buffer -> 'a1) -> (stack -> buffer ->
+      'a1) -> step_result -> 'a1
 
     val reduce_step :
       Aut.initstate -> stack -> Aut.Gram.production -> buffer -> step_result
@@ -2685,15 +2714,17 @@ module MenhirLibParser :
     val parse_fix : Aut.initstate -> stack -> buffer -> nat -> step_result
 
     type 'a parse_result =
-    | Fail_pr
+    | Fail_pr_full of Aut.state * Aut.Gram.token
     | Timeout_pr
     | Parsed_pr of 'a * buffer
 
     val parse_result_rect :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2
+      (Aut.state -> Aut.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2)
+      -> 'a1 parse_result -> 'a2
 
     val parse_result_rec :
-      'a2 -> 'a2 -> ('a1 -> buffer -> 'a2) -> 'a1 parse_result -> 'a2
+      (Aut.state -> Aut.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2)
+      -> 'a1 parse_result -> 'a2
 
     val parse :
       Aut.initstate -> buffer -> nat -> Aut.Gram.symbol_semantic_type

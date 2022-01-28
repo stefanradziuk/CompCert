@@ -3,6 +3,7 @@ open BinNums
 open BinPos
 open Binary
 open Datatypes
+open SpecFloatCompat
 open ZArith_dec
 open Zaux
 

@@ -1,5 +1,6 @@
 open AST
 open Archi
+open BinInt
 open BinNat
 open Cop
 open Coqlib
@@ -9,7 +10,6 @@ open Errors
 open Floats
 open Integers
 open Maps
-open Ring
 open Values
 
 val strict : bool

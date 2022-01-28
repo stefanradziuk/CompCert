@@ -17,6 +17,7 @@ type token =
   | SUB_ASSIGN of (Cabs.loc)
   | STRUCT of (Cabs.loc)
   | STRING_LITERAL of (bool * int64 list * Cabs.loc)
+  | STATIC_ASSERT of (Cabs.loc)
   | STATIC of (Cabs.loc)
   | STAR of (Cabs.loc)
   | SLASH of (Cabs.loc)

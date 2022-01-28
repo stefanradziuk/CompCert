@@ -101,3 +101,9 @@ let rec forallb f = function
 let rec filter f = function
 | [] -> []
 | x :: l0 -> if f x then x :: (filter f l0) else filter f l0
+
+(** val repeat : 'a1 -> nat -> 'a1 list **)
+
+let rec repeat x = function
+| O -> []
+| S k -> x :: (repeat x k)

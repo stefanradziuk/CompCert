@@ -1,4 +1,4 @@
-# 16 "cparser/Lexer.mll"
+# 17 "cparser/Lexer.mll"
  
 open Lexing
 open Pre_parser
@@ -21,6 +21,7 @@ let () =
       ("_Bool", fun loc -> UNDERSCORE_BOOL loc);
       ("_Complex", fun loc -> reserved_keyword loc "_Complex");
       ("_Imaginary", fun loc -> reserved_keyword loc "_Imaginary");
+      ("_Static_assert", fun loc -> STATIC_ASSERT loc);
       ("__alignof", fun loc -> ALIGNOF loc);
       ("__alignof__", fun loc -> ALIGNOF loc);
       ("__asm", fun loc -> ASM loc);
@@ -80,7 +81,8 @@ let () =
     (* We can ignore the __extension__ GCC keyword. *)
     ignored_keywords := SSet.add "__extension__" !ignored_keywords
 
-let init_ctx = SSet.singleton "__builtin_va_list"
+let init_ctx = SSet.of_list (List.map fst CBuiltins.builtins.C.builtin_typedefs)
+
 let types_context : SSet.t ref = ref init_ctx
 
 let _ =
@@ -143,7 +145,7 @@ let convert_escape = function
   | 'v' -> 11L (* vertical tab *)
   | c   -> Int64.of_int (Char.code c)
 
-# 147 "cparser/Lexer.ml"
+# 149 "cparser/Lexer.ml"
 let __ocaml_lex_tables = {
   Lexing.lex_base =
    "\000\000\195\255\196\255\091\000\199\255\200\255\201\255\202\255\
@@ -170,7 +172,7 @@ let __ocaml_lex_tables = {
     \128\030\151\030\255\255\189\030\212\030\250\030\017\031\055\031\
     \078\031\116\031\139\031\202\029\253\255\245\000\254\255\255\255\
     \211\029\254\255\255\255\188\031\252\255\253\255\227\000\061\029\
-    \212\031\243\000\167\029\222\031\020\032\212\029\075\030\244\000\
+    \212\031\243\000\167\029\222\031\021\032\212\029\075\030\244\000\
     \255\255\247\000\126\002\135\029\020\001\139\030\067\031\254\255\
     \021\001\152\001\252\255\253\255\254\255\102\000\255\255\023\001\
     \253\255\254\255\255\255";
@@ -1257,23 +1259,23 @@ let __ocaml_lex_tables = {
     \189\000\198\000\198\000\198\000\178\000\178\000\178\000\178\000\
     \178\000\178\000\000\000\000\000\196\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\198\000\000\000\
-    \197\000\000\000\000\000\000\000\000\000\195\000\195\000\195\000\
+    \197\000\000\000\000\000\000\000\195\000\195\000\195\000\195\000\
     \195\000\195\000\195\000\195\000\195\000\195\000\195\000\195\000\
     \195\000\195\000\195\000\195\000\195\000\195\000\195\000\195\000\
-    \000\000\000\000\000\000\000\000\000\000\196\000\189\000\196\000\
-    \196\000\196\000\000\000\000\000\000\000\000\000\000\000\000\000\
+    \000\000\000\000\000\000\000\000\000\000\000\000\196\000\189\000\
+    \196\000\196\000\196\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\191\000\000\000\000\000\000\000\
-    \000\000\000\000\000\000\000\000\196\000\000\000\000\000\000\000\
+    \000\000\000\000\000\000\000\000\000\000\196\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\188\000\194\000\195\000\195\000\195\000\
-    \195\000\195\000\195\000\195\000\195\000\195\000\000\000\000\000\
+    \195\000\195\000\195\000\195\000\195\000\195\000\195\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-    \000\000\000\000\000\000\000\000\194\000\000\000\000\000\000\000\
+    \000\000\000\000\000\000\000\000\000\000\194\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
@@ -1291,7 +1293,7 @@ let __ocaml_lex_tables = {
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-    \000\000\000\000\000\000\000\000\188\000";
+    \000\000\000\000\000\000\000\000\000\000\188\000";
   Lexing.lex_check =
    "\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\000\000\000\000\000\000\000\000\000\000\255\255\255\255\
@@ -2317,23 +2319,23 @@ let __ocaml_lex_tables = {
     \195\000\195\000\195\000\195\000\178\000\178\000\178\000\178\000\
     \178\000\178\000\255\255\255\255\192\000\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\195\000\255\255\
-    \195\000\255\255\255\255\255\255\255\255\192\000\192\000\192\000\
+    \195\000\255\255\255\255\255\255\192\000\192\000\192\000\192\000\
     \192\000\192\000\192\000\192\000\192\000\192\000\195\000\195\000\
     \195\000\195\000\195\000\195\000\195\000\195\000\195\000\195\000\
-    \255\255\255\255\255\255\255\255\255\255\196\000\196\000\196\000\
-    \196\000\196\000\255\255\255\255\255\255\255\255\255\255\255\255\
+    \255\255\255\255\255\255\255\255\255\255\255\255\196\000\196\000\
+    \196\000\196\000\196\000\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\187\000\255\255\255\255\255\255\
-    \255\255\255\255\255\255\255\255\196\000\255\255\255\255\255\255\
+    \255\255\255\255\255\255\255\255\255\255\196\000\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\206\000\192\000\196\000\196\000\196\000\
-    \196\000\196\000\196\000\196\000\196\000\196\000\255\255\255\255\
+    \196\000\196\000\196\000\196\000\196\000\196\000\196\000\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-    \255\255\255\255\255\255\255\255\196\000\255\255\255\255\255\255\
+    \255\255\255\255\255\255\255\255\255\255\196\000\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
@@ -2351,7 +2353,7 @@ let __ocaml_lex_tables = {
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-    \255\255\255\255\255\255\255\255\196\000";
+    \255\255\255\255\255\255\255\255\255\255\196\000";
   Lexing.lex_base_code =
    "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
@@ -2587,11 +2589,11 @@ let __ocaml_lex_tables = {
     \047\001\047\001\047\001\047\001\047\001\047\001\047\001\000\000\
     \000\000\036\001\036\001\036\001\036\001\036\001\036\001\044\001\
     \000\000\000\000\044\001\000\000\044\001\044\001\044\001\000\000\
-    \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
+    \000\000\000\000\000\000\000\000\000\000\000\000\000\000\047\001\
     \047\001\047\001\047\001\047\001\047\001\047\001\047\001\047\001\
     \047\001\044\001\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-    \000\000\000\000\047\001\047\001\047\001\047\001\047\001\047\001\
+    \000\000\047\001\047\001\047\001\047\001\047\001\047\001\047\001\
     \047\001\047\001\047\001\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
     \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
@@ -2766,11 +2768,11 @@ let __ocaml_lex_tables = {
     \195\000\195\000\195\000\195\000\195\000\195\000\195\000\255\255\
     \255\255\177\000\177\000\177\000\177\000\177\000\177\000\192\000\
     \255\255\255\255\196\000\255\255\196\000\196\000\196\000\255\255\
-    \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
+    \255\255\255\255\255\255\255\255\255\255\255\255\255\255\192\000\
     \192\000\192\000\192\000\192\000\192\000\192\000\192\000\192\000\
     \192\000\196\000\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-    \255\255\255\255\196\000\196\000\196\000\196\000\196\000\196\000\
+    \255\255\196\000\196\000\196\000\196\000\196\000\196\000\196\000\
     \196\000\196\000\196\000\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
     \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
@@ -2828,57 +2830,57 @@ let rec initial lexbuf =
 and __ocaml_lex_initial_rec lexbuf __ocaml_lex_state =
   match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 255 "cparser/Lexer.mll"
+# 258 "cparser/Lexer.mll"
                                   ( new_line lexbuf; initial_linebegin lexbuf )
-# 2834 "cparser/Lexer.ml"
+# 2836 "cparser/Lexer.ml"
 
   | 1 ->
-# 256 "cparser/Lexer.mll"
+# 259 "cparser/Lexer.mll"
                                   ( initial lexbuf )
-# 2839 "cparser/Lexer.ml"
+# 2841 "cparser/Lexer.ml"
 
   | 2 ->
-# 257 "cparser/Lexer.mll"
+# 260 "cparser/Lexer.mll"
                                   ( multiline_comment lexbuf; initial lexbuf )
-# 2844 "cparser/Lexer.ml"
+# 2846 "cparser/Lexer.ml"
 
   | 3 ->
-# 258 "cparser/Lexer.mll"
+# 261 "cparser/Lexer.mll"
                                   ( singleline_comment lexbuf; initial lexbuf )
-# 2849 "cparser/Lexer.ml"
+# 2851 "cparser/Lexer.ml"
 
   | 4 ->
 let
-# 259 "cparser/Lexer.mll"
+# 262 "cparser/Lexer.mll"
                         s
-# 2855 "cparser/Lexer.ml"
+# 2857 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 259 "cparser/Lexer.mll"
+# 262 "cparser/Lexer.mll"
                                   ( CONSTANT (Cabs.CONST_INT s, currentLoc lexbuf) )
-# 2859 "cparser/Lexer.ml"
+# 2861 "cparser/Lexer.ml"
 
   | 5 ->
 let
-# 210 "cparser/Lexer.mll"
+# 213 "cparser/Lexer.mll"
                                            suffix
-# 2865 "cparser/Lexer.ml"
+# 2867 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char_opt lexbuf lexbuf.Lexing.lex_mem.(6)
 and
-# 213 "cparser/Lexer.mll"
+# 216 "cparser/Lexer.mll"
                        intpart
-# 2870 "cparser/Lexer.ml"
+# 2872 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_opt lexbuf lexbuf.Lexing.lex_mem.(5) lexbuf.Lexing.lex_mem.(4)
 and
-# 213 "cparser/Lexer.mll"
+# 216 "cparser/Lexer.mll"
                                                         frac
-# 2875 "cparser/Lexer.ml"
+# 2877 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_opt lexbuf lexbuf.Lexing.lex_mem.(3) lexbuf.Lexing.lex_mem.(2)
 and
-# 216 "cparser/Lexer.mll"
+# 219 "cparser/Lexer.mll"
                                    expo
-# 2880 "cparser/Lexer.ml"
+# 2882 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_opt lexbuf lexbuf.Lexing.lex_mem.(1) lexbuf.Lexing.lex_mem.(0) in
-# 260 "cparser/Lexer.mll"
+# 263 "cparser/Lexer.mll"
                                   ( CONSTANT (Cabs.CONST_FLOAT
                                       {Cabs.isHex_FI = false;
                                        Cabs.integer_FI = intpart;
@@ -2889,30 +2891,30 @@ and
                                          | None -> None
                                          | Some c -> Some (String.make 1 c) },
                                       currentLoc lexbuf) )
-# 2893 "cparser/Lexer.ml"
+# 2895 "cparser/Lexer.ml"
 
   | 6 ->
 let
-# 210 "cparser/Lexer.mll"
+# 213 "cparser/Lexer.mll"
                                            suffix
-# 2899 "cparser/Lexer.ml"
+# 2901 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char_opt lexbuf lexbuf.Lexing.lex_mem.(6)
 and
-# 224 "cparser/Lexer.mll"
+# 227 "cparser/Lexer.mll"
                                    intpart
-# 2904 "cparser/Lexer.ml"
+# 2906 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_opt lexbuf lexbuf.Lexing.lex_mem.(5) lexbuf.Lexing.lex_mem.(4)
 and
-# 224 "cparser/Lexer.mll"
+# 227 "cparser/Lexer.mll"
                                                                                 frac
-# 2909 "cparser/Lexer.ml"
+# 2911 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_opt lexbuf lexbuf.Lexing.lex_mem.(3) lexbuf.Lexing.lex_mem.(2)
 and
-# 227 "cparser/Lexer.mll"
+# 230 "cparser/Lexer.mll"
                                    expo
-# 2914 "cparser/Lexer.ml"
+# 2916 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(1) lexbuf.Lexing.lex_mem.(0) in
-# 270 "cparser/Lexer.mll"
+# 273 "cparser/Lexer.mll"
                                   ( CONSTANT (Cabs.CONST_FLOAT
                                       {Cabs.isHex_FI = true;
                                        Cabs.integer_FI = intpart;
@@ -2923,304 +2925,304 @@ and
                                            | None -> None
                                            | Some c -> Some (String.make 1 c) },
                                       currentLoc lexbuf))
-# 2927 "cparser/Lexer.ml"
+# 2929 "cparser/Lexer.ml"
 
   | 7 ->
 let
-# 280 "cparser/Lexer.mll"
+# 283 "cparser/Lexer.mll"
                             s
-# 2933 "cparser/Lexer.ml"
+# 2935 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 280 "cparser/Lexer.mll"
+# 283 "cparser/Lexer.mll"
                                   ( error lexbuf "invalid numerical constant '%s'@ These characters form a preprocessor number, but not a constant" s;
                                     CONSTANT (Cabs.CONST_INT "0", currentLoc lexbuf) )
-# 2938 "cparser/Lexer.ml"
+# 2940 "cparser/Lexer.ml"
 
   | 8 ->
-# 282 "cparser/Lexer.mll"
+# 285 "cparser/Lexer.mll"
                                   ( let l = char_literal lexbuf.lex_start_p [] lexbuf in
                                     CONSTANT (Cabs.CONST_CHAR(false, l),
                                               currentLoc lexbuf) )
-# 2945 "cparser/Lexer.ml"
+# 2947 "cparser/Lexer.ml"
 
   | 9 ->
-# 285 "cparser/Lexer.mll"
+# 288 "cparser/Lexer.mll"
                                   ( let l = char_literal lexbuf.lex_start_p [] lexbuf in
                                     CONSTANT (Cabs.CONST_CHAR(true, l),
                                               currentLoc lexbuf) )
-# 2952 "cparser/Lexer.ml"
+# 2954 "cparser/Lexer.ml"
 
   | 10 ->
-# 288 "cparser/Lexer.mll"
+# 291 "cparser/Lexer.mll"
                                   ( let l = string_literal lexbuf.lex_start_p [] lexbuf in
                                     STRING_LITERAL(false, l, currentLoc lexbuf) )
-# 2958 "cparser/Lexer.ml"
+# 2960 "cparser/Lexer.ml"
 
   | 11 ->
-# 290 "cparser/Lexer.mll"
+# 293 "cparser/Lexer.mll"
                                   ( let l = string_literal lexbuf.lex_start_p [] lexbuf in
                                     STRING_LITERAL(true, l, currentLoc lexbuf) )
-# 2964 "cparser/Lexer.ml"
+# 2966 "cparser/Lexer.ml"
 
   | 12 ->
-# 292 "cparser/Lexer.mll"
+# 295 "cparser/Lexer.mll"
                                   ( ELLIPSIS(currentLoc lexbuf) )
-# 2969 "cparser/Lexer.ml"
+# 2971 "cparser/Lexer.ml"
 
   | 13 ->
-# 293 "cparser/Lexer.mll"
+# 296 "cparser/Lexer.mll"
                                   ( ADD_ASSIGN(currentLoc lexbuf) )
-# 2974 "cparser/Lexer.ml"
+# 2976 "cparser/Lexer.ml"
 
   | 14 ->
-# 294 "cparser/Lexer.mll"
+# 297 "cparser/Lexer.mll"
                                   ( SUB_ASSIGN(currentLoc lexbuf) )
-# 2979 "cparser/Lexer.ml"
+# 2981 "cparser/Lexer.ml"
 
   | 15 ->
-# 295 "cparser/Lexer.mll"
+# 298 "cparser/Lexer.mll"
                                   ( MUL_ASSIGN(currentLoc lexbuf) )
-# 2984 "cparser/Lexer.ml"
+# 2986 "cparser/Lexer.ml"
 
   | 16 ->
-# 296 "cparser/Lexer.mll"
+# 299 "cparser/Lexer.mll"
                                   ( DIV_ASSIGN(currentLoc lexbuf) )
-# 2989 "cparser/Lexer.ml"
+# 2991 "cparser/Lexer.ml"
 
   | 17 ->
-# 297 "cparser/Lexer.mll"
+# 300 "cparser/Lexer.mll"
                                   ( MOD_ASSIGN(currentLoc lexbuf) )
-# 2994 "cparser/Lexer.ml"
+# 2996 "cparser/Lexer.ml"
 
   | 18 ->
-# 298 "cparser/Lexer.mll"
+# 301 "cparser/Lexer.mll"
                                   ( OR_ASSIGN(currentLoc lexbuf) )
-# 2999 "cparser/Lexer.ml"
+# 3001 "cparser/Lexer.ml"
 
   | 19 ->
-# 299 "cparser/Lexer.mll"
+# 302 "cparser/Lexer.mll"
                                   ( AND_ASSIGN(currentLoc lexbuf) )
-# 3004 "cparser/Lexer.ml"
+# 3006 "cparser/Lexer.ml"
 
   | 20 ->
-# 300 "cparser/Lexer.mll"
+# 303 "cparser/Lexer.mll"
                                   ( XOR_ASSIGN(currentLoc lexbuf) )
-# 3009 "cparser/Lexer.ml"
+# 3011 "cparser/Lexer.ml"
 
   | 21 ->
-# 301 "cparser/Lexer.mll"
+# 304 "cparser/Lexer.mll"
                                   ( LEFT_ASSIGN(currentLoc lexbuf) )
-# 3014 "cparser/Lexer.ml"
+# 3016 "cparser/Lexer.ml"
 
   | 22 ->
-# 302 "cparser/Lexer.mll"
+# 305 "cparser/Lexer.mll"
                                   ( RIGHT_ASSIGN(currentLoc lexbuf) )
-# 3019 "cparser/Lexer.ml"
+# 3021 "cparser/Lexer.ml"
 
   | 23 ->
-# 303 "cparser/Lexer.mll"
+# 306 "cparser/Lexer.mll"
                                   ( LEFT(currentLoc lexbuf) )
-# 3024 "cparser/Lexer.ml"
+# 3026 "cparser/Lexer.ml"
 
   | 24 ->
-# 304 "cparser/Lexer.mll"
+# 307 "cparser/Lexer.mll"
                                   ( RIGHT(currentLoc lexbuf) )
-# 3029 "cparser/Lexer.ml"
+# 3031 "cparser/Lexer.ml"
 
   | 25 ->
-# 305 "cparser/Lexer.mll"
+# 308 "cparser/Lexer.mll"
                                   ( EQEQ(currentLoc lexbuf) )
-# 3034 "cparser/Lexer.ml"
+# 3036 "cparser/Lexer.ml"
 
   | 26 ->
-# 306 "cparser/Lexer.mll"
+# 309 "cparser/Lexer.mll"
                                   ( NEQ(currentLoc lexbuf) )
-# 3039 "cparser/Lexer.ml"
+# 3041 "cparser/Lexer.ml"
 
   | 27 ->
-# 307 "cparser/Lexer.mll"
+# 310 "cparser/Lexer.mll"
                                   ( LEQ(currentLoc lexbuf) )
-# 3044 "cparser/Lexer.ml"
+# 3046 "cparser/Lexer.ml"
 
   | 28 ->
-# 308 "cparser/Lexer.mll"
+# 311 "cparser/Lexer.mll"
                                   ( GEQ(currentLoc lexbuf) )
-# 3049 "cparser/Lexer.ml"
+# 3051 "cparser/Lexer.ml"
 
   | 29 ->
-# 309 "cparser/Lexer.mll"
+# 312 "cparser/Lexer.mll"
                                   ( EQ(currentLoc lexbuf) )
-# 3054 "cparser/Lexer.ml"
+# 3056 "cparser/Lexer.ml"
 
   | 30 ->
-# 310 "cparser/Lexer.mll"
+# 313 "cparser/Lexer.mll"
                                   ( LT(currentLoc lexbuf) )
-# 3059 "cparser/Lexer.ml"
+# 3061 "cparser/Lexer.ml"
 
   | 31 ->
-# 311 "cparser/Lexer.mll"
+# 314 "cparser/Lexer.mll"
                                   ( GT(currentLoc lexbuf) )
-# 3064 "cparser/Lexer.ml"
+# 3066 "cparser/Lexer.ml"
 
   | 32 ->
-# 312 "cparser/Lexer.mll"
+# 315 "cparser/Lexer.mll"
                                   ( INC(currentLoc lexbuf) )
-# 3069 "cparser/Lexer.ml"
+# 3071 "cparser/Lexer.ml"
 
   | 33 ->
-# 313 "cparser/Lexer.mll"
+# 316 "cparser/Lexer.mll"
                                   ( DEC(currentLoc lexbuf) )
-# 3074 "cparser/Lexer.ml"
+# 3076 "cparser/Lexer.ml"
 
   | 34 ->
-# 314 "cparser/Lexer.mll"
+# 317 "cparser/Lexer.mll"
                                   ( PTR(currentLoc lexbuf) )
-# 3079 "cparser/Lexer.ml"
+# 3081 "cparser/Lexer.ml"
 
   | 35 ->
-# 315 "cparser/Lexer.mll"
+# 318 "cparser/Lexer.mll"
                                   ( PLUS(currentLoc lexbuf) )
-# 3084 "cparser/Lexer.ml"
+# 3086 "cparser/Lexer.ml"
 
   | 36 ->
-# 316 "cparser/Lexer.mll"
+# 319 "cparser/Lexer.mll"
                                   ( MINUS(currentLoc lexbuf) )
-# 3089 "cparser/Lexer.ml"
+# 3091 "cparser/Lexer.ml"
 
   | 37 ->
-# 317 "cparser/Lexer.mll"
+# 320 "cparser/Lexer.mll"
                                   ( STAR(currentLoc lexbuf) )
-# 3094 "cparser/Lexer.ml"
+# 3096 "cparser/Lexer.ml"
 
   | 38 ->
-# 318 "cparser/Lexer.mll"
+# 321 "cparser/Lexer.mll"
                                   ( SLASH(currentLoc lexbuf) )
-# 3099 "cparser/Lexer.ml"
+# 3101 "cparser/Lexer.ml"
 
   | 39 ->
-# 319 "cparser/Lexer.mll"
+# 322 "cparser/Lexer.mll"
                                   ( PERCENT(currentLoc lexbuf) )
-# 3104 "cparser/Lexer.ml"
+# 3106 "cparser/Lexer.ml"
 
   | 40 ->
-# 320 "cparser/Lexer.mll"
+# 323 "cparser/Lexer.mll"
                                   ( BANG(currentLoc lexbuf) )
-# 3109 "cparser/Lexer.ml"
+# 3111 "cparser/Lexer.ml"
 
   | 41 ->
-# 321 "cparser/Lexer.mll"
+# 324 "cparser/Lexer.mll"
                                   ( ANDAND(currentLoc lexbuf) )
-# 3114 "cparser/Lexer.ml"
+# 3116 "cparser/Lexer.ml"
 
   | 42 ->
-# 322 "cparser/Lexer.mll"
+# 325 "cparser/Lexer.mll"
                                   ( BARBAR(currentLoc lexbuf) )
-# 3119 "cparser/Lexer.ml"
+# 3121 "cparser/Lexer.ml"
 
   | 43 ->
-# 323 "cparser/Lexer.mll"
+# 326 "cparser/Lexer.mll"
                                   ( AND(currentLoc lexbuf) )
-# 3124 "cparser/Lexer.ml"
+# 3126 "cparser/Lexer.ml"
 
   | 44 ->
-# 324 "cparser/Lexer.mll"
+# 327 "cparser/Lexer.mll"
                                   ( BAR(currentLoc lexbuf) )
-# 3129 "cparser/Lexer.ml"
+# 3131 "cparser/Lexer.ml"
 
   | 45 ->
-# 325 "cparser/Lexer.mll"
+# 328 "cparser/Lexer.mll"
                                   ( HAT(currentLoc lexbuf) )
-# 3134 "cparser/Lexer.ml"
+# 3136 "cparser/Lexer.ml"
 
   | 46 ->
-# 326 "cparser/Lexer.mll"
+# 329 "cparser/Lexer.mll"
                                   ( QUESTION(currentLoc lexbuf) )
-# 3139 "cparser/Lexer.ml"
+# 3141 "cparser/Lexer.ml"
 
   | 47 ->
-# 327 "cparser/Lexer.mll"
+# 330 "cparser/Lexer.mll"
                                   ( COLON(currentLoc lexbuf) )
-# 3144 "cparser/Lexer.ml"
+# 3146 "cparser/Lexer.ml"
 
   | 48 ->
-# 328 "cparser/Lexer.mll"
+# 331 "cparser/Lexer.mll"
                                   ( TILDE(currentLoc lexbuf) )
-# 3149 "cparser/Lexer.ml"
+# 3151 "cparser/Lexer.ml"
 
   | 49 ->
-# 329 "cparser/Lexer.mll"
+# 332 "cparser/Lexer.mll"
                                   ( LBRACE(currentLoc lexbuf) )
-# 3154 "cparser/Lexer.ml"
+# 3156 "cparser/Lexer.ml"
 
   | 50 ->
-# 330 "cparser/Lexer.mll"
+# 333 "cparser/Lexer.mll"
                                   ( RBRACE(currentLoc lexbuf) )
-# 3159 "cparser/Lexer.ml"
+# 3161 "cparser/Lexer.ml"
 
   | 51 ->
-# 331 "cparser/Lexer.mll"
+# 334 "cparser/Lexer.mll"
                                   ( LBRACK(currentLoc lexbuf) )
-# 3164 "cparser/Lexer.ml"
+# 3166 "cparser/Lexer.ml"
 
   | 52 ->
-# 332 "cparser/Lexer.mll"
+# 335 "cparser/Lexer.mll"
                                   ( RBRACK(currentLoc lexbuf) )
-# 3169 "cparser/Lexer.ml"
+# 3171 "cparser/Lexer.ml"
 
   | 53 ->
-# 333 "cparser/Lexer.mll"
+# 336 "cparser/Lexer.mll"
                                   ( LPAREN(currentLoc lexbuf) )
-# 3174 "cparser/Lexer.ml"
+# 3176 "cparser/Lexer.ml"
 
   | 54 ->
-# 334 "cparser/Lexer.mll"
+# 337 "cparser/Lexer.mll"
                                   ( RPAREN(currentLoc lexbuf) )
-# 3179 "cparser/Lexer.ml"
+# 3181 "cparser/Lexer.ml"
 
   | 55 ->
-# 335 "cparser/Lexer.mll"
+# 338 "cparser/Lexer.mll"
                                   ( SEMICOLON(currentLoc lexbuf) )
-# 3184 "cparser/Lexer.ml"
+# 3186 "cparser/Lexer.ml"
 
   | 56 ->
-# 336 "cparser/Lexer.mll"
+# 339 "cparser/Lexer.mll"
                                   ( COMMA(currentLoc lexbuf) )
-# 3189 "cparser/Lexer.ml"
+# 3191 "cparser/Lexer.ml"
 
   | 57 ->
-# 337 "cparser/Lexer.mll"
+# 340 "cparser/Lexer.mll"
                                   ( DOT(currentLoc lexbuf) )
-# 3194 "cparser/Lexer.ml"
+# 3196 "cparser/Lexer.ml"
 
   | 58 ->
 let
-# 338 "cparser/Lexer.mll"
+# 341 "cparser/Lexer.mll"
                   id
-# 3200 "cparser/Lexer.ml"
+# 3202 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 338 "cparser/Lexer.mll"
+# 341 "cparser/Lexer.mll"
                                   (
     if SSet.mem id !ignored_keywords then
       initial lexbuf
     else
       try Hashtbl.find lexicon id (currentLoc lexbuf)
       with Not_found -> PRE_NAME id )
-# 3209 "cparser/Lexer.ml"
+# 3211 "cparser/Lexer.ml"
 
   | 59 ->
-# 344 "cparser/Lexer.mll"
+# 347 "cparser/Lexer.mll"
                                   ( EOF )
-# 3214 "cparser/Lexer.ml"
+# 3216 "cparser/Lexer.ml"
 
   | 60 ->
 let
-# 345 "cparser/Lexer.mll"
+# 348 "cparser/Lexer.mll"
          c
-# 3220 "cparser/Lexer.ml"
+# 3222 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 345 "cparser/Lexer.mll"
+# 348 "cparser/Lexer.mll"
                                   ( fatal_error lexbuf "invalid symbol %C" c )
-# 3224 "cparser/Lexer.ml"
+# 3226 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_initial_rec lexbuf __ocaml_lex_state
@@ -3230,24 +3232,24 @@ and initial_linebegin lexbuf =
 and __ocaml_lex_initial_linebegin_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 348 "cparser/Lexer.mll"
+# 351 "cparser/Lexer.mll"
                                   ( new_line lexbuf; initial_linebegin lexbuf )
-# 3236 "cparser/Lexer.ml"
+# 3238 "cparser/Lexer.ml"
 
   | 1 ->
-# 349 "cparser/Lexer.mll"
+# 352 "cparser/Lexer.mll"
                                   ( initial_linebegin lexbuf )
-# 3241 "cparser/Lexer.ml"
+# 3243 "cparser/Lexer.ml"
 
   | 2 ->
-# 350 "cparser/Lexer.mll"
+# 353 "cparser/Lexer.mll"
                                   ( hash lexbuf )
-# 3246 "cparser/Lexer.ml"
+# 3248 "cparser/Lexer.ml"
 
   | 3 ->
-# 351 "cparser/Lexer.mll"
+# 354 "cparser/Lexer.mll"
                                   ( initial lexbuf )
-# 3251 "cparser/Lexer.ml"
+# 3253 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_initial_linebegin_rec lexbuf __ocaml_lex_state
@@ -3258,74 +3260,74 @@ and __ocaml_lex_char_rec lexbuf __ocaml_lex_state =
   match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 let
-# 169 "cparser/Lexer.mll"
+# 172 "cparser/Lexer.mll"
                        n
-# 3264 "cparser/Lexer.ml"
+# 3266 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(1) lexbuf.Lexing.lex_mem.(0) in
-# 355 "cparser/Lexer.mll"
+# 358 "cparser/Lexer.mll"
       ( try
           Int64.of_string ("0x" ^ n)
         with Failure _ ->
           error lexbuf "overflow in universal character name";
           0L
       )
-# 3273 "cparser/Lexer.ml"
+# 3275 "cparser/Lexer.ml"
 
   | 1 ->
 let
-# 247 "cparser/Lexer.mll"
+# 250 "cparser/Lexer.mll"
                                                                n
-# 3279 "cparser/Lexer.ml"
+# 3281 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf (lexbuf.Lexing.lex_start_pos + 2) lexbuf.Lexing.lex_curr_pos in
-# 362 "cparser/Lexer.mll"
+# 365 "cparser/Lexer.mll"
       ( try
           Int64.of_string ("0x" ^ n)
         with Failure _ ->
           error lexbuf "overflow in hexadecimal escape sequence";
           0L
       )
-# 3288 "cparser/Lexer.ml"
+# 3290 "cparser/Lexer.ml"
 
   | 2 ->
 let
-# 246 "cparser/Lexer.mll"
+# 249 "cparser/Lexer.mll"
                                                    n
-# 3294 "cparser/Lexer.ml"
+# 3296 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf (lexbuf.Lexing.lex_start_pos + 1) lexbuf.Lexing.lex_curr_pos in
-# 369 "cparser/Lexer.mll"
+# 372 "cparser/Lexer.mll"
       ( Int64.of_string  ("0o" ^ n) )
-# 3298 "cparser/Lexer.ml"
+# 3300 "cparser/Lexer.ml"
 
   | 3 ->
 let
-# 242 "cparser/Lexer.mll"
+# 245 "cparser/Lexer.mll"
                                                                             c
-# 3304 "cparser/Lexer.ml"
+# 3306 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 371 "cparser/Lexer.mll"
+# 374 "cparser/Lexer.mll"
       ( convert_escape c )
-# 3308 "cparser/Lexer.ml"
+# 3310 "cparser/Lexer.ml"
 
   | 4 ->
 let
-# 372 "cparser/Lexer.mll"
+# 375 "cparser/Lexer.mll"
                c
-# 3314 "cparser/Lexer.ml"
+# 3316 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 373 "cparser/Lexer.mll"
+# 376 "cparser/Lexer.mll"
       ( error lexbuf "incorrect escape sequence '\\%c'" c;
         Int64.of_int (Char.code c) )
-# 3319 "cparser/Lexer.ml"
+# 3321 "cparser/Lexer.ml"
 
   | 5 ->
 let
-# 375 "cparser/Lexer.mll"
+# 378 "cparser/Lexer.mll"
          c
-# 3325 "cparser/Lexer.ml"
+# 3327 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 376 "cparser/Lexer.mll"
+# 379 "cparser/Lexer.mll"
       ( Int64.of_int (Char.code c) )
-# 3329 "cparser/Lexer.ml"
+# 3331 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_char_rec lexbuf __ocaml_lex_state
@@ -3335,20 +3337,20 @@ and char_literal startp accu lexbuf =
 and __ocaml_lex_char_literal_rec startp accu lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 379 "cparser/Lexer.mll"
+# 382 "cparser/Lexer.mll"
                ( lexbuf.lex_start_p <- startp;
                  List.rev accu )
-# 3342 "cparser/Lexer.ml"
+# 3344 "cparser/Lexer.ml"
 
   | 1 ->
-# 381 "cparser/Lexer.mll"
+# 384 "cparser/Lexer.mll"
                ( fatal_error lexbuf "missing terminating \"'\" character" )
-# 3347 "cparser/Lexer.ml"
+# 3349 "cparser/Lexer.ml"
 
   | 2 ->
-# 382 "cparser/Lexer.mll"
+# 385 "cparser/Lexer.mll"
                ( let c = char lexbuf in char_literal startp (c :: accu) lexbuf )
-# 3352 "cparser/Lexer.ml"
+# 3354 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_char_literal_rec startp accu lexbuf __ocaml_lex_state
@@ -3358,20 +3360,20 @@ and string_literal startp accu lexbuf =
 and __ocaml_lex_string_literal_rec startp accu lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 385 "cparser/Lexer.mll"
+# 388 "cparser/Lexer.mll"
                ( lexbuf.lex_start_p <- startp;
                  List.rev accu )
-# 3365 "cparser/Lexer.ml"
+# 3367 "cparser/Lexer.ml"
 
   | 1 ->
-# 387 "cparser/Lexer.mll"
+# 390 "cparser/Lexer.mll"
                ( fatal_error lexbuf "missing terminating '\"' character" )
-# 3370 "cparser/Lexer.ml"
+# 3372 "cparser/Lexer.ml"
 
   | 2 ->
-# 388 "cparser/Lexer.mll"
+# 391 "cparser/Lexer.mll"
                ( let c = char lexbuf in string_literal startp (c :: accu) lexbuf )
-# 3375 "cparser/Lexer.ml"
+# 3377 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_string_literal_rec startp accu lexbuf __ocaml_lex_state
@@ -3382,16 +3384,16 @@ and __ocaml_lex_hash_rec lexbuf __ocaml_lex_state =
   match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 let
-# 393 "cparser/Lexer.mll"
-                         n
-# 3388 "cparser/Lexer.ml"
+# 396 "cparser/Lexer.mll"
+                n
+# 3390 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(0) lexbuf.Lexing.lex_mem.(1)
 and
-# 395 "cparser/Lexer.mll"
+# 398 "cparser/Lexer.mll"
                             file
-# 3393 "cparser/Lexer.ml"
+# 3395 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(2) lexbuf.Lexing.lex_mem.(3) in
-# 397 "cparser/Lexer.mll"
+# 400 "cparser/Lexer.mll"
       ( let n =
           try
             int_of_string n
@@ -3405,38 +3407,38 @@ and
             pos_bol = lexbuf.lex_curr_p.pos_cnum
         };
         initial_linebegin lexbuf )
-# 3409 "cparser/Lexer.ml"
+# 3411 "cparser/Lexer.ml"
 
   | 1 ->
 let
-# 413 "cparser/Lexer.mll"
+# 416 "cparser/Lexer.mll"
                   s
-# 3415 "cparser/Lexer.ml"
+# 3417 "cparser/Lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_mem.(0) (lexbuf.Lexing.lex_curr_pos + -1) in
-# 414 "cparser/Lexer.mll"
+# 417 "cparser/Lexer.mll"
       ( new_line lexbuf; PRAGMA (s, currentLoc lexbuf) )
-# 3419 "cparser/Lexer.ml"
+# 3421 "cparser/Lexer.ml"
 
   | 2 ->
-# 416 "cparser/Lexer.mll"
+# 419 "cparser/Lexer.mll"
       ( warning lexbuf "unrecognized '#' line";
         new_line lexbuf; initial_linebegin lexbuf )
-# 3425 "cparser/Lexer.ml"
+# 3427 "cparser/Lexer.ml"
 
   | 3 ->
-# 419 "cparser/Lexer.mll"
+# 422 "cparser/Lexer.mll"
       ( fatal_error lexbuf "unexpected end of file" )
-# 3430 "cparser/Lexer.ml"
+# 3432 "cparser/Lexer.ml"
 
   | 4 ->
 let
-# 420 "cparser/Lexer.mll"
+# 423 "cparser/Lexer.mll"
          c
-# 3436 "cparser/Lexer.ml"
+# 3438 "cparser/Lexer.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 421 "cparser/Lexer.mll"
+# 424 "cparser/Lexer.mll"
       ( fatal_error lexbuf "invalid symbol %C" c )
-# 3440 "cparser/Lexer.ml"
+# 3442 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_hash_rec lexbuf __ocaml_lex_state
@@ -3446,24 +3448,24 @@ and multiline_comment lexbuf =
 and __ocaml_lex_multiline_comment_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 425 "cparser/Lexer.mll"
+# 428 "cparser/Lexer.mll"
            ( () )
-# 3452 "cparser/Lexer.ml"
+# 3454 "cparser/Lexer.ml"
 
   | 1 ->
-# 426 "cparser/Lexer.mll"
+# 429 "cparser/Lexer.mll"
            ( error lexbuf "unterminated comment" )
-# 3457 "cparser/Lexer.ml"
+# 3459 "cparser/Lexer.ml"
 
   | 2 ->
-# 427 "cparser/Lexer.mll"
+# 430 "cparser/Lexer.mll"
            ( new_line lexbuf; multiline_comment lexbuf )
-# 3462 "cparser/Lexer.ml"
+# 3464 "cparser/Lexer.ml"
 
   | 3 ->
-# 428 "cparser/Lexer.mll"
+# 431 "cparser/Lexer.mll"
            ( multiline_comment lexbuf )
-# 3467 "cparser/Lexer.ml"
+# 3469 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_multiline_comment_rec lexbuf __ocaml_lex_state
@@ -3473,26 +3475,26 @@ and singleline_comment lexbuf =
 and __ocaml_lex_singleline_comment_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 432 "cparser/Lexer.mll"
+# 435 "cparser/Lexer.mll"
            ( new_line lexbuf )
-# 3479 "cparser/Lexer.ml"
+# 3481 "cparser/Lexer.ml"
 
   | 1 ->
-# 433 "cparser/Lexer.mll"
+# 436 "cparser/Lexer.mll"
            ( () )
-# 3484 "cparser/Lexer.ml"
+# 3486 "cparser/Lexer.ml"
 
   | 2 ->
-# 434 "cparser/Lexer.mll"
+# 437 "cparser/Lexer.mll"
            ( singleline_comment lexbuf )
-# 3489 "cparser/Lexer.ml"
+# 3491 "cparser/Lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_singleline_comment_rec lexbuf __ocaml_lex_state
 
 ;;
 
-# 436 "cparser/Lexer.mll"
+# 439 "cparser/Lexer.mll"
  
   open Parser.MenhirLibParser.Inter
 
@@ -3637,6 +3639,7 @@ and __ocaml_lex_singleline_comment_rec lexbuf __ocaml_lex_state =
       | Pre_parser.SLASH loc -> loop (Parser.SLASH loc)
       | Pre_parser.STAR loc -> loop (Parser.STAR loc)
       | Pre_parser.STATIC loc -> loop (Parser.STATIC loc)
+      | Pre_parser.STATIC_ASSERT loc -> loop (Parser.STATIC_ASSERT loc)
       | Pre_parser.STRING_LITERAL (wide, str, loc) ->
           (* Merge consecutive string literals *)
           let rec doConcat wide str =
@@ -3680,4 +3683,4 @@ and __ocaml_lex_singleline_comment_rec lexbuf __ocaml_lex_state =
     Lazy.from_fun compute_buffer
 
 
-# 3684 "cparser/Lexer.ml"
+# 3687 "cparser/Lexer.ml"

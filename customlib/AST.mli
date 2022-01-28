@@ -45,7 +45,7 @@ val rettype_eq : rettype -> rettype -> bool
 
 val proj_rettype : rettype -> typ
 
-type calling_convention = { cc_vararg : bool; cc_unproto : bool;
+type calling_convention = { cc_vararg : coq_Z option; cc_unproto : bool;
                             cc_structret : bool }
 
 val cc_default : calling_convention

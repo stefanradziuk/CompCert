@@ -29,3 +29,5 @@ val existsb : ('a1 -> bool) -> 'a1 list -> bool
 val forallb : ('a1 -> bool) -> 'a1 list -> bool
 
 val filter : ('a1 -> bool) -> 'a1 list -> 'a1 list
+
+val repeat : 'a1 -> nat -> 'a1 list

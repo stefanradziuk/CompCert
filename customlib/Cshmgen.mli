@@ -1,10 +1,12 @@
 open AST
 open Archi
+open BinInt
 open BinNums
 open Clight
 open Cminor
 open Conventions1
 open Cop
+open Coqlib
 open Csharpminor
 open Ctypes
 open Datatypes
@@ -13,6 +15,7 @@ open Floats
 open Integers
 open List0
 open Maps
+open Zpower
 
 val make_intconst : Int.int -> expr
 
@@ -106,11 +109,18 @@ val make_cmp_ptr : comparison -> expr -> expr -> expr
 
 val make_cmp : comparison -> expr -> coq_type -> expr -> coq_type -> expr res
 
-val make_load : expr -> coq_type -> expr res
+val make_extract_bitfield :
+  intsize -> signedness -> coq_Z -> coq_Z -> expr -> expr res
+
+val make_load : expr -> coq_type -> bitfield -> expr res
+
+val make_store_bitfield :
+  intsize -> signedness -> coq_Z -> coq_Z -> expr -> expr -> stmt res
 
 val make_memcpy : composite_env -> expr -> expr -> coq_type -> stmt res
 
-val make_store : composite_env -> expr -> coq_type -> expr -> stmt res
+val make_store :
+  composite_env -> expr -> coq_type -> bitfield -> expr -> stmt res
 
 val transl_unop : Cop.unary_operation -> expr -> coq_type -> expr res
 
@@ -118,11 +128,12 @@ val transl_binop :
   composite_env -> Cop.binary_operation -> expr -> coq_type -> expr ->
   coq_type -> expr res
 
-val make_field_access : composite_env -> coq_type -> ident -> expr -> expr res
+val make_field_access :
+  composite_env -> coq_type -> ident -> expr -> (expr * bitfield) res
 
 val transl_expr : composite_env -> Clight.expr -> expr res
 
-val transl_lvalue : composite_env -> Clight.expr -> expr res
+val transl_lvalue : composite_env -> Clight.expr -> (expr * bitfield) res
 
 val transl_arglist :
   composite_env -> Clight.expr list -> typelist -> expr list res

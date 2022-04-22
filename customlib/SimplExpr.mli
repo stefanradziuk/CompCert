@@ -1,4 +1,6 @@
 open AST
+open BinInt
+open BinNums
 open BinPos
 open Clight
 open Cop
@@ -7,8 +9,10 @@ open Ctypes
 open Datatypes
 open Errors
 open Integers
+open Maps
 open Memory
 open Values
+open Zpower
 
 type generator = { gen_next : ident; gen_trail : (ident * coq_type) list }
 
@@ -40,14 +44,26 @@ val coq_Eaddrof' : Clight.expr -> coq_type -> Clight.expr
 
 val transl_incrdecr : incr_or_decr -> Clight.expr -> coq_type -> Clight.expr
 
-val chunk_for_volatile_type : coq_type -> memory_chunk option
+val is_bitfield_access_aux :
+  composite_env -> (composite_env -> ident -> members -> (coq_Z * bitfield)
+  res) -> ident -> ident -> bitfield mon
 
-val make_set : ident -> Clight.expr -> Clight.statement
+val is_bitfield_access : composite_env -> Clight.expr -> bitfield mon
+
+val chunk_for_volatile_type : coq_type -> bitfield -> memory_chunk option
+
+val make_set : bitfield -> ident -> Clight.expr -> Clight.statement
 
 val transl_valof :
-  coq_type -> Clight.expr -> (Clight.statement list * Clight.expr) mon
+  composite_env -> coq_type -> Clight.expr -> (Clight.statement
+  list * Clight.expr) mon
 
-val make_assign : Clight.expr -> Clight.expr -> Clight.statement
+val make_assign : bitfield -> Clight.expr -> Clight.expr -> Clight.statement
+
+val make_normalize :
+  intsize -> signedness -> coq_Z -> Clight.expr -> Clight.expr
+
+val make_assign_value : bitfield -> Clight.expr -> Clight.expr
 
 type set_destination =
 | SDbase of coq_type * coq_type * ident
@@ -73,26 +89,24 @@ val sd_seqbool_val : ident -> coq_type -> set_destination
 val sd_seqbool_set : coq_type -> set_destination -> set_destination
 
 val transl_expr :
-  destination -> expr -> (Clight.statement list * Clight.expr) mon
+  composite_env -> destination -> expr -> (Clight.statement
+  list * Clight.expr) mon
 
-val transl_exprlist :
-  exprlist -> (Clight.statement list * Clight.expr list) mon
+val transl_expression :
+  composite_env -> expr -> (Clight.statement * Clight.expr) mon
 
-val transl_expression : expr -> (Clight.statement * Clight.expr) mon
-
-val transl_expr_stmt : expr -> Clight.statement mon
+val transl_expr_stmt : composite_env -> expr -> Clight.statement mon
 
 val transl_if :
-  expr -> Clight.statement -> Clight.statement -> Clight.statement mon
+  composite_env -> expr -> Clight.statement -> Clight.statement ->
+  Clight.statement mon
 
 val is_Sskip : statement -> bool
 
-val transl_stmt : statement -> Clight.statement mon
+val transl_stmt : composite_env -> statement -> Clight.statement mon
 
-val transl_lblstmt : labeled_statements -> Clight.labeled_statements mon
+val transl_function : composite_env -> coq_function -> Clight.coq_function res
 
-val transl_function : coq_function -> Clight.coq_function res
-
-val transl_fundef : Csyntax.fundef -> Clight.fundef res
+val transl_fundef : composite_env -> Csyntax.fundef -> Clight.fundef res
 
 val transl_program : Csyntax.program -> Clight.program res

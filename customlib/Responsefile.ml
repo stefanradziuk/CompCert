@@ -1,4 +1,4 @@
-# 18 "lib/Responsefile.mll"
+# 19 "lib/Responsefile.mll"
  
 (* To accumulate the characters in a word or quoted string *)
 let buf = Buffer.create 32
@@ -112,27 +112,27 @@ let rec gnu_unquoted inword words lexbuf =
 and __ocaml_lex_gnu_unquoted_rec inword words lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 48 "lib/Responsefile.mll"
+# 49 "lib/Responsefile.mll"
                   ( List.rev (stash inword words) )
 # 118 "lib/Responsefile.ml"
 
   | 1 ->
-# 49 "lib/Responsefile.mll"
+# 50 "lib/Responsefile.mll"
                   ( gnu_unquoted false (stash inword words) lexbuf )
 # 123 "lib/Responsefile.ml"
 
   | 2 ->
-# 50 "lib/Responsefile.mll"
+# 51 "lib/Responsefile.mll"
                   ( gnu_single_quote lexbuf; gnu_unquoted true words lexbuf )
 # 128 "lib/Responsefile.ml"
 
   | 3 ->
-# 51 "lib/Responsefile.mll"
+# 52 "lib/Responsefile.mll"
                   ( gnu_double_quote lexbuf; gnu_unquoted true words lexbuf )
 # 133 "lib/Responsefile.ml"
 
   | 4 ->
-# 52 "lib/Responsefile.mll"
+# 53 "lib/Responsefile.mll"
                   ( gnu_one_char lexbuf; gnu_unquoted true words lexbuf )
 # 138 "lib/Responsefile.ml"
 
@@ -145,21 +145,21 @@ and __ocaml_lex_gnu_one_char_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 let
-# 55 "lib/Responsefile.mll"
+# 56 "lib/Responsefile.mll"
                c
 # 151 "lib/Responsefile.ml"
 = Lexing.sub_lexeme_char lexbuf (lexbuf.Lexing.lex_start_pos + 1) in
-# 55 "lib/Responsefile.mll"
+# 56 "lib/Responsefile.mll"
                   ( Buffer.add_char buf c )
 # 155 "lib/Responsefile.ml"
 
   | 1 ->
 let
-# 56 "lib/Responsefile.mll"
+# 57 "lib/Responsefile.mll"
          c
 # 161 "lib/Responsefile.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 56 "lib/Responsefile.mll"
+# 57 "lib/Responsefile.mll"
                   ( Buffer.add_char buf c )
 # 165 "lib/Responsefile.ml"
 
@@ -171,17 +171,17 @@ and gnu_single_quote lexbuf =
 and __ocaml_lex_gnu_single_quote_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 59 "lib/Responsefile.mll"
+# 60 "lib/Responsefile.mll"
                   ( () (* tolerance *) )
 # 177 "lib/Responsefile.ml"
 
   | 1 ->
-# 60 "lib/Responsefile.mll"
+# 61 "lib/Responsefile.mll"
                   ( () )
 # 182 "lib/Responsefile.ml"
 
   | 2 ->
-# 61 "lib/Responsefile.mll"
+# 62 "lib/Responsefile.mll"
                   ( gnu_one_char lexbuf; gnu_single_quote lexbuf )
 # 187 "lib/Responsefile.ml"
 
@@ -193,17 +193,17 @@ and gnu_double_quote lexbuf =
 and __ocaml_lex_gnu_double_quote_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 64 "lib/Responsefile.mll"
+# 65 "lib/Responsefile.mll"
                   ( () (* tolerance *) )
 # 199 "lib/Responsefile.ml"
 
   | 1 ->
-# 65 "lib/Responsefile.mll"
+# 66 "lib/Responsefile.mll"
                   ( () )
 # 204 "lib/Responsefile.ml"
 
   | 2 ->
-# 66 "lib/Responsefile.mll"
+# 67 "lib/Responsefile.mll"
                   ( gnu_one_char lexbuf; gnu_double_quote lexbuf )
 # 209 "lib/Responsefile.ml"
 
@@ -212,7 +212,7 @@ and __ocaml_lex_gnu_double_quote_rec lexbuf __ocaml_lex_state =
 
 ;;
 
-# 68 "lib/Responsefile.mll"
+# 69 "lib/Responsefile.mll"
  
 
 let re_responsefile = Str.regexp "@\\(.*\\)$"

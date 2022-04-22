@@ -2,6 +2,7 @@ open AST
 open BinNums
 open Clight
 open Compopts
+open Conventions1
 open Cop
 open Coqlib
 open Ctypes
@@ -167,7 +168,10 @@ let rec store_params cenv params s =
   | p :: params' ->
     let (id, ty) = p in
     if VSet.mem id cenv
-    then store_params cenv params' s
+    then if parameter_needs_normalization (rettype_of_type ty)
+         then Ssequence ((Sset (id, (make_cast (Etempvar (id, ty)) ty))),
+                (store_params cenv params' s))
+         else store_params cenv params' s
     else Ssequence ((Sassign ((Evar (id, ty)), (Etempvar (id, ty)))),
            (store_params cenv params' s))
 

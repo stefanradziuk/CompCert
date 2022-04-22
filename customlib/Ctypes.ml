@@ -63,19 +63,37 @@ let intsize_eq s1 s2 =
               | IBool -> true
               | _ -> false)
 
+(** val signedness_eq : signedness -> signedness -> bool **)
+
+let signedness_eq s1 s2 =
+  match s1 with
+  | Signed -> (match s2 with
+               | Signed -> true
+               | Unsigned -> false)
+  | Unsigned -> (match s2 with
+                 | Signed -> false
+                 | Unsigned -> true)
+
+(** val attr_eq : attr -> attr -> bool **)
+
+let attr_eq a1 a2 =
+  let { attr_volatile = attr_volatile0; attr_alignas = attr_alignas0 } = a1 in
+  let { attr_volatile = attr_volatile1; attr_alignas = attr_alignas1 } = a2 in
+  if bool_dec attr_volatile0 attr_volatile1
+  then (match attr_alignas0 with
+        | Some x ->
+          (match attr_alignas1 with
+           | Some n -> N.eq_dec x n
+           | None -> false)
+        | None -> (match attr_alignas1 with
+                   | Some _ -> false
+                   | None -> true))
+  else false
+
 (** val type_eq : coq_type -> coq_type -> bool **)
 
 let rec type_eq =
   let h = fun x y ->
-    match x with
-    | Signed -> (match y with
-                 | Signed -> true
-                 | Unsigned -> false)
-    | Unsigned -> (match y with
-                   | Signed -> false
-                   | Unsigned -> true)
-  in
-  let h0 = fun x y ->
     match x with
     | F32 -> (match y with
               | F32 -> true
@@ -83,22 +101,6 @@ let rec type_eq =
     | F64 -> (match y with
               | F32 -> false
               | F64 -> true)
-  in
-  let h1 = fun x y ->
-    let { attr_volatile = attr_volatile0; attr_alignas = attr_alignas0 } = x
-    in
-    let { attr_volatile = attr_volatile1; attr_alignas = attr_alignas1 } = y
-    in
-    if bool_dec attr_volatile0 attr_volatile1
-    then (match attr_alignas0 with
-          | Some x0 ->
-            (match attr_alignas1 with
-             | Some n -> N.eq_dec x0 n
-             | None -> false)
-          | None -> (match attr_alignas1 with
-                     | Some _ -> false
-                     | None -> true))
-    else false
   in
   (fun ty1 ty2 ->
   match ty1 with
@@ -108,24 +110,28 @@ let rec type_eq =
   | Tint (i, s, a) ->
     (match ty2 with
      | Tint (i0, s0, a0) ->
-       if intsize_eq i i0 then if h s s0 then h1 a a0 else false else false
+       if intsize_eq i i0
+       then if signedness_eq s s0 then attr_eq a a0 else false
+       else false
      | _ -> false)
   | Tlong (s, a) ->
     (match ty2 with
-     | Tlong (s0, a0) -> if h s s0 then h1 a a0 else false
+     | Tlong (s0, a0) -> if signedness_eq s s0 then attr_eq a a0 else false
      | _ -> false)
   | Tfloat (f, a) ->
     (match ty2 with
-     | Tfloat (f0, a0) -> if h0 f f0 then h1 a a0 else false
+     | Tfloat (f0, a0) -> if h f f0 then attr_eq a a0 else false
      | _ -> false)
   | Tpointer (t0, a) ->
     (match ty2 with
-     | Tpointer (t1, a0) -> if type_eq t0 t1 then h1 a a0 else false
+     | Tpointer (t1, a0) -> if type_eq t0 t1 then attr_eq a a0 else false
      | _ -> false)
   | Tarray (t0, z, a) ->
     (match ty2 with
      | Tarray (t1, z0, a0) ->
-       if type_eq t0 t1 then if zeq z z0 then h1 a a0 else false else false
+       if type_eq t0 t1
+       then if zeq z z0 then attr_eq a a0 else false
+       else false
      | _ -> false)
   | Tfunction (t0, t1, c) ->
     (match ty2 with
@@ -138,7 +144,15 @@ let rec type_eq =
                  let { cc_vararg = cc_vararg1; cc_unproto = cc_unproto1;
                    cc_structret = cc_structret1 } = c0
                  in
-                 if bool_dec cc_vararg0 cc_vararg1
+                 if match cc_vararg0 with
+                    | Some x ->
+                      (match cc_vararg1 with
+                       | Some z -> zeq x z
+                       | None -> false)
+                    | None ->
+                      (match cc_vararg1 with
+                       | Some _ -> false
+                       | None -> true)
                  then if bool_dec cc_unproto0 cc_unproto1
                       then bool_dec cc_structret0 cc_structret1
                       else false
@@ -148,11 +162,11 @@ let rec type_eq =
      | _ -> false)
   | Tstruct (i, a) ->
     (match ty2 with
-     | Tstruct (i0, a0) -> if ident_eq i i0 then h1 a a0 else false
+     | Tstruct (i0, a0) -> if ident_eq i i0 then attr_eq a a0 else false
      | _ -> false)
   | Tunion (i, a) ->
     (match ty2 with
-     | Tunion (i0, a0) -> if ident_eq i i0 then h1 a a0 else false
+     | Tunion (i0, a0) -> if ident_eq i i0 then attr_eq a a0 else false
      | _ -> false))
 
 (** val typelist_eq : typelist -> typelist -> bool **)
@@ -212,20 +226,56 @@ let attr_union a1 a2 =
 let merge_attributes ty a =
   change_attributes (attr_union a) ty
 
+(** val bitsize_intsize : intsize -> coq_Z **)
+
+let bitsize_intsize = function
+| I8 -> Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH)))
+| I16 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))
+| I32 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH)))))
+| IBool -> Zpos Coq_xH
+
 type struct_or_union =
 | Struct
 | Union
 
-type members = (ident * coq_type) list
+type member =
+| Member_plain of ident * coq_type
+| Member_bitfield of ident * intsize * signedness * attr * coq_Z * bool
+
+type members = member list
 
 type composite_definition =
 | Composite of ident * struct_or_union * members * attr
+
+(** val name_member : member -> ident **)
+
+let name_member = function
+| Member_plain (id, _) -> id
+| Member_bitfield (id, _, _, _, _, _) -> id
+
+(** val type_member : member -> coq_type **)
+
+let type_member = function
+| Member_plain (_, t0) -> t0
+| Member_bitfield (_, sz, sg, a, w, _) ->
+  let sg' = if zlt w (bitsize_intsize sz) then Signed else sg in
+  Tint (sz, sg', a)
+
+(** val member_is_padding : member -> bool **)
+
+let member_is_padding = function
+| Member_plain (_, _) -> false
+| Member_bitfield (_, _, _, _, _, p) -> p
 
 type composite = { co_su : struct_or_union; co_members : members;
                    co_attr : attr; co_sizeof : coq_Z; co_alignof : coq_Z;
                    co_rank : nat }
 
 type composite_env = composite PTree.t
+
+type bitfield =
+| Full
+| Bits of intsize * signedness * coq_Z * coq_Z
 
 (** val type_int32s : coq_type **)
 
@@ -341,47 +391,93 @@ let rec sizeof env = function
    | None -> Z0)
 | _ -> Zpos Coq_xH
 
+(** val bitalignof : composite_env -> coq_type -> coq_Z **)
+
+let bitalignof env t0 =
+  Z.mul (alignof env t0) (Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH))))
+
+(** val bitsizeof : composite_env -> coq_type -> coq_Z **)
+
+let bitsizeof env t0 =
+  Z.mul (sizeof env t0) (Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH))))
+
+(** val bitalignof_intsize : intsize -> coq_Z **)
+
+let bitalignof_intsize = function
+| I16 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))
+| I32 -> Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH)))))
+| _ -> Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH)))
+
+(** val next_field : composite_env -> coq_Z -> member -> coq_Z **)
+
+let next_field env pos = function
+| Member_plain (_, t0) ->
+  Z.add (align pos (bitalignof env t0)) (bitsizeof env t0)
+| Member_bitfield (_, sz, _, _, w, _) ->
+  let s = bitalignof_intsize sz in
+  if zle w Z0
+  then align pos s
+  else let curr = floor pos s in
+       let next = Z.add curr s in
+       if zle (Z.add pos w) next then Z.add pos w else Z.add next w
+
+(** val layout_field :
+    composite_env -> coq_Z -> member -> (coq_Z * bitfield) res **)
+
+let layout_field env pos = function
+| Member_plain (_, t0) ->
+  OK
+    ((Z.div (align pos (bitalignof env t0)) (Zpos (Coq_xO (Coq_xO (Coq_xO
+       Coq_xH))))), Full)
+| Member_bitfield (_, sz, sg, _, w, _) ->
+  if zle w Z0
+  then Error
+         (msg
+           ('a'::('c'::('c'::('e'::('s'::('s'::('i'::('n'::('g'::(' '::('z'::('e'::('r'::('o'::('-'::('w'::('i'::('d'::('t'::('h'::(' '::('b'::('i'::('t'::('f'::('i'::('e'::('l'::('d'::[]))))))))))))))))))))))))))))))
+  else if zlt (bitsize_intsize sz) w
+       then Error
+              (msg
+                ('b'::('i'::('t'::('f'::('i'::('e'::('l'::('d'::(' '::('t'::('o'::('o'::(' '::('w'::('i'::('d'::('e'::[]))))))))))))))))))
+       else let s = bitalignof_intsize sz in
+            let start = floor pos s in
+            let next = Z.add start s in
+            if zle (Z.add pos w) next
+            then OK ((Z.div start (Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH))))),
+                   (Bits (sz, sg, (Z.sub pos start), w)))
+            else OK ((Z.div next (Zpos (Coq_xO (Coq_xO (Coq_xO Coq_xH))))),
+                   (Bits (sz, sg, Z0, w)))
+
 (** val alignof_composite : composite_env -> members -> coq_Z **)
 
 let rec alignof_composite env = function
 | [] -> Zpos Coq_xH
-| p :: m' ->
-  let (_, t0) = p in Z.max (alignof env t0) (alignof_composite env m')
+| m :: ms0 ->
+  if member_is_padding m
+  then alignof_composite env ms0
+  else Z.max (alignof env (type_member m)) (alignof_composite env ms0)
 
-(** val sizeof_struct : composite_env -> coq_Z -> members -> coq_Z **)
+(** val bitsizeof_struct : composite_env -> coq_Z -> members -> coq_Z **)
 
-let rec sizeof_struct env cur = function
+let rec bitsizeof_struct env cur = function
 | [] -> cur
-| p :: m' ->
-  let (_, t0) = p in
-  sizeof_struct env (Z.add (align cur (alignof env t0)) (sizeof env t0)) m'
+| m :: ms0 -> bitsizeof_struct env (next_field env cur m) ms0
+
+(** val bytes_of_bits : coq_Z -> coq_Z **)
+
+let bytes_of_bits n =
+  Z.div (Z.add n (Zpos (Coq_xI (Coq_xI Coq_xH)))) (Zpos (Coq_xO (Coq_xO
+    (Coq_xO Coq_xH))))
+
+(** val sizeof_struct : composite_env -> members -> coq_Z **)
+
+let sizeof_struct env m =
+  bytes_of_bits (bitsizeof_struct env Z0 m)
 
 (** val sizeof_union : composite_env -> members -> coq_Z **)
 
 let rec sizeof_union env = function
 | [] -> Z0
-| p :: m' -> let (_, t0) = p in Z.max (sizeof env t0) (sizeof_union env m')
-
-(** val field_offset_rec :
-    composite_env -> ident -> members -> coq_Z -> coq_Z res **)
-
-let rec field_offset_rec env id fld pos =
-  match fld with
-  | [] ->
-    Error ((MSG
-      ('U'::('n'::('k'::('n'::('o'::('w'::('n'::(' '::('f'::('i'::('e'::('l'::('d'::(' '::[]))))))))))))))) :: ((CTX
-      id) :: []))
-  | p :: fld' ->
-    let (id', t0) = p in
-    if ident_eq id id'
-    then OK (align pos (alignof env t0))
-    else field_offset_rec env id fld'
-           (Z.add (align pos (alignof env t0)) (sizeof env t0))
-
-(** val field_offset : composite_env -> ident -> members -> coq_Z res **)
-
-let field_offset env id fld =
-  field_offset_rec env id fld Z0
+| m :: ms0 -> Z.max (sizeof env (type_member m)) (sizeof_union env ms0)
 
 (** val field_type : ident -> members -> coq_type res **)
 
@@ -390,8 +486,43 @@ let rec field_type id = function
   Error ((MSG
     ('U'::('n'::('k'::('n'::('o'::('w'::('n'::(' '::('f'::('i'::('e'::('l'::('d'::(' '::[]))))))))))))))) :: ((CTX
     id) :: []))
-| p :: fld' ->
-  let (id', t0) = p in if ident_eq id id' then OK t0 else field_type id fld'
+| m :: ms0 ->
+  if ident_eq id (name_member m)
+  then OK (type_member m)
+  else field_type id ms0
+
+(** val field_offset_rec :
+    composite_env -> ident -> members -> coq_Z -> (coq_Z * bitfield) res **)
+
+let rec field_offset_rec env id ms pos =
+  match ms with
+  | [] ->
+    Error ((MSG
+      ('U'::('n'::('k'::('n'::('o'::('w'::('n'::(' '::('f'::('i'::('e'::('l'::('d'::(' '::[]))))))))))))))) :: ((CTX
+      id) :: []))
+  | m :: ms0 ->
+    if ident_eq id (name_member m)
+    then layout_field env pos m
+    else field_offset_rec env id ms0 (next_field env pos m)
+
+(** val field_offset :
+    composite_env -> ident -> members -> (coq_Z * bitfield) res **)
+
+let field_offset env id ms =
+  field_offset_rec env id ms Z0
+
+(** val union_field_offset :
+    composite_env -> ident -> members -> (coq_Z * bitfield) res **)
+
+let rec union_field_offset env id = function
+| [] ->
+  Error ((MSG
+    ('U'::('n'::('k'::('n'::('o'::('w'::('n'::(' '::('f'::('i'::('e'::('l'::('d'::(' '::[]))))))))))))))) :: ((CTX
+    id) :: []))
+| m :: ms0 ->
+  if ident_eq id (name_member m)
+  then layout_field env Z0 m
+  else union_field_offset env id ms0
 
 type mode =
 | By_value of memory_chunk
@@ -478,7 +609,10 @@ let rec rank_type ce = function
 
 let rec rank_members ce = function
 | [] -> O
-| p :: m0 -> let (_, t0) = p in max (rank_type ce t0) (rank_members ce m0)
+| m0 :: m1 ->
+  (match m0 with
+   | Member_plain (_, t0) -> max (rank_type ce t0) (rank_members ce m1)
+   | Member_bitfield (_, _, _, _, _, _) -> rank_members ce m1)
 
 (** val type_of_params : (ident * coq_type) list -> typelist **)
 
@@ -535,15 +669,15 @@ let signature_of_type args res0 cc =
 
 let sizeof_composite env su m =
   match su with
-  | Struct -> sizeof_struct env Z0 m
+  | Struct -> sizeof_struct env m
   | Union -> sizeof_union env m
 
 (** val complete_members : composite_env -> members -> bool **)
 
 let rec complete_members env = function
 | [] -> true
-| p :: m' ->
-  let (_, t0) = p in (&&) (complete_type env t0) (complete_members env m')
+| m :: ms0 ->
+  (&&) (complete_type env (type_member m)) (complete_members env ms0)
 
 (** val composite_of_def :
     composite_env -> ident -> struct_or_union -> members -> attr -> composite
@@ -574,7 +708,7 @@ let rec add_composite_definitions env = function
   let Composite (id, su, m, a) = c in
   (match composite_of_def env id su m a with
    | OK x -> add_composite_definitions (PTree.set id x env) defs0
-   | Error msg -> Error msg)
+   | Error msg0 -> Error msg0)
 
 (** val build_composite_env :
     composite_definition list -> composite_env res **)

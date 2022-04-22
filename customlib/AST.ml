@@ -134,17 +134,17 @@ let rettype_eq t1 t2 =
 
 (** val proj_rettype : rettype -> typ **)
 
-let rec proj_rettype = function
+let proj_rettype = function
 | Tret t0 -> t0
 | _ -> Tint
 
-type calling_convention = { cc_vararg : bool; cc_unproto : bool;
+type calling_convention = { cc_vararg : coq_Z option; cc_unproto : bool;
                             cc_structret : bool }
 
 (** val cc_default : calling_convention **)
 
 let cc_default =
-  { cc_vararg = false; cc_unproto = false; cc_structret = false }
+  { cc_vararg = None; cc_unproto = false; cc_structret = false }
 
 (** val calling_convention_eq :
     calling_convention -> calling_convention -> bool **)
@@ -156,7 +156,14 @@ let calling_convention_eq x y =
   let { cc_vararg = cc_vararg1; cc_unproto = cc_unproto1; cc_structret =
     cc_structret1 } = y
   in
-  if bool_dec cc_vararg0 cc_vararg1
+  if match cc_vararg0 with
+     | Some x0 ->
+       (match cc_vararg1 with
+        | Some z -> Z.eq_dec x0 z
+        | None -> false)
+     | None -> (match cc_vararg1 with
+                | Some _ -> false
+                | None -> true)
   then if bool_dec cc_unproto0 cc_unproto1
        then bool_dec cc_structret0 cc_structret1
        else false

@@ -2,7 +2,6 @@ open AST
 open Archi
 open BinInt
 open BinNums
-open Coqlib
 open Datatypes
 open Floats
 open Integers
@@ -163,7 +162,7 @@ let encode_val chunk v = match v with
   (match chunk with
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 | Vint n ->
   (match chunk with
    | Mint8signed -> inj_bytes (encode_int (S O) (Int.unsigned n))
@@ -173,7 +172,7 @@ let encode_val chunk v = match v with
    | Mint32 -> inj_bytes (encode_int (S (S (S (S O)))) (Int.unsigned n))
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 | Vlong n ->
   (match chunk with
    | Mint64 ->
@@ -181,7 +180,7 @@ let encode_val chunk v = match v with
        (encode_int (S (S (S (S (S (S (S (S O)))))))) (Int64.unsigned n))
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 | Vfloat n ->
   (match chunk with
    | Mfloat64 ->
@@ -190,7 +189,7 @@ let encode_val chunk v = match v with
          (Int64.unsigned (Float.to_bits n)))
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 | Vsingle n ->
   (match chunk with
    | Mfloat32 ->
@@ -198,18 +197,18 @@ let encode_val chunk v = match v with
        (encode_int (S (S (S (S O)))) (Int.unsigned (Float32.to_bits n)))
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 | Vptr (_, _) ->
   (match chunk with
    | Mint32 ->
-     if ptr64 then list_repeat (S (S (S (S O)))) Undef else inj_value Q32 v
+     if ptr64 then repeat Undef (S (S (S (S O)))) else inj_value Q32 v
    | Mint64 ->
      if ptr64
      then inj_value Q64 v
-     else list_repeat (S (S (S (S (S (S (S (S O)))))))) Undef
+     else repeat Undef (S (S (S (S (S (S (S (S O))))))))
    | Many32 -> inj_value Q32 v
    | Many64 -> inj_value Q64 v
-   | _ -> list_repeat (size_chunk_nat chunk) Undef)
+   | _ -> repeat Undef (size_chunk_nat chunk))
 
 (** val decode_val : memory_chunk -> memval list -> coq_val **)
 

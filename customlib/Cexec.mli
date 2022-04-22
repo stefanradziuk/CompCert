@@ -25,7 +25,7 @@ open Znumtheory
 
 val is_val : expr -> (coq_val * coq_type) option
 
-val is_loc : expr -> ((block * Ptrofs.int) * coq_type) option
+val is_loc : expr -> (((block * Ptrofs.int) * bitfield) * coq_type) option
 
 val is_val_list : exprlist -> (coq_val * coq_type) list option
 
@@ -44,18 +44,18 @@ val do_volatile_load :
 
 val do_volatile_store :
   genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int -> coq_val
-  -> ((world * trace) * Mem.mem) option
+  -> (((world * trace) * Mem.mem) * coq_val) option
 
 val do_deref_loc :
-  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int ->
+  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield ->
   ((world * trace) * coq_val) option
 
 val check_assign_copy :
   genv -> coq_type -> block -> Ptrofs.int -> block -> Ptrofs.int -> bool
 
 val do_assign_loc :
-  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> coq_val ->
-  ((world * trace) * Mem.mem) option
+  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield ->
+  coq_val -> (((world * trace) * Mem.mem) * coq_val) option
 
 val do_ef_volatile_load :
   genv -> memory_chunk -> world -> coq_val list -> Mem.mem ->

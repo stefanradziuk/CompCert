@@ -1,5 +1,6 @@
 open AST
 open Archi
+open BinInt
 open BinNat
 open Cop
 open Coqlib
@@ -9,7 +10,6 @@ open Errors
 open Floats
 open Integers
 open Maps
-open Ring
 open Values
 
 (** val strict : bool **)
@@ -247,7 +247,7 @@ let floatsize_eq x y =
     calling_convention -> calling_convention -> calling_convention res **)
 
 let callconv_combine cc1 cc2 =
-  if bool_eq cc1.cc_vararg cc2.cc_vararg
+  if option_eq Z.eq_dec cc1.cc_vararg cc2.cc_vararg
   then OK { cc_vararg = cc1.cc_vararg; cc_unproto =
          ((&&) cc1.cc_unproto cc2.cc_unproto); cc_structret =
          cc1.cc_structret }
@@ -542,7 +542,7 @@ let check_rval = function
   Error
     (msg
       ('n'::('o'::('t'::(' '::('a'::(' '::('r'::('-'::('v'::('a'::('l'::('u'::('e'::[]))))))))))))))
-| Eloc (_, _, _) ->
+| Eloc (_, _, _, _) ->
   Error
     (msg
       ('n'::('o'::('t'::(' '::('a'::(' '::('r'::('-'::('v'::('a'::('l'::('u'::('e'::[]))))))))))))))
@@ -554,7 +554,7 @@ let check_lval = function
 | Evar (_, _) -> OK ()
 | Efield (_, _, _) -> OK ()
 | Ederef (_, _) -> OK ()
-| Eloc (_, _, _) -> OK ()
+| Eloc (_, _, _, _) -> OK ()
 | _ ->
   Error
     (msg
@@ -1077,7 +1077,7 @@ let rec retype_expr ce e = function
   (match retype_exprlist ce e rl with
    | OK x -> ebuiltin ef tyargs x tyres
    | Error msg0 -> Error msg0)
-| Eloc (_, _, _) ->
+| Eloc (_, _, _, _) ->
   Error
     (msg
       ('E'::('l'::('o'::('c'::(' '::('i'::('n'::(' '::('s'::('o'::('u'::('r'::('c'::('e'::[])))))))))))))))

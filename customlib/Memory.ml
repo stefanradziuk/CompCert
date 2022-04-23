@@ -56,7 +56,7 @@ module Mem =
 
   let perm_order'_dec op p =
     match op with
-    | Some p0 -> perm_order_dec p0 p
+    | Some a -> perm_order_dec a p
     | None -> false
 
   (** val perm_dec :

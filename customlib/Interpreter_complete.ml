@@ -127,7 +127,8 @@ module Make =
 
   let pt_zipper_rect _ _ f f0 _ _ = function
   | Top_ptz -> f
-  | Cons_ptl_ptz (x, x0, x1, x2, x3, x4) -> f0 x x0 x1 x2 x3 x4
+  | Cons_ptl_ptz (head_symbolsq, wordq, p0, head_symbolt, wordt, p1) ->
+    f0 head_symbolsq wordq p0 head_symbolt wordt p1
 
   (** val pt_zipper_rec :
       A.initstate -> A.Gram.token list -> 'a1 -> (A.Gram.symbol list ->
@@ -137,7 +138,8 @@ module Make =
 
   let pt_zipper_rec _ _ f f0 _ _ = function
   | Top_ptz -> f
-  | Cons_ptl_ptz (x, x0, x1, x2, x3, x4) -> f0 x x0 x1 x2 x3 x4
+  | Cons_ptl_ptz (head_symbolsq, wordq, p0, head_symbolt, wordt, p1) ->
+    f0 head_symbolsq wordq p0 head_symbolt wordt p1
 
   (** val ptl_zipper_rect :
       A.initstate -> A.Gram.token list -> (A.Gram.production -> A.Gram.token
@@ -180,8 +182,8 @@ module Make =
       A.GramDefs.parse_tree_list -> ptl_zipper -> 'a1) -> pt_dot -> 'a1 **)
 
   let pt_dot_rect _ _ f f0 = function
-  | Reduce_ptd (x, x0, x1, x2) -> f x x0 x1 x2
-  | Shift_ptd (x, x0, x1, x2, x3) -> f0 x x0 x1 x2 x3
+  | Reduce_ptd (prod, word, p0, p1) -> f prod word p0 p1
+  | Shift_ptd (tok, symbolsq, wordq, p0, p1) -> f0 tok symbolsq wordq p0 p1
 
   (** val pt_dot_rec :
       A.initstate -> A.Gram.token list -> (A.Gram.production -> A.Gram.token
@@ -190,8 +192,8 @@ module Make =
       A.GramDefs.parse_tree_list -> ptl_zipper -> 'a1) -> pt_dot -> 'a1 **)
 
   let pt_dot_rec _ _ f f0 = function
-  | Reduce_ptd (x, x0, x1, x2) -> f x x0 x1 x2
-  | Shift_ptd (x, x0, x1, x2, x3) -> f0 x x0 x1 x2 x3
+  | Reduce_ptd (prod, word, p0, p1) -> f prod word p0 p1
+  | Shift_ptd (tok, symbolsq, wordq, p0, p1) -> f0 tok symbolsq wordq p0 p1
 
   (** val ptlz_sem :
       A.initstate -> A.Gram.token list -> A.Gram.symbol list -> A.Gram.token

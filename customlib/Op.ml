@@ -110,6 +110,8 @@ type operation =
 | Osubf
 | Omulf
 | Odivf
+| Omaxf
+| Ominf
 | Onegfs
 | Oabsfs
 | Oaddfs
@@ -154,93 +156,92 @@ let eq_condition x y =
               | _ -> false)
   in
   (match x with
-   | Ccomp x0 -> (match y with
-                  | Ccomp c0 -> h0 x0 c0
+   | Ccomp c -> (match y with
+                 | Ccomp c0 -> h0 c c0
+                 | _ -> false)
+   | Ccompu c -> (match y with
+                  | Ccompu c0 -> h0 c c0
                   | _ -> false)
-   | Ccompu x0 -> (match y with
-                   | Ccompu c0 -> h0 x0 c0
+   | Ccompimm (c, n) ->
+     (match y with
+      | Ccompimm (c0, n0) -> if h0 c c0 then Int.eq_dec n n0 else false
+      | _ -> false)
+   | Ccompuimm (c, n) ->
+     (match y with
+      | Ccompuimm (c0, n0) -> if h0 c c0 then Int.eq_dec n n0 else false
+      | _ -> false)
+   | Ccompl c -> (match y with
+                  | Ccompl c0 -> h0 c c0
+                  | _ -> false)
+   | Ccomplu c -> (match y with
+                   | Ccomplu c0 -> h0 c c0
                    | _ -> false)
-   | Ccompimm (x0, x1) ->
+   | Ccomplimm (c, n) ->
      (match y with
-      | Ccompimm (c0, n0) -> if h0 x0 c0 then Int.eq_dec x1 n0 else false
+      | Ccomplimm (c0, n0) -> if h0 c c0 then Int64.eq_dec n n0 else false
       | _ -> false)
-   | Ccompuimm (x0, x1) ->
+   | Ccompluimm (c, n) ->
      (match y with
-      | Ccompuimm (c0, n0) -> if h0 x0 c0 then Int.eq_dec x1 n0 else false
+      | Ccompluimm (c0, n0) -> if h0 c c0 then Int64.eq_dec n n0 else false
       | _ -> false)
-   | Ccompl x0 -> (match y with
-                   | Ccompl c0 -> h0 x0 c0
+   | Ccompf c -> (match y with
+                  | Ccompf c0 -> h0 c c0
+                  | _ -> false)
+   | Cnotcompf c -> (match y with
+                     | Cnotcompf c0 -> h0 c c0
+                     | _ -> false)
+   | Ccompfs c -> (match y with
+                   | Ccompfs c0 -> h0 c c0
                    | _ -> false)
-   | Ccomplu x0 -> (match y with
-                    | Ccomplu c0 -> h0 x0 c0
-                    | _ -> false)
-   | Ccomplimm (x0, x1) ->
-     (match y with
-      | Ccomplimm (c0, n0) -> if h0 x0 c0 then Int64.eq_dec x1 n0 else false
-      | _ -> false)
-   | Ccompluimm (x0, x1) ->
-     (match y with
-      | Ccompluimm (c0, n0) -> if h0 x0 c0 then Int64.eq_dec x1 n0 else false
-      | _ -> false)
-   | Ccompf x0 -> (match y with
-                   | Ccompf c0 -> h0 x0 c0
-                   | _ -> false)
-   | Cnotcompf x0 -> (match y with
-                      | Cnotcompf c0 -> h0 x0 c0
+   | Cnotcompfs c -> (match y with
+                      | Cnotcompfs c0 -> h0 c c0
                       | _ -> false)
-   | Ccompfs x0 -> (match y with
-                    | Ccompfs c0 -> h0 x0 c0
-                    | _ -> false)
-   | Cnotcompfs x0 -> (match y with
-                       | Cnotcompfs c0 -> h0 x0 c0
-                       | _ -> false)
-   | Cmaskzero x0 ->
+   | Cmaskzero n ->
      (match y with
-      | Cmaskzero n0 -> Int.eq_dec x0 n0
+      | Cmaskzero n0 -> Int.eq_dec n n0
       | _ -> false)
-   | Cmasknotzero x0 ->
+   | Cmasknotzero n ->
      (match y with
-      | Cmasknotzero n0 -> Int.eq_dec x0 n0
+      | Cmasknotzero n0 -> Int.eq_dec n n0
       | _ -> false))
 
 (** val eq_addressing : addressing -> addressing -> bool **)
 
 let eq_addressing x y =
   match x with
-  | Aindexed x0 -> (match y with
-                    | Aindexed z0 -> zeq x0 z0
+  | Aindexed z -> (match y with
+                   | Aindexed z0 -> zeq z z0
+                   | _ -> false)
+  | Aindexed2 z -> (match y with
+                    | Aindexed2 z0 -> zeq z z0
                     | _ -> false)
-  | Aindexed2 x0 -> (match y with
-                     | Aindexed2 z0 -> zeq x0 z0
-                     | _ -> false)
-  | Ascaled (x0, x1) ->
+  | Ascaled (z, z0) ->
     (match y with
-     | Ascaled (z1, z2) -> if zeq x0 z1 then zeq x1 z2 else false
+     | Ascaled (z1, z2) -> if zeq z z1 then zeq z0 z2 else false
      | _ -> false)
-  | Aindexed2scaled (x0, x1) ->
+  | Aindexed2scaled (z, z0) ->
     (match y with
-     | Aindexed2scaled (z1, z2) -> if zeq x0 z1 then zeq x1 z2 else false
+     | Aindexed2scaled (z1, z2) -> if zeq z z1 then zeq z0 z2 else false
      | _ -> false)
-  | Aglobal (x0, x1) ->
+  | Aglobal (i, i0) ->
     (match y with
      | Aglobal (i1, i2) ->
-       if ident_eq x0 i1 then Ptrofs.eq_dec x1 i2 else false
+       if ident_eq i i1 then Ptrofs.eq_dec i0 i2 else false
      | _ -> false)
-  | Abased (x0, x1) ->
+  | Abased (i, i0) ->
     (match y with
-     | Abased (i1, i2) ->
-       if ident_eq x0 i1 then Ptrofs.eq_dec x1 i2 else false
+     | Abased (i1, i2) -> if ident_eq i i1 then Ptrofs.eq_dec i0 i2 else false
      | _ -> false)
-  | Abasedscaled (x0, x1, x2) ->
+  | Abasedscaled (z, i, i0) ->
     (match y with
      | Abasedscaled (z0, i1, i2) ->
-       if zeq x0 z0
-       then if ident_eq x1 i1 then Ptrofs.eq_dec x2 i2 else false
+       if zeq z z0
+       then if ident_eq i i1 then Ptrofs.eq_dec i0 i2 else false
        else false
      | _ -> false)
-  | Ainstack x0 ->
+  | Ainstack i ->
     (match y with
-     | Ainstack i0 -> Ptrofs.eq_dec x0 i0
+     | Ainstack i0 -> Ptrofs.eq_dec i i0
      | _ -> false)
 
 (** val beq_operation : operation -> operation -> bool **)
@@ -499,6 +500,12 @@ let beq_operation x y =
   | Odivf -> (match y with
               | Odivf -> true
               | _ -> false)
+  | Omaxf -> (match y with
+              | Omaxf -> true
+              | _ -> false)
+  | Ominf -> (match y with
+              | Ominf -> true
+              | _ -> false)
   | Onegfs -> (match y with
                | Onegfs -> true
                | _ -> false)
@@ -561,6 +568,24 @@ let beq_operation x y =
 
 let eq_operation =
   BE.dec_eq_from_bool_eq beq_operation
+
+(** val float_max : float -> float -> float **)
+
+let float_max f1 f2 =
+  match Float.compare f1 f2 with
+  | Some c -> (match c with
+               | Gt -> f1
+               | _ -> f2)
+  | None -> f2
+
+(** val float_min : float -> float -> float **)
+
+let float_min f1 f2 =
+  match Float.compare f1 f2 with
+  | Some c -> (match c with
+               | Lt -> f1
+               | _ -> f2)
+  | None -> f2
 
 (** val offset_in_range : coq_Z -> bool **)
 
@@ -708,6 +733,8 @@ let type_of_operation = function
 | Osubf -> ((Tfloat :: (Tfloat :: [])), Tfloat)
 | Omulf -> ((Tfloat :: (Tfloat :: [])), Tfloat)
 | Odivf -> ((Tfloat :: (Tfloat :: [])), Tfloat)
+| Omaxf -> ((Tfloat :: (Tfloat :: [])), Tfloat)
+| Ominf -> ((Tfloat :: (Tfloat :: [])), Tfloat)
 | Onegfs -> ((Tsingle :: []), Tsingle)
 | Oabsfs -> ((Tsingle :: []), Tsingle)
 | Oaddfs -> ((Tsingle :: (Tsingle :: [])), Tsingle)

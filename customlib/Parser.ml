@@ -1299,15 +1299,15 @@ module Gram =
       (terminal -> 'a1) -> (nonterminal -> 'a1) -> symbol -> 'a1 **)
 
   let symbol_rect f f0 = function
-  | T x -> f x
-  | NT x -> f0 x
+  | T t0 -> f t0
+  | NT n -> f0 n
 
   (** val symbol_rec :
       (terminal -> 'a1) -> (nonterminal -> 'a1) -> symbol -> 'a1 **)
 
   let symbol_rec f f0 = function
-  | T x -> f x
-  | NT x -> f0 x
+  | T t0 -> f t0
+  | NT n -> f0 n
 
   (** val coq_SymbolAlph : symbol coq_Alphabet **)
 
@@ -5160,16 +5160,16 @@ module Gram =
       -> symbol -> token list -> parse_tree -> 'a1 **)
 
   let parse_tree_rect f f0 _ _ = function
-  | Terminal_pt x -> f x
-  | Non_terminal_pt (x, x0, x1) -> f0 x x0 x1
+  | Terminal_pt tok -> f tok
+  | Non_terminal_pt (prod, word, p0) -> f0 prod word p0
 
   (** val parse_tree_rec :
       (token -> 'a1) -> (production -> token list -> parse_tree_list -> 'a1)
       -> symbol -> token list -> parse_tree -> 'a1 **)
 
   let parse_tree_rec f f0 _ _ = function
-  | Terminal_pt x -> f x
-  | Non_terminal_pt (x, x0, x1) -> f0 x x0 x1
+  | Terminal_pt tok -> f tok
+  | Non_terminal_pt (prod, word, p0) -> f0 prod word p0
 
   (** val parse_tree_list_rect :
       'a1 -> (symbol list -> token list -> parse_tree_list -> 'a1 -> symbol
@@ -10311,15 +10311,15 @@ module Aut =
       (initstate -> 'a1) -> (noninitstate -> 'a1) -> state -> 'a1 **)
 
   let state_rect f f0 = function
-  | Init x -> f x
-  | Ninit x -> f0 x
+  | Init i -> f i
+  | Ninit n -> f0 n
 
   (** val state_rec :
       (initstate -> 'a1) -> (noninitstate -> 'a1) -> state -> 'a1 **)
 
   let state_rec f f0 = function
-  | Init x -> f x
-  | Ninit x -> f0 x
+  | Init i -> f i
+  | Ninit n -> f0 n
 
   (** val coq_StateAlph : state coq_Alphabet **)
 
@@ -10352,8 +10352,8 @@ module Aut =
       'a1) -> 'a1 -> lookahead_action -> 'a1 **)
 
   let lookahead_action_rect _ f f0 f1 = function
-  | Shift_act x -> f x __
-  | Reduce_act x -> f0 x
+  | Shift_act s -> f s __
+  | Reduce_act p -> f0 p
   | Fail_act -> f1
 
   (** val lookahead_action_rec :
@@ -10361,8 +10361,8 @@ module Aut =
       'a1) -> 'a1 -> lookahead_action -> 'a1 **)
 
   let lookahead_action_rec _ f f0 f1 = function
-  | Shift_act x -> f x __
-  | Reduce_act x -> f0 x
+  | Shift_act s -> f s __
+  | Reduce_act p -> f0 p
   | Fail_act -> f1
 
   type action =
@@ -10374,16 +10374,16 @@ module Aut =
       'a1) -> action -> 'a1 **)
 
   let action_rect f f0 = function
-  | Default_reduce_act x -> f x
-  | Lookahead_act x -> f0 x
+  | Default_reduce_act p -> f p
+  | Lookahead_act l -> f0 l
 
   (** val action_rec :
       (Gram.production -> 'a1) -> ((Gram.terminal -> lookahead_action) ->
       'a1) -> action -> 'a1 **)
 
   let action_rec f f0 = function
-  | Default_reduce_act x -> f x
-  | Lookahead_act x -> f0 x
+  | Default_reduce_act p -> f p
+  | Lookahead_act l -> f0 l
 
   type item = { prod_item : Gram.production; dot_pos_item : nat;
                 lookaheads_item : Gram.terminal list }

@@ -110,6 +110,8 @@ type operation =
 | Osubf
 | Omulf
 | Odivf
+| Omaxf
+| Ominf
 | Onegfs
 | Oabsfs
 | Oaddfs
@@ -136,6 +138,10 @@ val eq_addressing : addressing -> addressing -> bool
 val beq_operation : operation -> operation -> bool
 
 val eq_operation : operation -> operation -> bool
+
+val float_max : float -> float -> float
+
+val float_min : float -> float -> float
 
 val offset_in_range : coq_Z -> bool
 

@@ -17,8 +17,8 @@ let rec store_zeros m b p n =
   if zle n Z0
   then Some m
   else (match Mem.store Mint8unsigned m b p coq_Vzero with
-        | Some m' ->
-          store_zeros m' b (Z.add p (Zpos Coq_xH)) (Z.sub n (Zpos Coq_xH))
+        | Some a ->
+          store_zeros a b (Z.add p (Zpos Coq_xH)) (Z.sub n (Zpos Coq_xH))
         | None -> None)
 
 module Senv =

@@ -87,8 +87,8 @@ module Make =
     then if forallb (fun x ->
               forallb (fun x0 ->
                 match A.goto_table x x0 with
-                | Some s ->
-                  is_prefix (A.past_symb_of_non_init_state s)
+                | Some a ->
+                  is_prefix (A.past_symb_of_non_init_state a)
                     (head_symbs_of_state x)
                 | None -> true)
                 (all_list A.Gram.coq_NonTerminalAlph.coq_AlphabetFinite))
@@ -108,8 +108,8 @@ module Make =
               then if forallb (fun x ->
                         forallb (fun x0 ->
                           match A.goto_table x x0 with
-                          | Some s ->
-                            is_prefix_pred (A.past_state_of_non_init_state s)
+                          | Some a ->
+                            is_prefix_pred (A.past_state_of_non_init_state a)
                               (head_states_of_state x)
                           | None -> true)
                           (all_list

@@ -63,7 +63,7 @@ let rec list_eq_dec eq_dec l l' =
   | y :: l0 ->
     (match l' with
      | [] -> false
-     | a0 :: l1 -> if eq_dec y a0 then list_eq_dec eq_dec l0 l1 else false)
+     | a :: l1 -> if eq_dec y a then list_eq_dec eq_dec l0 l1 else false)
 
 (** val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list **)
 

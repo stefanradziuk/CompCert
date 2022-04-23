@@ -37,7 +37,7 @@ module Make =
     | y :: l ->
       (match l2 with
        | [] -> false
-       | t :: l0 -> if x y t then list_decidable_eq x l l0 else false)
+       | a :: l0 -> if x y a then list_decidable_eq x l l0 else false)
 
   (** val cast : 'a1 -> 'a1 -> (unit -> coq_Decidable) -> 'a2 -> 'a2 **)
 
@@ -119,9 +119,9 @@ module Make =
       'a1) -> step_result -> 'a1 **)
 
   let step_result_rect _ f f0 f1 = function
-  | Fail_sr_full (x, x0) -> f x x0
-  | Accept_sr (x, x0) -> f0 x x0
-  | Progress_sr (x, x0) -> f1 x x0
+  | Fail_sr_full (s0, t) -> f s0 t
+  | Accept_sr (s0, b) -> f0 s0 b
+  | Progress_sr (s0, b) -> f1 s0 b
 
   (** val step_result_rec :
       A.initstate -> (A.state -> A.Gram.token -> 'a1) ->
@@ -129,9 +129,9 @@ module Make =
       'a1) -> step_result -> 'a1 **)
 
   let step_result_rec _ f f0 f1 = function
-  | Fail_sr_full (x, x0) -> f x x0
-  | Accept_sr (x, x0) -> f0 x x0
-  | Progress_sr (x, x0) -> f1 x x0
+  | Fail_sr_full (s0, t) -> f s0 t
+  | Accept_sr (s0, b) -> f0 s0 b
+  | Progress_sr (s0, b) -> f1 s0 b
 
   (** val reduce_step :
       A.initstate -> stack -> A.Gram.production -> buffer -> step_result **)
@@ -186,18 +186,18 @@ module Make =
       'a1 parse_result -> 'a2 **)
 
   let parse_result_rect f f0 f1 = function
-  | Fail_pr_full (x, x0) -> f x x0
+  | Fail_pr_full (s, t) -> f s t
   | Timeout_pr -> f0
-  | Parsed_pr (x, x0) -> f1 x x0
+  | Parsed_pr (a, b) -> f1 a b
 
   (** val parse_result_rec :
       (A.state -> A.Gram.token -> 'a2) -> 'a2 -> ('a1 -> buffer -> 'a2) ->
       'a1 parse_result -> 'a2 **)
 
   let parse_result_rec f f0 f1 = function
-  | Fail_pr_full (x, x0) -> f x x0
+  | Fail_pr_full (s, t) -> f s t
   | Timeout_pr -> f0
-  | Parsed_pr (x, x0) -> f1 x x0
+  | Parsed_pr (a, b) -> f1 a b
 
   (** val parse :
       A.initstate -> buffer -> nat -> A.Gram.symbol_semantic_type parse_result **)

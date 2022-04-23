@@ -12,35 +12,35 @@ open Zaux
 
 let coq_Beq_dec _ _ f1 f2 =
   match f1 with
-  | B754_zero s1 ->
+  | B754_zero s ->
     (match f2 with
-     | B754_zero s2 ->
-       if s1 then if s2 then true else false else if s2 then false else true
+     | B754_zero s0 ->
+       if s then if s0 then true else false else if s0 then false else true
      | _ -> false)
-  | B754_infinity s1 ->
+  | B754_infinity s ->
     (match f2 with
-     | B754_infinity s2 ->
-       if s1 then if s2 then true else false else if s2 then false else true
+     | B754_infinity s0 ->
+       if s then if s0 then true else false else if s0 then false else true
      | _ -> false)
-  | B754_nan (s1, p1) ->
+  | B754_nan (s, pl) ->
     (match f2 with
-     | B754_nan (s2, p2) ->
-       if s1
-       then if s2 then Pos.eq_dec p1 p2 else false
-       else if s2 then false else Pos.eq_dec p1 p2
+     | B754_nan (s0, pl0) ->
+       if s
+       then if s0 then Pos.eq_dec pl pl0 else false
+       else if s0 then false else Pos.eq_dec pl pl0
      | _ -> false)
-  | B754_finite (s1, m1, e1) ->
+  | B754_finite (s, m, e) ->
     (match f2 with
-     | B754_finite (s2, m2, e2) ->
-       if s1
-       then if s2
-            then let s = Pos.eq_dec m1 m2 in
-                 if s then Z.eq_dec e1 e2 else false
+     | B754_finite (s0, m0, e0) ->
+       if s
+       then if s0
+            then let s1 = Pos.eq_dec m m0 in
+                 if s1 then Z.eq_dec e e0 else false
             else false
-       else if s2
+       else if s0
             then false
-            else let s = Pos.eq_dec m1 m2 in
-                 if s then Z.eq_dec e1 e2 else false
+            else let s1 = Pos.eq_dec m m0 in
+                 if s1 then Z.eq_dec e e0 else false
      | _ -> false)
 
 (** val coq_BofZ : coq_Z -> coq_Z -> coq_Z -> binary_float **)

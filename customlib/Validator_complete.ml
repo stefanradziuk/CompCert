@@ -210,9 +210,9 @@ module Make =
                                      | A.Gram.T _ -> true
                                      | A.Gram.NT n ->
                                        (match A.goto_table st n with
-                                        | Some s0 ->
+                                        | Some a ->
                                           TerminalSet.subset lset
-                                            (find_items_map im (A.Ninit s0)
+                                            (find_items_map im (A.Ninit a)
                                               prod (S pos))
                                         | None -> false)))
                              then if forallb (fun x ->

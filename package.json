@@ -24,15 +24,15 @@
   },
   "dependencies": {
     "@opam/menhir": "*",
-    "ocaml": "4.13.x",
+    "ocaml": "4.14.x",
     "@opam/dune": "^2.9"
   },
   "devDependencies": {
     "@opam/merlin": "*",
     "@opam/utop": "*",
     "@opam/odoc": "*",
-    "ocaml": "4.13.x", 
-    "@opam/coq": "8.13.2", 
+    "ocaml": "4.14.x", 
+    "@opam/coq": "8.15.0", 
     "@opam/depgraph": "*"
   }
 }

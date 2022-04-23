@@ -113,9 +113,9 @@ type rettype =
 
 let rettype_eq t1 t2 =
   match t1 with
-  | Tret x -> (match t2 with
-               | Tret t0 -> typ_eq x t0
-               | _ -> false)
+  | Tret t0 -> (match t2 with
+                | Tret t3 -> typ_eq t0 t3
+                | _ -> false)
   | Tint8signed -> (match t2 with
                     | Tint8signed -> true
                     | _ -> false)
@@ -157,9 +157,9 @@ let calling_convention_eq x y =
     cc_structret1 } = y
   in
   if match cc_vararg0 with
-     | Some x0 ->
+     | Some a ->
        (match cc_vararg1 with
-        | Some z -> Z.eq_dec x0 z
+        | Some a0 -> Z.eq_dec a a0
         | None -> false)
      | None -> (match cc_vararg1 with
                 | Some _ -> false
@@ -454,28 +454,28 @@ let external_function_eq =
   let x = fun _ -> list_eq_dec in
   (fun ef1 ef2 ->
   match ef1 with
-  | EF_external (x0, x1) ->
+  | EF_external (name, sg) ->
     (match ef2 with
      | EF_external (name0, sg0) ->
-       if string_dec x0 name0 then signature_eq x1 sg0 else false
+       if string_dec name name0 then signature_eq sg sg0 else false
      | _ -> false)
-  | EF_builtin (x0, x1) ->
+  | EF_builtin (name, sg) ->
     (match ef2 with
      | EF_builtin (name0, sg0) ->
-       if string_dec x0 name0 then signature_eq x1 sg0 else false
+       if string_dec name name0 then signature_eq sg sg0 else false
      | _ -> false)
-  | EF_runtime (x0, x1) ->
+  | EF_runtime (name, sg) ->
     (match ef2 with
      | EF_runtime (name0, sg0) ->
-       if string_dec x0 name0 then signature_eq x1 sg0 else false
+       if string_dec name name0 then signature_eq sg sg0 else false
      | _ -> false)
-  | EF_vload x0 ->
+  | EF_vload chunk ->
     (match ef2 with
-     | EF_vload chunk0 -> chunk_eq x0 chunk0
+     | EF_vload chunk0 -> chunk_eq chunk chunk0
      | _ -> false)
-  | EF_vstore x0 ->
+  | EF_vstore chunk ->
     (match ef2 with
-     | EF_vstore chunk0 -> chunk_eq x0 chunk0
+     | EF_vstore chunk0 -> chunk_eq chunk chunk0
      | _ -> false)
   | EF_malloc -> (match ef2 with
                   | EF_malloc -> true
@@ -483,38 +483,38 @@ let external_function_eq =
   | EF_free -> (match ef2 with
                 | EF_free -> true
                 | _ -> false)
-  | EF_memcpy (x0, x1) ->
+  | EF_memcpy (sz, al) ->
     (match ef2 with
-     | EF_memcpy (sz0, al0) -> if zeq x0 sz0 then zeq x1 al0 else false
+     | EF_memcpy (sz0, al0) -> if zeq sz sz0 then zeq al al0 else false
      | _ -> false)
-  | EF_annot (x0, x1, x2) ->
+  | EF_annot (kind, text, targs) ->
     (match ef2 with
      | EF_annot (kind0, text0, targs0) ->
-       if ident_eq x0 kind0
-       then if string_dec x1 text0 then x __ typ_eq x2 targs0 else false
+       if ident_eq kind kind0
+       then if string_dec text text0 then x __ typ_eq targs targs0 else false
        else false
      | _ -> false)
-  | EF_annot_val (x0, x1, x2) ->
+  | EF_annot_val (kind, text, targ) ->
     (match ef2 with
      | EF_annot_val (kind0, text0, targ0) ->
-       if ident_eq x0 kind0
-       then if string_dec x1 text0 then typ_eq x2 targ0 else false
+       if ident_eq kind kind0
+       then if string_dec text text0 then typ_eq targ targ0 else false
        else false
      | _ -> false)
-  | EF_inline_asm (x0, x1, x2) ->
+  | EF_inline_asm (text, sg, clobbers) ->
     (match ef2 with
      | EF_inline_asm (text0, sg0, clobbers0) ->
-       if string_dec x0 text0
-       then if signature_eq x1 sg0
-            then x __ string_dec x2 clobbers0
+       if string_dec text text0
+       then if signature_eq sg sg0
+            then x __ string_dec clobbers clobbers0
             else false
        else false
      | _ -> false)
-  | EF_debug (x0, x1, x2) ->
+  | EF_debug (kind, text, targs) ->
     (match ef2 with
      | EF_debug (kind0, text0, targs0) ->
-       if ident_eq x0 kind0
-       then if ident_eq x1 text0 then x __ typ_eq x2 targs0 else false
+       if ident_eq kind kind0
+       then if ident_eq text text0 then x __ typ_eq targs targs0 else false
        else false
      | _ -> false))
 

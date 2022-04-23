@@ -56,23 +56,22 @@ module Val =
     | Vundef -> (match y with
                  | Vundef -> true
                  | _ -> false)
-    | Vint x0 -> (match y with
-                  | Vint i0 -> Int.eq_dec x0 i0
+    | Vint i -> (match y with
+                 | Vint i0 -> Int.eq_dec i i0
+                 | _ -> false)
+    | Vlong i -> (match y with
+                  | Vlong i0 -> Int64.eq_dec i i0
                   | _ -> false)
-    | Vlong x0 -> (match y with
-                   | Vlong i0 -> Int64.eq_dec x0 i0
+    | Vfloat f -> (match y with
+                   | Vfloat f0 -> Float.eq_dec f f0
                    | _ -> false)
-    | Vfloat x0 -> (match y with
-                    | Vfloat f0 -> Float.eq_dec x0 f0
-                    | _ -> false)
-    | Vsingle x0 ->
+    | Vsingle f ->
       (match y with
-       | Vsingle f0 -> Float32.eq_dec x0 f0
+       | Vsingle f0 -> Float32.eq_dec f f0
        | _ -> false)
-    | Vptr (x0, x1) ->
+    | Vptr (b, i) ->
       (match y with
-       | Vptr (b0, i0) ->
-         if eq_block x0 b0 then Ptrofs.eq_dec x1 i0 else false
+       | Vptr (b0, i0) -> if eq_block b b0 then Ptrofs.eq_dec i i0 else false
        | _ -> false)
 
   (** val of_bool : bool -> coq_val **)

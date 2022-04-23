@@ -54,15 +54,15 @@ module Loc =
 
   let eq p q =
     match p with
-    | R x -> (match q with
-              | R r0 -> mreg_eq x r0
+    | R r -> (match q with
+              | R r0 -> mreg_eq r r0
               | S (_, _, _) -> false)
-    | S (x, x0, x1) ->
+    | S (sl, pos, ty) ->
       (match q with
        | R _ -> false
        | S (sl0, pos0, ty0) ->
-         if slot_eq x sl0
-         then if zeq x0 pos0 then typ_eq x1 ty0 else false
+         if slot_eq sl sl0
+         then if zeq pos pos0 then typ_eq ty ty0 else false
          else false)
 
   (** val diff_dec : loc -> loc -> bool **)

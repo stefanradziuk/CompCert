@@ -243,7 +243,7 @@ module Z =
     | Z0 -> (Z0, Z0)
     | Zpos a' ->
       (match b with
-       | Z0 -> (Z0, Z0)
+       | Z0 -> (Z0, a)
        | Zpos _ -> pos_div_eucl a' b
        | Zneg b' ->
          let (q, r) = pos_div_eucl a' (Zpos b') in
@@ -252,7 +252,7 @@ module Z =
           | _ -> ((opp (add q (Zpos Coq_xH))), (add b r))))
     | Zneg a' ->
       (match b with
-       | Z0 -> (Z0, Z0)
+       | Z0 -> (Z0, a)
        | Zpos _ ->
          let (q, r) = pos_div_eucl a' b in
          (match r with
@@ -434,12 +434,12 @@ module Z =
     | Z0 -> (match y with
              | Z0 -> true
              | _ -> false)
-    | Zpos x0 -> (match y with
-                  | Zpos p0 -> Pos.eq_dec x0 p0
-                  | _ -> false)
-    | Zneg x0 -> (match y with
-                  | Zneg p0 -> Pos.eq_dec x0 p0
-                  | _ -> false)
+    | Zpos p -> (match y with
+                 | Zpos p0 -> Pos.eq_dec p p0
+                 | _ -> false)
+    | Zneg p -> (match y with
+                 | Zneg p0 -> Pos.eq_dec p p0
+                 | _ -> false)
 
   (** val log2_up : coq_Z -> coq_Z **)
 

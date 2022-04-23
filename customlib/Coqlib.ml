@@ -47,9 +47,9 @@ let floor n amount =
 
 let option_eq eqA x y =
   match x with
-  | Some x0 -> (match y with
-                | Some a0 -> eqA x0 a0
-                | None -> false)
+  | Some a -> (match y with
+               | Some a0 -> eqA a a0
+               | None -> false)
   | None -> (match y with
              | Some _ -> false
              | None -> true)

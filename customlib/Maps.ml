@@ -302,170 +302,170 @@ module PTree =
 
   let rec tree_rec2' base base1 base2 nodes m1 m2 =
     match m1 with
-    | Node001 r1 ->
+    | Node001 t0 ->
       (match m2 with
-       | Node001 r2 ->
-         nodes Empty None (Nodes r1) Empty None (Nodes r2) base
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node010 x2 ->
-         nodes Empty None (Nodes r1) Empty (Some x2) Empty base
-           (base2 (Nodes r1))
-       | Node011 (x2, r2) ->
-         nodes Empty None (Nodes r1) Empty (Some x2) (Nodes r2) base
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node100 l2 ->
-         nodes Empty None (Nodes r1) (Nodes l2) None Empty (base1 (Nodes l2))
-           (base2 (Nodes r1))
-       | Node101 (l2, r2) ->
-         nodes Empty None (Nodes r1) (Nodes l2) None (Nodes r2)
-           (base1 (Nodes l2)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node110 (l2, x2) ->
-         nodes Empty None (Nodes r1) (Nodes l2) (Some x2) Empty
-           (base1 (Nodes l2)) (base2 (Nodes r1))
-       | Node111 (l2, x2, r2) ->
-         nodes Empty None (Nodes r1) (Nodes l2) (Some x2) (Nodes r2)
-           (base1 (Nodes l2)) (tree_rec2' base base1 base2 nodes r1 r2))
-    | Node010 x1 ->
+       | Node001 t1 ->
+         nodes Empty None (Nodes t0) Empty None (Nodes t1) base
+           (tree_rec2' base base1 base2 nodes t0 t1)
+       | Node010 a ->
+         nodes Empty None (Nodes t0) Empty (Some a) Empty base
+           (base2 (Nodes t0))
+       | Node011 (a, t1) ->
+         nodes Empty None (Nodes t0) Empty (Some a) (Nodes t1) base
+           (tree_rec2' base base1 base2 nodes t0 t1)
+       | Node100 t1 ->
+         nodes Empty None (Nodes t0) (Nodes t1) None Empty (base1 (Nodes t1))
+           (base2 (Nodes t0))
+       | Node101 (t1, t2) ->
+         nodes Empty None (Nodes t0) (Nodes t1) None (Nodes t2)
+           (base1 (Nodes t1)) (tree_rec2' base base1 base2 nodes t0 t2)
+       | Node110 (t1, a) ->
+         nodes Empty None (Nodes t0) (Nodes t1) (Some a) Empty
+           (base1 (Nodes t1)) (base2 (Nodes t0))
+       | Node111 (t1, a, t2) ->
+         nodes Empty None (Nodes t0) (Nodes t1) (Some a) (Nodes t2)
+           (base1 (Nodes t1)) (tree_rec2' base base1 base2 nodes t0 t2))
+    | Node010 a ->
       (match m2 with
-       | Node001 r2 ->
-         nodes Empty (Some x1) Empty Empty None (Nodes r2) base
-           (base1 (Nodes r2))
-       | Node010 x2 ->
-         nodes Empty (Some x1) Empty Empty (Some x2) Empty base base
-       | Node011 (x2, r2) ->
-         nodes Empty (Some x1) Empty Empty (Some x2) (Nodes r2) base
-           (base1 (Nodes r2))
-       | Node100 l2 ->
-         nodes Empty (Some x1) Empty (Nodes l2) None Empty (base1 (Nodes l2))
+       | Node001 t0 ->
+         nodes Empty (Some a) Empty Empty None (Nodes t0) base
+           (base1 (Nodes t0))
+       | Node010 a0 ->
+         nodes Empty (Some a) Empty Empty (Some a0) Empty base base
+       | Node011 (a0, t0) ->
+         nodes Empty (Some a) Empty Empty (Some a0) (Nodes t0) base
+           (base1 (Nodes t0))
+       | Node100 t0 ->
+         nodes Empty (Some a) Empty (Nodes t0) None Empty (base1 (Nodes t0))
            base
-       | Node101 (l2, r2) ->
-         nodes Empty (Some x1) Empty (Nodes l2) None (Nodes r2)
-           (base1 (Nodes l2)) (base1 (Nodes r2))
-       | Node110 (l2, x2) ->
-         nodes Empty (Some x1) Empty (Nodes l2) (Some x2) Empty
-           (base1 (Nodes l2)) base
-       | Node111 (l2, x2, r2) ->
-         nodes Empty (Some x1) Empty (Nodes l2) (Some x2) (Nodes r2)
-           (base1 (Nodes l2)) (base1 (Nodes r2)))
-    | Node011 (x1, r1) ->
+       | Node101 (t0, t1) ->
+         nodes Empty (Some a) Empty (Nodes t0) None (Nodes t1)
+           (base1 (Nodes t0)) (base1 (Nodes t1))
+       | Node110 (t0, a0) ->
+         nodes Empty (Some a) Empty (Nodes t0) (Some a0) Empty
+           (base1 (Nodes t0)) base
+       | Node111 (t0, a0, t1) ->
+         nodes Empty (Some a) Empty (Nodes t0) (Some a0) (Nodes t1)
+           (base1 (Nodes t0)) (base1 (Nodes t1)))
+    | Node011 (a, t0) ->
       (match m2 with
-       | Node001 r2 ->
-         nodes Empty (Some x1) (Nodes r1) Empty None (Nodes r2) base
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node010 x2 ->
-         nodes Empty (Some x1) (Nodes r1) Empty (Some x2) Empty base
-           (base2 (Nodes r1))
-       | Node011 (x2, r2) ->
-         nodes Empty (Some x1) (Nodes r1) Empty (Some x2) (Nodes r2) base
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node100 l2 ->
-         nodes Empty (Some x1) (Nodes r1) (Nodes l2) None Empty
-           (base1 (Nodes l2)) (base2 (Nodes r1))
-       | Node101 (l2, r2) ->
-         nodes Empty (Some x1) (Nodes r1) (Nodes l2) None (Nodes r2)
-           (base1 (Nodes l2)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node110 (l2, x2) ->
-         nodes Empty (Some x1) (Nodes r1) (Nodes l2) (Some x2) Empty
-           (base1 (Nodes l2)) (base2 (Nodes r1))
-       | Node111 (l2, x2, r2) ->
-         nodes Empty (Some x1) (Nodes r1) (Nodes l2) (Some x2) (Nodes r2)
-           (base1 (Nodes l2)) (tree_rec2' base base1 base2 nodes r1 r2))
-    | Node100 l1 ->
+       | Node001 t1 ->
+         nodes Empty (Some a) (Nodes t0) Empty None (Nodes t1) base
+           (tree_rec2' base base1 base2 nodes t0 t1)
+       | Node010 a0 ->
+         nodes Empty (Some a) (Nodes t0) Empty (Some a0) Empty base
+           (base2 (Nodes t0))
+       | Node011 (a0, t1) ->
+         nodes Empty (Some a) (Nodes t0) Empty (Some a0) (Nodes t1) base
+           (tree_rec2' base base1 base2 nodes t0 t1)
+       | Node100 t1 ->
+         nodes Empty (Some a) (Nodes t0) (Nodes t1) None Empty
+           (base1 (Nodes t1)) (base2 (Nodes t0))
+       | Node101 (t1, t2) ->
+         nodes Empty (Some a) (Nodes t0) (Nodes t1) None (Nodes t2)
+           (base1 (Nodes t1)) (tree_rec2' base base1 base2 nodes t0 t2)
+       | Node110 (t1, a0) ->
+         nodes Empty (Some a) (Nodes t0) (Nodes t1) (Some a0) Empty
+           (base1 (Nodes t1)) (base2 (Nodes t0))
+       | Node111 (t1, a0, t2) ->
+         nodes Empty (Some a) (Nodes t0) (Nodes t1) (Some a0) (Nodes t2)
+           (base1 (Nodes t1)) (tree_rec2' base base1 base2 nodes t0 t2))
+    | Node100 t0 ->
       (match m2 with
-       | Node001 r2 ->
-         nodes (Nodes l1) None Empty Empty None (Nodes r2) (base2 (Nodes l1))
-           (base1 (Nodes r2))
-       | Node010 x2 ->
-         nodes (Nodes l1) None Empty Empty (Some x2) Empty (base2 (Nodes l1))
+       | Node001 t1 ->
+         nodes (Nodes t0) None Empty Empty None (Nodes t1) (base2 (Nodes t0))
+           (base1 (Nodes t1))
+       | Node010 a ->
+         nodes (Nodes t0) None Empty Empty (Some a) Empty (base2 (Nodes t0))
            base
-       | Node011 (x2, r2) ->
-         nodes (Nodes l1) None Empty Empty (Some x2) (Nodes r2)
-           (base2 (Nodes l1)) (base1 (Nodes r2))
-       | Node100 l2 ->
-         nodes (Nodes l1) None Empty (Nodes l2) None Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) base
-       | Node101 (l2, r2) ->
-         nodes (Nodes l1) None Empty (Nodes l2) None (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2) (base1 (Nodes r2))
-       | Node110 (l2, x2) ->
-         nodes (Nodes l1) None Empty (Nodes l2) (Some x2) Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) base
-       | Node111 (l2, x2, r2) ->
-         nodes (Nodes l1) None Empty (Nodes l2) (Some x2) (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2) (base1 (Nodes r2)))
-    | Node101 (l1, r1) ->
+       | Node011 (a, t1) ->
+         nodes (Nodes t0) None Empty Empty (Some a) (Nodes t1)
+           (base2 (Nodes t0)) (base1 (Nodes t1))
+       | Node100 t1 ->
+         nodes (Nodes t0) None Empty (Nodes t1) None Empty
+           (tree_rec2' base base1 base2 nodes t0 t1) base
+       | Node101 (t1, t2) ->
+         nodes (Nodes t0) None Empty (Nodes t1) None (Nodes t2)
+           (tree_rec2' base base1 base2 nodes t0 t1) (base1 (Nodes t2))
+       | Node110 (t1, a) ->
+         nodes (Nodes t0) None Empty (Nodes t1) (Some a) Empty
+           (tree_rec2' base base1 base2 nodes t0 t1) base
+       | Node111 (t1, a, t2) ->
+         nodes (Nodes t0) None Empty (Nodes t1) (Some a) (Nodes t2)
+           (tree_rec2' base base1 base2 nodes t0 t1) (base1 (Nodes t2)))
+    | Node101 (t0, t1) ->
       (match m2 with
-       | Node001 r2 ->
-         nodes (Nodes l1) None (Nodes r1) Empty None (Nodes r2)
-           (base2 (Nodes l1)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node010 x2 ->
-         nodes (Nodes l1) None (Nodes r1) Empty (Some x2) Empty
-           (base2 (Nodes l1)) (base2 (Nodes r1))
-       | Node011 (x2, r2) ->
-         nodes (Nodes l1) None (Nodes r1) Empty (Some x2) (Nodes r2)
-           (base2 (Nodes l1)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node100 l2 ->
-         nodes (Nodes l1) None (Nodes r1) (Nodes l2) None Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) (base2 (Nodes r1))
-       | Node101 (l2, r2) ->
-         nodes (Nodes l1) None (Nodes r1) (Nodes l2) None (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2)
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node110 (l2, x2) ->
-         nodes (Nodes l1) None (Nodes r1) (Nodes l2) (Some x2) Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) (base2 (Nodes r1))
-       | Node111 (l2, x2, r2) ->
-         nodes (Nodes l1) None (Nodes r1) (Nodes l2) (Some x2) (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2)
-           (tree_rec2' base base1 base2 nodes r1 r2))
-    | Node110 (l1, x1) ->
+       | Node001 t2 ->
+         nodes (Nodes t0) None (Nodes t1) Empty None (Nodes t2)
+           (base2 (Nodes t0)) (tree_rec2' base base1 base2 nodes t1 t2)
+       | Node010 a ->
+         nodes (Nodes t0) None (Nodes t1) Empty (Some a) Empty
+           (base2 (Nodes t0)) (base2 (Nodes t1))
+       | Node011 (a, t2) ->
+         nodes (Nodes t0) None (Nodes t1) Empty (Some a) (Nodes t2)
+           (base2 (Nodes t0)) (tree_rec2' base base1 base2 nodes t1 t2)
+       | Node100 t2 ->
+         nodes (Nodes t0) None (Nodes t1) (Nodes t2) None Empty
+           (tree_rec2' base base1 base2 nodes t0 t2) (base2 (Nodes t1))
+       | Node101 (t2, t3) ->
+         nodes (Nodes t0) None (Nodes t1) (Nodes t2) None (Nodes t3)
+           (tree_rec2' base base1 base2 nodes t0 t2)
+           (tree_rec2' base base1 base2 nodes t1 t3)
+       | Node110 (t2, a) ->
+         nodes (Nodes t0) None (Nodes t1) (Nodes t2) (Some a) Empty
+           (tree_rec2' base base1 base2 nodes t0 t2) (base2 (Nodes t1))
+       | Node111 (t2, a, t3) ->
+         nodes (Nodes t0) None (Nodes t1) (Nodes t2) (Some a) (Nodes t3)
+           (tree_rec2' base base1 base2 nodes t0 t2)
+           (tree_rec2' base base1 base2 nodes t1 t3))
+    | Node110 (t0, a) ->
       (match m2 with
-       | Node001 r2 ->
-         nodes (Nodes l1) (Some x1) Empty Empty None (Nodes r2)
-           (base2 (Nodes l1)) (base1 (Nodes r2))
-       | Node010 x2 ->
-         nodes (Nodes l1) (Some x1) Empty Empty (Some x2) Empty
-           (base2 (Nodes l1)) base
-       | Node011 (x2, r2) ->
-         nodes (Nodes l1) (Some x1) Empty Empty (Some x2) (Nodes r2)
-           (base2 (Nodes l1)) (base1 (Nodes r2))
-       | Node100 l2 ->
-         nodes (Nodes l1) (Some x1) Empty (Nodes l2) None Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) base
-       | Node101 (l2, r2) ->
-         nodes (Nodes l1) (Some x1) Empty (Nodes l2) None (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2) (base1 (Nodes r2))
-       | Node110 (l2, x2) ->
-         nodes (Nodes l1) (Some x1) Empty (Nodes l2) (Some x2) Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) base
-       | Node111 (l2, x2, r2) ->
-         nodes (Nodes l1) (Some x1) Empty (Nodes l2) (Some x2) (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2) (base1 (Nodes r2)))
-    | Node111 (l1, x1, r1) ->
+       | Node001 t1 ->
+         nodes (Nodes t0) (Some a) Empty Empty None (Nodes t1)
+           (base2 (Nodes t0)) (base1 (Nodes t1))
+       | Node010 a0 ->
+         nodes (Nodes t0) (Some a) Empty Empty (Some a0) Empty
+           (base2 (Nodes t0)) base
+       | Node011 (a0, t1) ->
+         nodes (Nodes t0) (Some a) Empty Empty (Some a0) (Nodes t1)
+           (base2 (Nodes t0)) (base1 (Nodes t1))
+       | Node100 t1 ->
+         nodes (Nodes t0) (Some a) Empty (Nodes t1) None Empty
+           (tree_rec2' base base1 base2 nodes t0 t1) base
+       | Node101 (t1, t2) ->
+         nodes (Nodes t0) (Some a) Empty (Nodes t1) None (Nodes t2)
+           (tree_rec2' base base1 base2 nodes t0 t1) (base1 (Nodes t2))
+       | Node110 (t1, a0) ->
+         nodes (Nodes t0) (Some a) Empty (Nodes t1) (Some a0) Empty
+           (tree_rec2' base base1 base2 nodes t0 t1) base
+       | Node111 (t1, a0, t2) ->
+         nodes (Nodes t0) (Some a) Empty (Nodes t1) (Some a0) (Nodes t2)
+           (tree_rec2' base base1 base2 nodes t0 t1) (base1 (Nodes t2)))
+    | Node111 (t0, a, t1) ->
       (match m2 with
-       | Node001 r2 ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) Empty None (Nodes r2)
-           (base2 (Nodes l1)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node010 x2 ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) Empty (Some x2) Empty
-           (base2 (Nodes l1)) (base2 (Nodes r1))
-       | Node011 (x2, r2) ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) Empty (Some x2) (Nodes r2)
-           (base2 (Nodes l1)) (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node100 l2 ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) (Nodes l2) None Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) (base2 (Nodes r1))
-       | Node101 (l2, r2) ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) (Nodes l2) None (Nodes r2)
-           (tree_rec2' base base1 base2 nodes l1 l2)
-           (tree_rec2' base base1 base2 nodes r1 r2)
-       | Node110 (l2, x2) ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) (Nodes l2) (Some x2) Empty
-           (tree_rec2' base base1 base2 nodes l1 l2) (base2 (Nodes r1))
-       | Node111 (l2, x2, r2) ->
-         nodes (Nodes l1) (Some x1) (Nodes r1) (Nodes l2) (Some x2) (Nodes
-           r2) (tree_rec2' base base1 base2 nodes l1 l2)
-           (tree_rec2' base base1 base2 nodes r1 r2))
+       | Node001 t2 ->
+         nodes (Nodes t0) (Some a) (Nodes t1) Empty None (Nodes t2)
+           (base2 (Nodes t0)) (tree_rec2' base base1 base2 nodes t1 t2)
+       | Node010 a0 ->
+         nodes (Nodes t0) (Some a) (Nodes t1) Empty (Some a0) Empty
+           (base2 (Nodes t0)) (base2 (Nodes t1))
+       | Node011 (a0, t2) ->
+         nodes (Nodes t0) (Some a) (Nodes t1) Empty (Some a0) (Nodes t2)
+           (base2 (Nodes t0)) (tree_rec2' base base1 base2 nodes t1 t2)
+       | Node100 t2 ->
+         nodes (Nodes t0) (Some a) (Nodes t1) (Nodes t2) None Empty
+           (tree_rec2' base base1 base2 nodes t0 t2) (base2 (Nodes t1))
+       | Node101 (t2, t3) ->
+         nodes (Nodes t0) (Some a) (Nodes t1) (Nodes t2) None (Nodes t3)
+           (tree_rec2' base base1 base2 nodes t0 t2)
+           (tree_rec2' base base1 base2 nodes t1 t3)
+       | Node110 (t2, a0) ->
+         nodes (Nodes t0) (Some a) (Nodes t1) (Nodes t2) (Some a0) Empty
+           (tree_rec2' base base1 base2 nodes t0 t2) (base2 (Nodes t1))
+       | Node111 (t2, a0, t3) ->
+         nodes (Nodes t0) (Some a) (Nodes t1) (Nodes t2) (Some a0) (Nodes t3)
+           (tree_rec2' base base1 base2 nodes t0 t2)
+           (tree_rec2' base base1 base2 nodes t1 t3))
 
   (** val tree_rec2 :
       'a3 -> ('a2 tree -> 'a3) -> ('a1 tree -> 'a3) -> ('a1 tree -> 'a1
@@ -707,140 +707,140 @@ module PTree =
        | Nodes b' ->
          let rec tree_rec2'0 m3 m4 =
            match m3 with
-           | Node001 r1 ->
+           | Node001 t0 ->
              (match m4 with
-              | Node001 r2 -> coq_Node Empty None (tree_rec2'0 r1 r2)
-              | Node010 x2 ->
-                coq_Node Empty (f None (Some x2)) (combine_l (Nodes r1))
-              | Node011 (x2, r2) ->
-                coq_Node Empty (f None (Some x2)) (tree_rec2'0 r1 r2)
-              | Node100 l2 ->
-                coq_Node (combine_r (Nodes l2)) None (combine_l (Nodes r1))
-              | Node101 (l2, r2) ->
-                coq_Node (combine_r (Nodes l2)) None (tree_rec2'0 r1 r2)
-              | Node110 (l2, x2) ->
-                coq_Node (combine_r (Nodes l2)) (f None (Some x2))
-                  (combine_l (Nodes r1))
-              | Node111 (l2, x2, r2) ->
-                coq_Node (combine_r (Nodes l2)) (f None (Some x2))
-                  (tree_rec2'0 r1 r2))
-           | Node010 x1 ->
+              | Node001 t1 -> coq_Node Empty None (tree_rec2'0 t0 t1)
+              | Node010 a ->
+                coq_Node Empty (f None (Some a)) (combine_l (Nodes t0))
+              | Node011 (a, t1) ->
+                coq_Node Empty (f None (Some a)) (tree_rec2'0 t0 t1)
+              | Node100 t1 ->
+                coq_Node (combine_r (Nodes t1)) None (combine_l (Nodes t0))
+              | Node101 (t1, t2) ->
+                coq_Node (combine_r (Nodes t1)) None (tree_rec2'0 t0 t2)
+              | Node110 (t1, a) ->
+                coq_Node (combine_r (Nodes t1)) (f None (Some a))
+                  (combine_l (Nodes t0))
+              | Node111 (t1, a, t2) ->
+                coq_Node (combine_r (Nodes t1)) (f None (Some a))
+                  (tree_rec2'0 t0 t2))
+           | Node010 a ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node Empty (f (Some x1) None) (combine_r (Nodes r2))
-              | Node010 x2 -> coq_Node Empty (f (Some x1) (Some x2)) Empty
-              | Node011 (x2, r2) ->
-                coq_Node Empty (f (Some x1) (Some x2)) (combine_r (Nodes r2))
-              | Node100 l2 ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) None) Empty
-              | Node101 (l2, r2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) None)
-                  (combine_r (Nodes r2))
-              | Node110 (l2, x2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) (Some x2)) Empty
-              | Node111 (l2, x2, r2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) (Some x2))
-                  (combine_r (Nodes r2)))
-           | Node011 (x1, r1) ->
+              | Node001 t0 ->
+                coq_Node Empty (f (Some a) None) (combine_r (Nodes t0))
+              | Node010 a0 -> coq_Node Empty (f (Some a) (Some a0)) Empty
+              | Node011 (a0, t0) ->
+                coq_Node Empty (f (Some a) (Some a0)) (combine_r (Nodes t0))
+              | Node100 t0 ->
+                coq_Node (combine_r (Nodes t0)) (f (Some a) None) Empty
+              | Node101 (t0, t1) ->
+                coq_Node (combine_r (Nodes t0)) (f (Some a) None)
+                  (combine_r (Nodes t1))
+              | Node110 (t0, a0) ->
+                coq_Node (combine_r (Nodes t0)) (f (Some a) (Some a0)) Empty
+              | Node111 (t0, a0, t1) ->
+                coq_Node (combine_r (Nodes t0)) (f (Some a) (Some a0))
+                  (combine_r (Nodes t1)))
+           | Node011 (a, t0) ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node Empty (f (Some x1) None) (tree_rec2'0 r1 r2)
-              | Node010 x2 ->
-                coq_Node Empty (f (Some x1) (Some x2)) (combine_l (Nodes r1))
-              | Node011 (x2, r2) ->
-                coq_Node Empty (f (Some x1) (Some x2)) (tree_rec2'0 r1 r2)
-              | Node100 l2 ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) None)
-                  (combine_l (Nodes r1))
-              | Node101 (l2, r2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) None)
-                  (tree_rec2'0 r1 r2)
-              | Node110 (l2, x2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) (Some x2))
-                  (combine_l (Nodes r1))
-              | Node111 (l2, x2, r2) ->
-                coq_Node (combine_r (Nodes l2)) (f (Some x1) (Some x2))
-                  (tree_rec2'0 r1 r2))
-           | Node100 l1 ->
+              | Node001 t1 ->
+                coq_Node Empty (f (Some a) None) (tree_rec2'0 t0 t1)
+              | Node010 a0 ->
+                coq_Node Empty (f (Some a) (Some a0)) (combine_l (Nodes t0))
+              | Node011 (a0, t1) ->
+                coq_Node Empty (f (Some a) (Some a0)) (tree_rec2'0 t0 t1)
+              | Node100 t1 ->
+                coq_Node (combine_r (Nodes t1)) (f (Some a) None)
+                  (combine_l (Nodes t0))
+              | Node101 (t1, t2) ->
+                coq_Node (combine_r (Nodes t1)) (f (Some a) None)
+                  (tree_rec2'0 t0 t2)
+              | Node110 (t1, a0) ->
+                coq_Node (combine_r (Nodes t1)) (f (Some a) (Some a0))
+                  (combine_l (Nodes t0))
+              | Node111 (t1, a0, t2) ->
+                coq_Node (combine_r (Nodes t1)) (f (Some a) (Some a0))
+                  (tree_rec2'0 t0 t2))
+           | Node100 t0 ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node (combine_l (Nodes l1)) None (combine_r (Nodes r2))
-              | Node010 x2 ->
-                coq_Node (combine_l (Nodes l1)) (f None (Some x2)) Empty
-              | Node011 (x2, r2) ->
-                coq_Node (combine_l (Nodes l1)) (f None (Some x2))
-                  (combine_r (Nodes r2))
-              | Node100 l2 -> coq_Node (tree_rec2'0 l1 l2) None Empty
-              | Node101 (l2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) None (combine_r (Nodes r2))
-              | Node110 (l2, x2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f None (Some x2)) Empty
-              | Node111 (l2, x2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f None (Some x2))
-                  (combine_r (Nodes r2)))
-           | Node101 (l1, r1) ->
+              | Node001 t1 ->
+                coq_Node (combine_l (Nodes t0)) None (combine_r (Nodes t1))
+              | Node010 a ->
+                coq_Node (combine_l (Nodes t0)) (f None (Some a)) Empty
+              | Node011 (a, t1) ->
+                coq_Node (combine_l (Nodes t0)) (f None (Some a))
+                  (combine_r (Nodes t1))
+              | Node100 t1 -> coq_Node (tree_rec2'0 t0 t1) None Empty
+              | Node101 (t1, t2) ->
+                coq_Node (tree_rec2'0 t0 t1) None (combine_r (Nodes t2))
+              | Node110 (t1, a) ->
+                coq_Node (tree_rec2'0 t0 t1) (f None (Some a)) Empty
+              | Node111 (t1, a, t2) ->
+                coq_Node (tree_rec2'0 t0 t1) (f None (Some a))
+                  (combine_r (Nodes t2)))
+           | Node101 (t0, t1) ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node (combine_l (Nodes l1)) None (tree_rec2'0 r1 r2)
-              | Node010 x2 ->
-                coq_Node (combine_l (Nodes l1)) (f None (Some x2))
-                  (combine_l (Nodes r1))
-              | Node011 (x2, r2) ->
-                coq_Node (combine_l (Nodes l1)) (f None (Some x2))
-                  (tree_rec2'0 r1 r2)
-              | Node100 l2 ->
-                coq_Node (tree_rec2'0 l1 l2) None (combine_l (Nodes r1))
-              | Node101 (l2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) None (tree_rec2'0 r1 r2)
-              | Node110 (l2, x2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f None (Some x2))
-                  (combine_l (Nodes r1))
-              | Node111 (l2, x2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f None (Some x2))
-                  (tree_rec2'0 r1 r2))
-           | Node110 (l1, x1) ->
+              | Node001 t2 ->
+                coq_Node (combine_l (Nodes t0)) None (tree_rec2'0 t1 t2)
+              | Node010 a ->
+                coq_Node (combine_l (Nodes t0)) (f None (Some a))
+                  (combine_l (Nodes t1))
+              | Node011 (a, t2) ->
+                coq_Node (combine_l (Nodes t0)) (f None (Some a))
+                  (tree_rec2'0 t1 t2)
+              | Node100 t2 ->
+                coq_Node (tree_rec2'0 t0 t2) None (combine_l (Nodes t1))
+              | Node101 (t2, t3) ->
+                coq_Node (tree_rec2'0 t0 t2) None (tree_rec2'0 t1 t3)
+              | Node110 (t2, a) ->
+                coq_Node (tree_rec2'0 t0 t2) (f None (Some a))
+                  (combine_l (Nodes t1))
+              | Node111 (t2, a, t3) ->
+                coq_Node (tree_rec2'0 t0 t2) (f None (Some a))
+                  (tree_rec2'0 t1 t3))
+           | Node110 (t0, a) ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) None)
-                  (combine_r (Nodes r2))
-              | Node010 x2 ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) (Some x2)) Empty
-              | Node011 (x2, r2) ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) (Some x2))
-                  (combine_r (Nodes r2))
-              | Node100 l2 ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) None) Empty
-              | Node101 (l2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) None)
-                  (combine_r (Nodes r2))
-              | Node110 (l2, x2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) (Some x2)) Empty
-              | Node111 (l2, x2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) (Some x2))
-                  (combine_r (Nodes r2)))
-           | Node111 (l1, x1, r1) ->
+              | Node001 t1 ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) None)
+                  (combine_r (Nodes t1))
+              | Node010 a0 ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) (Some a0)) Empty
+              | Node011 (a0, t1) ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) (Some a0))
+                  (combine_r (Nodes t1))
+              | Node100 t1 ->
+                coq_Node (tree_rec2'0 t0 t1) (f (Some a) None) Empty
+              | Node101 (t1, t2) ->
+                coq_Node (tree_rec2'0 t0 t1) (f (Some a) None)
+                  (combine_r (Nodes t2))
+              | Node110 (t1, a0) ->
+                coq_Node (tree_rec2'0 t0 t1) (f (Some a) (Some a0)) Empty
+              | Node111 (t1, a0, t2) ->
+                coq_Node (tree_rec2'0 t0 t1) (f (Some a) (Some a0))
+                  (combine_r (Nodes t2)))
+           | Node111 (t0, a, t1) ->
              (match m4 with
-              | Node001 r2 ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) None)
-                  (tree_rec2'0 r1 r2)
-              | Node010 x2 ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) (Some x2))
-                  (combine_l (Nodes r1))
-              | Node011 (x2, r2) ->
-                coq_Node (combine_l (Nodes l1)) (f (Some x1) (Some x2))
-                  (tree_rec2'0 r1 r2)
-              | Node100 l2 ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) None)
-                  (combine_l (Nodes r1))
-              | Node101 (l2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) None)
-                  (tree_rec2'0 r1 r2)
-              | Node110 (l2, x2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) (Some x2))
-                  (combine_l (Nodes r1))
-              | Node111 (l2, x2, r2) ->
-                coq_Node (tree_rec2'0 l1 l2) (f (Some x1) (Some x2))
-                  (tree_rec2'0 r1 r2))
+              | Node001 t2 ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) None)
+                  (tree_rec2'0 t1 t2)
+              | Node010 a0 ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) (Some a0))
+                  (combine_l (Nodes t1))
+              | Node011 (a0, t2) ->
+                coq_Node (combine_l (Nodes t0)) (f (Some a) (Some a0))
+                  (tree_rec2'0 t1 t2)
+              | Node100 t2 ->
+                coq_Node (tree_rec2'0 t0 t2) (f (Some a) None)
+                  (combine_l (Nodes t1))
+              | Node101 (t2, t3) ->
+                coq_Node (tree_rec2'0 t0 t2) (f (Some a) None)
+                  (tree_rec2'0 t1 t3)
+              | Node110 (t2, a0) ->
+                coq_Node (tree_rec2'0 t0 t2) (f (Some a) (Some a0))
+                  (combine_l (Nodes t1))
+              | Node111 (t2, a0, t3) ->
+                coq_Node (tree_rec2'0 t0 t2) (f (Some a) (Some a0))
+                  (tree_rec2'0 t1 t3))
          in tree_rec2'0 a' b'))
 
   (** val xelements' :

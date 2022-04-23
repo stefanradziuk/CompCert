@@ -130,7 +130,7 @@ module N =
     | N0 -> (match m with
              | N0 -> true
              | Npos _ -> false)
-    | Npos x -> (match m with
+    | Npos p -> (match m with
                  | N0 -> false
-                 | Npos p0 -> Pos.eq_dec x p0)
+                 | Npos p0 -> Pos.eq_dec p p0)
  end

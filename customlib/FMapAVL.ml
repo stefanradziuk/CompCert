@@ -477,21 +477,21 @@ module Raw =
         tree -> key -> 'a1 -> 'a1 tree -> 'a1 tree -> 'a1 coq_R_bal -> 'a2 **)
 
     let coq_R_bal_rect f f0 f1 f2 f3 f4 f5 f6 f7 _ _ _ _ _ = function
-    | R_bal_0 (x, x0, x1, x2) -> f x x0 x1 x2 __ __ __
-    | R_bal_1 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f0 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __
-    | R_bal_2 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f1 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __ __
-    | R_bal_3 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f2 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __ x8 x9 x10 x11 x12 __
-    | R_bal_4 (x, x0, x1, x2) -> f3 x x0 x1 x2 __ __ __ __ __
-    | R_bal_5 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f4 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __
-    | R_bal_6 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f5 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __ __
-    | R_bal_7 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f6 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __ x8 x9 x10 x11 x12 __
-    | R_bal_8 (x, x0, x1, x2) -> f7 x x0 x1 x2 __ __ __ __
+    | R_bal_0 (l, x, d, r0) -> f l x d r0 __ __ __
+    | R_bal_1 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f0 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __
+    | R_bal_2 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f1 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __ __
+    | R_bal_3 (l, x, d, r0, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) ->
+      f2 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __ x5 x6 x7 x8 x9 __
+    | R_bal_4 (l, x, d, r0) -> f3 l x d r0 __ __ __ __ __
+    | R_bal_5 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f4 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __
+    | R_bal_6 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f5 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __ __
+    | R_bal_7 (l, x, d, r0, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) ->
+      f6 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __ x5 x6 x7 x8 x9 __
+    | R_bal_8 (l, x, d, r0) -> f7 l x d r0 __ __ __ __
 
     (** val coq_R_bal_rec :
         ('a1 tree -> key -> 'a1 -> 'a1 tree -> __ -> __ -> __ -> 'a2) -> ('a1
@@ -513,21 +513,21 @@ module Raw =
         tree -> key -> 'a1 -> 'a1 tree -> 'a1 tree -> 'a1 coq_R_bal -> 'a2 **)
 
     let coq_R_bal_rec f f0 f1 f2 f3 f4 f5 f6 f7 _ _ _ _ _ = function
-    | R_bal_0 (x, x0, x1, x2) -> f x x0 x1 x2 __ __ __
-    | R_bal_1 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f0 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __
-    | R_bal_2 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f1 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __ __
-    | R_bal_3 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f2 x x0 x1 x2 __ __ x3 x4 x5 x6 x7 __ __ __ x8 x9 x10 x11 x12 __
-    | R_bal_4 (x, x0, x1, x2) -> f3 x x0 x1 x2 __ __ __ __ __
-    | R_bal_5 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f4 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __
-    | R_bal_6 (x, x0, x1, x2, x3, x4, x5, x6, x7) ->
-      f5 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __ __
-    | R_bal_7 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f6 x x0 x1 x2 __ __ __ __ x3 x4 x5 x6 x7 __ __ __ x8 x9 x10 x11 x12 __
-    | R_bal_8 (x, x0, x1, x2) -> f7 x x0 x1 x2 __ __ __ __
+    | R_bal_0 (l, x, d, r0) -> f l x d r0 __ __ __
+    | R_bal_1 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f0 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __
+    | R_bal_2 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f1 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __ __
+    | R_bal_3 (l, x, d, r0, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) ->
+      f2 l x d r0 __ __ x0 x1 x2 x3 x4 __ __ __ x5 x6 x7 x8 x9 __
+    | R_bal_4 (l, x, d, r0) -> f3 l x d r0 __ __ __ __ __
+    | R_bal_5 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f4 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __
+    | R_bal_6 (l, x, d, r0, x0, x1, x2, x3, x4) ->
+      f5 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __ __
+    | R_bal_7 (l, x, d, r0, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) ->
+      f6 l x d r0 __ __ __ __ x0 x1 x2 x3 x4 __ __ __ x5 x6 x7 x8 x9 __
+    | R_bal_8 (l, x, d, r0) -> f7 l x d r0 __ __ __ __
 
     type 'elt coq_R_add =
     | R_add_0 of 'elt tree
@@ -624,11 +624,12 @@ module Raw =
         -> 'a1 tree -> 'a1 coq_R_merge -> 'a2 **)
 
     let coq_R_merge_rect f f0 f1 _ _ _ = function
-    | R_merge_0 (x, x0) -> f x x0 __
-    | R_merge_1 (x, x0, x1, x2, x3, x4, x5) -> f0 x x0 x1 x2 x3 x4 x5 __ __
-    | R_merge_2 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12,
-                 x13, x14) ->
-      f1 x x0 x1 x2 x3 x4 x5 __ x6 x7 x8 x9 x10 __ x11 x12 __ x13 x14 __
+    | R_merge_0 (s1, s2) -> f s1 s2 __
+    | R_merge_1 (s1, s2, _x, _x0, _x1, _x2, _x3) ->
+      f0 s1 s2 _x _x0 _x1 _x2 _x3 __ __
+    | R_merge_2 (s1, s2, _x, _x0, _x1, _x2, _x3, l2, x2, d2, r2, _x4, s2', p,
+                 x, d) ->
+      f1 s1 s2 _x _x0 _x1 _x2 _x3 __ l2 x2 d2 r2 _x4 __ s2' p __ x d __
 
     (** val coq_R_merge_rec :
         ('a1 tree -> 'a1 tree -> __ -> 'a2) -> ('a1 tree -> 'a1 tree -> 'a1
@@ -639,11 +640,12 @@ module Raw =
         -> 'a1 tree -> 'a1 coq_R_merge -> 'a2 **)
 
     let coq_R_merge_rec f f0 f1 _ _ _ = function
-    | R_merge_0 (x, x0) -> f x x0 __
-    | R_merge_1 (x, x0, x1, x2, x3, x4, x5) -> f0 x x0 x1 x2 x3 x4 x5 __ __
-    | R_merge_2 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12,
-                 x13, x14) ->
-      f1 x x0 x1 x2 x3 x4 x5 __ x6 x7 x8 x9 x10 __ x11 x12 __ x13 x14 __
+    | R_merge_0 (s1, s2) -> f s1 s2 __
+    | R_merge_1 (s1, s2, _x, _x0, _x1, _x2, _x3) ->
+      f0 s1 s2 _x _x0 _x1 _x2 _x3 __ __
+    | R_merge_2 (s1, s2, _x, _x0, _x1, _x2, _x3, l2, x2, d2, r2, _x4, s2', p,
+                 x, d) ->
+      f1 s1 s2 _x _x0 _x1 _x2 _x3 __ l2 x2 d2 r2 _x4 __ s2' p __ x d __
 
     type 'elt coq_R_remove =
     | R_remove_0 of 'elt tree
@@ -706,10 +708,11 @@ module Raw =
         coq_R_concat -> 'a2 **)
 
     let coq_R_concat_rect f f0 f1 _ _ _ = function
-    | R_concat_0 (x, x0) -> f x x0 __
-    | R_concat_1 (x, x0, x1, x2, x3, x4, x5) -> f0 x x0 x1 x2 x3 x4 x5 __ __
-    | R_concat_2 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f1 x x0 x1 x2 x3 x4 x5 __ x6 x7 x8 x9 x10 __ x11 x12 __
+    | R_concat_0 (m1, m2) -> f m1 m2 __
+    | R_concat_1 (m1, m2, _x, _x0, _x1, _x2, _x3) ->
+      f0 m1 m2 _x _x0 _x1 _x2 _x3 __ __
+    | R_concat_2 (m1, m2, _x, _x0, _x1, _x2, _x3, l2, x2, d2, r2, _x4, m2', xd) ->
+      f1 m1 m2 _x _x0 _x1 _x2 _x3 __ l2 x2 d2 r2 _x4 __ m2' xd __
 
     (** val coq_R_concat_rec :
         ('a1 tree -> 'a1 tree -> __ -> 'a2) -> ('a1 tree -> 'a1 tree -> 'a1
@@ -720,10 +723,11 @@ module Raw =
         coq_R_concat -> 'a2 **)
 
     let coq_R_concat_rec f f0 f1 _ _ _ = function
-    | R_concat_0 (x, x0) -> f x x0 __
-    | R_concat_1 (x, x0, x1, x2, x3, x4, x5) -> f0 x x0 x1 x2 x3 x4 x5 __ __
-    | R_concat_2 (x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) ->
-      f1 x x0 x1 x2 x3 x4 x5 __ x6 x7 x8 x9 x10 __ x11 x12 __
+    | R_concat_0 (m1, m2) -> f m1 m2 __
+    | R_concat_1 (m1, m2, _x, _x0, _x1, _x2, _x3) ->
+      f0 m1 m2 _x _x0 _x1 _x2 _x3 __ __
+    | R_concat_2 (m1, m2, _x, _x0, _x1, _x2, _x3, l2, x2, d2, r2, _x4, m2', xd) ->
+      f1 m1 m2 _x _x0 _x1 _x2 _x3 __ l2 x2 d2 r2 _x4 __ m2' xd __
 
     type 'elt coq_R_split =
     | R_split_0 of 'elt tree

@@ -81,9 +81,9 @@ let attr_eq a1 a2 =
   let { attr_volatile = attr_volatile1; attr_alignas = attr_alignas1 } = a2 in
   if bool_dec attr_volatile0 attr_volatile1
   then (match attr_alignas0 with
-        | Some x ->
+        | Some a ->
           (match attr_alignas1 with
-           | Some n -> N.eq_dec x n
+           | Some a0 -> N.eq_dec a a0
            | None -> false)
         | None -> (match attr_alignas1 with
                    | Some _ -> false
@@ -145,9 +145,9 @@ let rec type_eq =
                    cc_structret = cc_structret1 } = c0
                  in
                  if match cc_vararg0 with
-                    | Some x ->
+                    | Some a ->
                       (match cc_vararg1 with
-                       | Some z -> zeq x z
+                       | Some a0 -> zeq a a0
                        | None -> false)
                     | None ->
                       (match cc_vararg1 with

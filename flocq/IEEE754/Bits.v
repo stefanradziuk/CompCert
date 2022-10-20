@@ -181,7 +181,7 @@ cut (x / (2^mw * 2^ew) < 2)%Z. clear ; lia.
 apply Zdiv_lt_upper_bound.
 now apply Zmult_lt_0_compat.
 rewrite <- Zpower_exp ; try ( apply Z.le_ge ; apply Zlt_le_weak ; assumption ).
-change 2%Z with (Zpower 2 1) at 1.
+change at 1 2%Z with (Zpower 2 1).
 rewrite <- Zpower_exp.
 now rewrite Zplus_comm.
 discriminate.

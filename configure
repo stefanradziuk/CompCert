@@ -366,7 +366,7 @@ if test "$arch" = "x86" -a "$bitsize" = "64"; then
         cprepro_options="-std=c99 -m64 -U__GNUC__ -U__SIZEOF_INT128__ -E"
         system="linux"
         ;;
-    macos|macosx)
+    macos|macosx|darwin)
         abi="macos"
         cc_options="-arch x86_64"
         casm_options="-arch x86_64 -c"

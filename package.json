@@ -44,7 +44,7 @@
   },
 	"resolutions": {
 		"coq-flocq": {
-			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#a77bd08b9f4e139bc1f760f58ccc1d57b1a84cb8",
+			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#63ae222c9125a42a44c706c9cbf04709cfaaedf2",
 			"override": {
 				 "dependencies": {
 					  "ocaml": "*",

@@ -4,11 +4,6 @@
 	"description": "Esy packaging for CompCert",
 	"license": "INRIA Non-Commercial License Agreement",
   "esy": {
-	  "buildEnv": {
-			"COQBIN": "#{@opam/coq.bin}/",
-			"COQLIB": "#{@opam/coq.lib}/coq/",
-			"COQPATH": "#{coq-flocq.install}/coq"
-		},
           "build": [
 			["./configure", "x86_64-#{os}", "--prefix", "#{self.install}", "--coqdevdir", "#{self.install}/coq/compcert"],
 			["make", "-j", "4"],
@@ -31,8 +26,7 @@
     "ocaml": "4.14.x",
     "@opam/dune": "^2.9",
     "@opam/coq": ">=8.9.0 <=8.13.2",
-    "@opam/menhir": "*",
-    "coq-flocq": "3.4.2"
+    "@opam/menhir": "*"
   },
   "devDependencies": {
     "@opam/merlin": "*",
@@ -41,30 +35,5 @@
     "ocaml": "4.14.x", 
     "@opam/coq": "8.13.2", 
     "@opam/depgraph": "*"
-  },
-	"resolutions": {
-		"coq-flocq": {
-			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#63ae222c9125a42a44c706c9cbf04709cfaaedf2",
-			"override": {
-				 "dependencies": {
-					  "ocaml": "*",
-						"@opam/coq": "*"
-					},
-				"buildEnv": {
-					"HOME": "#{self.target_dir}",
-					"COQBIN": "#{@opam/coq.bin}",
-					"COQLIB": "#{@opam/coq.lib}/coq/",
-					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib/",
-					"COQUSERCONTRIB": "#{self.install}/coq/",
-					"DESTDIR": ""
-				},
-				"build": [
-						["autoconf"],
-						["./configure"],
-						["./remake", "--jobs=2"],
-						["./remake", "install"]
-					]
-				}
-		}
-	}
+  }
 }

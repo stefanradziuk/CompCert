@@ -33,7 +33,32 @@
     "@opam/utop": "*",
     "@opam/odoc": "*",
     "ocaml": "4.14.x", 
-    "@opam/coq": "8.15.0", 
+    "@opam/coq": "8.13.2", 
     "@opam/depgraph": "*"
-  }
+  },
+	"resolutions": {
+		"coq-flocq": {
+			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#3c92e3f9461c382d95f43e04815c0070be687335",
+			"override": {
+				 "dependencies": {
+					  "ocaml": "*",
+						"@opam/coq": "*"
+					},
+				"buildEnv": {
+					"HOME": "#{self.target_dir}",
+					"COQBIN": "#{@opam/coq.bin}",
+					"COQLIB": "#{@opam/coq.lib}/coq/",
+					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib/",
+					"COQUSERCONTRIB": "#{self.install}/coq/",
+					"DESTDIR": ""
+				},
+				"build": [
+						["autoconf"],
+						["./configure"],
+						["./remake", "--jobs=2"],
+						["./remake", "install"]
+					]
+				}
+		}
+	}
 }

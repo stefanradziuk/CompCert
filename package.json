@@ -1,8 +1,8 @@
 {
   "name": "compcert",
-  "version": "3.5",
-  "description": "Esy packaging for a library, subset of CompCert, that exports an API to manipulate Csharpminor",
-  "license": "INRIA Non-Commercial License Agreement",
+	"version": "3.7",
+	"description": "Esy packaging for CompCert",
+	"license": "INRIA Non-Commercial License Agreement",
   "esy": {
 	  "buildEnv": {
 			"COQBIN": "#{@opam/coq.bin}/",
@@ -32,7 +32,7 @@
     "@opam/dune": "^2.9",
     "@opam/coq": ">=8.9.0 <=8.13.2",
     "@opam/menhir": "*",
-    "coq-flocq": "4.1.0"
+    "coq-flocq": "3.4.2"
   },
   "devDependencies": {
     "@opam/merlin": "*",
@@ -44,7 +44,7 @@
   },
 	"resolutions": {
 		"coq-flocq": {
-			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#3c92e3f9461c382d95f43e04815c0070be687335",
+			"source": "git:https://gitlab.inria.fr/flocq/flocq.git#63ae222c9125a42a44c706c9cbf04709cfaaedf2",
 			"override": {
 				 "dependencies": {
 					  "ocaml": "*",

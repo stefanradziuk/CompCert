@@ -28,36 +28,36 @@ type state = { init : init_data list; curr : coq_Z; total_size : coq_Z }
 
 val initial_state : coq_Z -> state
 
-val int_of_byte : Byte.int -> Int.int
+val int_of_byte : Byte.int_compcert -> Int.int_compcert
 
-val coq_Init_byte : Byte.int -> init_data
+val coq_Init_byte : Byte.int_compcert -> init_data
 
-val add_rev_bytes : Byte.int list -> init_data list -> init_data list
+val add_rev_bytes : Byte.int_compcert list -> init_data list -> init_data list
 
 val add_zeros : coq_Z -> init_data list -> init_data list
 
 val normalize : init_data list -> coq_Z -> init_data list res
 
 val decompose_rec :
-  Byte.int list -> init_data list -> coq_Z -> (Byte.int list * init_data
+  Byte.int_compcert list -> init_data list -> coq_Z -> (Byte.int_compcert list * init_data
   list) res
 
 val decompose :
-  init_data list -> coq_Z -> (Byte.int list * init_data list) res
+  init_data list -> coq_Z -> (Byte.int_compcert list * init_data list) res
 
 val trisection :
-  init_data list -> coq_Z -> coq_Z -> ((Byte.int list * Byte.int
+  init_data list -> coq_Z -> coq_Z -> ((Byte.int_compcert list * Byte.int_compcert
   list) * init_data list) res
 
 val pad_to : state -> coq_Z -> state
 
 val store_data : state -> coq_Z -> init_data -> state res
 
-val init_data_for_carrier : intsize -> Int.int -> init_data
+val init_data_for_carrier : intsize -> Int.int_compcert -> init_data
 
-val store_int : state -> coq_Z -> intsize -> Int.int -> state res
+val store_int : state -> coq_Z -> intsize -> Int.int_compcert -> state res
 
-val load_int : state -> coq_Z -> intsize -> Int.int res
+val load_int : state -> coq_Z -> intsize -> Int.int_compcert res
 
 val init_data_list_of_state : state -> init_data list res
 

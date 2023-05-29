@@ -19,7 +19,7 @@ Require Import Op CminorSel SelectOp SplitLong SelectLong.
 
 Local Open Scope cminorsel_scope.
 
-Definition is_intconst (e: expr) : option int :=
+Definition is_intconst (e: expr) : option int_compcert :=
   match e with
   | Eop (Ointconst n) _ => Some n
   | _ => None
@@ -110,7 +110,7 @@ Definition divu_mul (p: Z) (m: Z) :=
   shruimm (mulhu (Eletvar O) (Eop (Ointconst (Int.repr m)) Enil))
           (Int.repr p).
 
-Definition divuimm (e1: expr) (n2: int) :=
+Definition divuimm (e1: expr) (n2: int_compcert) :=
   match Int.is_power2 n2 with
   | Some l => shruimm e1 l
   | None =>
@@ -133,10 +133,10 @@ Definition divu (e1: expr) (e2: expr) :=
   | _, _ => divu_base e1 e2
   end.
 
-Definition mod_from_div (equo: expr) (n: int) :=
+Definition mod_from_div (equo: expr) (n: int_compcert) :=
   Eop Osub (Eletvar O ::: mulimm n equo ::: Enil).
 
-Definition moduimm (e1: expr) (n2: int) :=
+Definition moduimm (e1: expr) (n2: int_compcert) :=
   match Int.is_power2 n2 with
   | Some l => andimm (Int.sub n2 Int.one) e1
   | None =>
@@ -167,7 +167,7 @@ Definition divs_mul (p: Z) (m: Z) :=
   add (shrimm e3 (Int.repr p))
       (shruimm (Eletvar O) (Int.repr (Int.zwordsize - 1))).
 
-Definition divsimm (e1: expr) (n2: int) :=
+Definition divsimm (e1: expr) (n2: int_compcert) :=
   match Int.is_power2 n2 with
   | Some l =>
       if Int.ltu l (Int.repr 31)
@@ -193,7 +193,7 @@ Definition divs (e1: expr) (e2: expr) :=
   | _, _ => divs_base e1 e2
   end.
 
-Definition modsimm (e1: expr) (n2: int) :=
+Definition modsimm (e1: expr) (n2: int_compcert) :=
   match Int.is_power2 n2 with
   | Some l =>
       if Int.ltu l (Int.repr 31)

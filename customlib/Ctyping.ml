@@ -622,18 +622,18 @@ let efield ce r f =
          (' '::('i'::('s'::(' '::('n'::('o'::('t'::(' '::('a'::(' '::('s'::('t'::('r'::('u'::('c'::('t'::(' '::('o'::('r'::(' '::('u'::('n'::('i'::('o'::('n'::[])))))))))))))))))))))))))) :: []))))
   | Error msg0 -> Error msg0
 
-(** val econst_int : Int.int -> signedness -> expr **)
+(** val econst_int : Int.int_compcert -> signedness -> expr **)
 
 let econst_int n sg =
   Eval ((Vint n), (Tint (I32, sg, noattr)))
 
-(** val econst_ptr_int : Int.int -> coq_type -> expr **)
+(** val econst_ptr_int : Int.int_compcert -> coq_type -> expr **)
 
 let econst_ptr_int n ty =
   Eval ((if ptr64 then Vlong (Int64.repr (Int.unsigned n)) else Vint n),
     (Tpointer (ty, noattr)))
 
-(** val econst_long : Int64.int -> signedness -> expr **)
+(** val econst_long : Int64.int_compcert -> signedness -> expr **)
 
 let econst_long n sg =
   Eval ((Vlong n), (Tlong (sg, noattr)))

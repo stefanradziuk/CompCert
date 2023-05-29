@@ -292,19 +292,19 @@ Definition store_data (s: state) (pos: Z) (i: init_data) : res state :=
 
 (** Store the integer [n] of size [isz] at position [pos] in state [s]. *)
 
-Definition init_data_for_carrier (isz: intsize) (n: int) :=
+Definition init_data_for_carrier (isz: intsize) (n: int_compcert) :=
   match isz with
   | I8 | IBool => Init_int8 n
   | I16 => Init_int16 n
   | I32 => Init_int32 n
   end.
 
-Definition store_int (s: state) (pos: Z) (isz: intsize) (n: int) : res state :=
+Definition store_int (s: state) (pos: Z) (isz: intsize) (n: int_compcert) : res state :=
   store_data s pos (init_data_for_carrier isz n).
 
 (** Load the integer of size [isz] at position [pos] in state [s]. *)
 
-Definition load_int (s: state) (pos: Z) (isz: intsize) : res int :=
+Definition load_int (s: state) (pos: Z) (isz: intsize) : res int_compcert :=
   let chunk := chunk_for_carrier isz in
   let sz := size_chunk chunk in
   assertion (zle 0 pos && zle (pos + sz) s.(total_size));

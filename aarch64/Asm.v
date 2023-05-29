@@ -131,27 +131,27 @@ Inductive testcond : Type :=
 Inductive addressing: Type :=
   | ADimm (base: iregsp) (n: int64)                  (**r base plus immediate offset *)
   | ADreg (base: iregsp) (r: ireg)                   (**r base plus reg *)
-  | ADlsl (base: iregsp) (r: ireg) (n: int)          (**r base plus reg LSL n *)
-  | ADsxt (base: iregsp) (r: ireg) (n: int)          (**r base plus SIGN-EXT(reg) LSL n *)
-  | ADuxt (base: iregsp) (r: ireg) (n: int)          (**r base plus ZERO-EXT(reg) LSL n *)
+  | ADlsl (base: iregsp) (r: ireg) (n: int_compcert)          (**r base plus reg LSL n *)
+  | ADsxt (base: iregsp) (r: ireg) (n: int_compcert)          (**r base plus SIGN-EXT(reg) LSL n *)
+  | ADuxt (base: iregsp) (r: ireg) (n: int_compcert)          (**r base plus ZERO-EXT(reg) LSL n *)
   | ADadr (base: iregsp) (id: ident) (ofs: ptrofs)   (**r base plus low address of [id + ofs] *)
   | ADpostincr (base: iregsp) (n: int64).            (**r base plus offset; base is updated after *)
 
 Inductive shift_op: Type :=
   | SOnone
-  | SOlsl (n: int)
-  | SOlsr (n: int)
-  | SOasr (n: int)
-  | SOror (n: int).
+  | SOlsl (n: int_compcert)
+  | SOlsr (n: int_compcert)
+  | SOasr (n: int_compcert)
+  | SOror (n: int_compcert).
 
 Inductive extend_op: Type :=
-  | EOsxtb (n: int)
-  | EOsxth (n: int)
-  | EOsxtw (n: int)
-  | EOuxtb (n: int)
-  | EOuxth (n: int)
-  | EOuxtw (n: int)
-  | EOuxtx (n: int).
+  | EOsxtb (n: int_compcert)
+  | EOsxth (n: int_compcert)
+  | EOsxtw (n: int_compcert)
+  | EOuxtb (n: int_compcert)
+  | EOuxth (n: int_compcert)
+  | EOuxtw (n: int_compcert)
+  | EOuxtx (n: int_compcert).
 
 Inductive instruction: Type :=
   (** Branches *)
@@ -164,8 +164,8 @@ Inductive instruction: Type :=
   | Pret (r: ireg)                                                    (**r return *)
   | Pcbnz (sz: isize) (r: ireg) (lbl: label)                          (**r branch if not zero *)
   | Pcbz (sz: isize) (r: ireg) (lbl: label)                           (**r branch if zero *)
-  | Ptbnz (sz: isize) (r: ireg) (n: int) (lbl: label)                 (**r branch if bit n is not zero *)
-  | Ptbz (sz: isize) (r: ireg) (n: int) (lbl: label)                  (**r branch if bit n is zero *)
+  | Ptbnz (sz: isize) (r: ireg) (n: int_compcert) (lbl: label)                 (**r branch if bit n is not zero *)
+  | Ptbz (sz: isize) (r: ireg) (n: int_compcert) (lbl: label)                  (**r branch if bit n is zero *)
   (** Memory loads and stores *)
   | Pldrw (rd: ireg) (a: addressing)                                  (**r load int32 *)
   | Pldrw_a (rd: ireg) (a: addressing)                                (**r load int32 as any32 *)
@@ -205,10 +205,10 @@ Inductive instruction: Type :=
   | Padrp (rd: ireg) (id: ident) (ofs: ptrofs)                        (**r set [rd] to high address of [id + ofs] *)
   | Paddadr (rd: ireg) (r1: ireg) (id: ident) (ofs: ptrofs)           (**r add the low address of [id + ofs] *)
   (** Bit-field operations *)
-  | Psbfiz (sz: isize) (rd: ireg) (r1: ireg) (r: int) (s: Z)          (**r sign extend and shift left *)
-  | Psbfx (sz: isize) (rd: ireg) (r1: ireg) (r: int) (s: Z)           (**r shift right and sign extend *)
-  | Pubfiz (sz: isize) (rd: ireg) (r1: ireg) (r: int) (s: Z)          (**r zero extend and shift left *)
-  | Pubfx (sz: isize) (rd: ireg) (r1: ireg) (r: int) (s: Z)           (**r shift right and zero extend *)
+  | Psbfiz (sz: isize) (rd: ireg) (r1: ireg) (r: int_compcert) (s: Z)          (**r sign extend and shift left *)
+  | Psbfx (sz: isize) (rd: ireg) (r1: ireg) (r: int_compcert) (s: Z)           (**r shift right and sign extend *)
+  | Pubfiz (sz: isize) (rd: ireg) (r1: ireg) (r: int_compcert) (s: Z)          (**r zero extend and shift left *)
+  | Pubfx (sz: isize) (rd: ireg) (r1: ireg) (r: int_compcert) (s: Z)           (**r shift right and zero extend *)
   (** Integer arithmetic, shifted register *)
   | Padd (sz: isize) (rd: ireg) (r1: ireg0) (r2: ireg) (s: shift_op)  (**r addition *)
   | Psub (sz: isize) (rd: ireg) (r1: ireg0) (r2: ireg) (s: shift_op)  (**r subtraction *)
@@ -239,7 +239,7 @@ Inductive instruction: Type :=
   | Prev16 (sz: isize) (rd r1: ireg)                                  (**r reverse bytes in each 16-bit word *)
   | Prbit (sz: isize) (rd r1: ireg)                                   (**r reverse bits *)
   (** Conditional data processing *)
-  | Pcsel (rd: ireg) (r1 r2: ireg) (c: testcond)                      (**r int conditional move *)
+  | Pcsel (rd: ireg) (r1 r2: ireg) (c: testcond)                      (**r int_compcert conditional move *)
   | Pcset (rd: ireg) (c: testcond)                                    (**r set to 1/0 if cond is true/false *)
 (*
   | Pcsetm (rd: ireg) (c: testcond)                                   (**r set to -1/0 if cond is true/false *)
@@ -262,14 +262,14 @@ Inductive instruction: Type :=
   | Pfmov (rd r1: freg)
   | Pfmovimms (rd: freg) (f: float32)                                 (**r load float32 constant *)
   | Pfmovimmd (rd: freg) (f: float)                                   (**r load float64 constant *)
-  | Pfmovi (fsz: fsize) (rd: freg) (r1: ireg0)                        (**r copy int reg to FP reg *)
+  | Pfmovi (fsz: fsize) (rd: freg) (r1: ireg0)                        (**r copy int_compcert reg to FP reg *)
   (** Floating-point conversions *)
   | Pfcvtds (rd r1: freg)                                             (**r convert float32 to float64 *)
   | Pfcvtsd (rd r1: freg)                                             (**r convert float64 to float32 *)
-  | Pfcvtzs (isz: isize) (fsz: fsize) (rd: ireg) (r1: freg)           (**r convert float to signed int *)
-  | Pfcvtzu (isz: isize) (fsz: fsize) (rd: ireg) (r1: freg)           (**r convert float to unsigned int *)
-  | Pscvtf (fsz: fsize) (isz: isize) (rd: freg) (r1: ireg)            (**r convert signed int to float *)
-  | Pucvtf (fsz: fsize) (isz: isize) (rd: freg) (r1: ireg)            (**r convert unsigned int to float *)
+  | Pfcvtzs (isz: isize) (fsz: fsize) (rd: ireg) (r1: freg)           (**r convert float to signed int_compcert *)
+  | Pfcvtzu (isz: isize) (fsz: fsize) (rd: ireg) (r1: freg)           (**r convert float to unsigned int_compcert *)
+  | Pscvtf (fsz: fsize) (isz: isize) (rd: freg) (r1: ireg)            (**r convert signed int_compcert to float *)
+  | Pucvtf (fsz: fsize) (isz: isize) (rd: freg) (r1: ireg)            (**r convert unsigned int_compcert to float *)
   (** Floating-point arithmetic *)
   | Pfabs (sz: fsize) (rd r1: freg)                                   (**r absolute value *)
   | Pfneg (sz: fsize) (rd r1: freg)                                   (**r negation *)
@@ -295,15 +295,15 @@ Inductive instruction: Type :=
   | Pfreeframe (sz: Z) (linkofs: ptrofs)                              (**r deallocate stack frame and restore previous frame *)
   | Plabel (lbl: label)                                               (**r define a code label *)
   | Ploadsymbol (rd: ireg) (id: ident)                                (**r load the address of [id] *)
-  | Pcvtsw2x (rd: ireg) (r1: ireg)                                    (**r sign-extend 32-bit int to 64-bit *)
-  | Pcvtuw2x (rd: ireg) (r1: ireg)                                    (**r zero-extend 32-bit int to 64-bit *)
-  | Pcvtx2w (rd: ireg)                                                (**r retype a 64-bit int as a 32-bit int *)
+  | Pcvtsw2x (rd: ireg) (r1: ireg)                                    (**r sign-extend 32-bit int_compcert to 64-bit *)
+  | Pcvtuw2x (rd: ireg) (r1: ireg)                                    (**r zero-extend 32-bit int_compcert to 64-bit *)
+  | Pcvtx2w (rd: ireg)                                                (**r retype a 64-bit int_compcert as a 32-bit int_compcert *)
   | Pbtbl (r1: ireg) (tbl: list label)                                (**r N-way branch through a jump table *)
   | Pbuiltin (ef: external_function)
              (args: list (builtin_arg preg)) (res: builtin_res preg)  (**r built-in function (pseudo) *)
   | Pnop                                                              (**r no operation *)
-  | Pcfi_adjust (ofs: int)                                            (**r .cfi_adjust debug directive *)
-  | Pcfi_rel_offset (ofs: int)                                        (**r .cfi_rel_offset debug directive *)
+  | Pcfi_adjust (ofs: int_compcert)                                            (**r .cfi_adjust debug directive *)
+  | Pcfi_rel_offset (ofs: int_compcert)                                        (**r .cfi_rel_offset debug directive *)
 .
 
 Definition code := list instruction.
@@ -524,7 +524,7 @@ Definition eval_testzero (sz: isize) (v: val) (m: mem): option bool :=
 
 (** Integer "bit is set?" test *)
 
-Definition eval_testbit (sz: isize) (v: val) (n: int): option bool :=
+Definition eval_testbit (sz: isize) (v: val) (n: int_compcert): option bool :=
   match sz with
   | W => Val.cmp_bool Cne (Val.and v (Vint (Int.shl Int.one n))) (Vint Int.zero)
   | X => Val.cmpl_bool Cne (Val.andl v (Vlong (Int64.shl' Int64.one n))) (Vlong Int64.zero)
@@ -1238,7 +1238,7 @@ Inductive initial_state (p: program): state -> Prop :=
         # SP <- Vnullptr in
       initial_state p (State rs0 m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall rs m r,
       rs#PC = Vnullptr ->
       rs#X0 = Vint r ->

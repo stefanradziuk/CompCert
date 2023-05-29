@@ -125,7 +125,7 @@ Nondetfunction xorl (e1: expr) (e2: expr) :=
   | _, _ => Eop Oxorl (e1:::e2:::Enil)
   end.
 
-Nondetfunction rolml (e1: expr) (amount2: int) (mask2: int64) :=
+Nondetfunction rolml (e1: expr) (amount2: int_compcert) (mask2: int64) :=
   if Int.eq amount2 Int.zero then andlimm mask2 e1 else
   match e1 with
   | Eop (Olongconst n1) Enil =>
@@ -142,7 +142,7 @@ Nondetfunction rolml (e1: expr) (amount2: int) (mask2: int64) :=
       Eop (Orolml amount2 mask2) (e1:::Enil)
   end.
 
-Definition shllimm (e1: expr) (n: int) :=
+Definition shllimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shllimm e1 n else
   if Int.eq n Int.zero then e1 else
   if negb (Int.ltu n Int64.iwordsize') then
@@ -151,7 +151,7 @@ Definition shllimm (e1: expr) (n: int) :=
     let n' := Int64.repr (Int.unsigned n) in
     rolml e1 n (Int64.shl Int64.mone n').
 
-Definition shrluimm (e1: expr) (n: int) :=
+Definition shrluimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrluimm e1 n else
   if Int.eq n Int.zero then e1 else
   if negb (Int.ltu n Int64.iwordsize') then
@@ -160,7 +160,7 @@ Definition shrluimm (e1: expr) (n: int) :=
     let n' := Int64.repr (Int.unsigned n) in
     rolml e1 (Int.sub Int64.iwordsize' n) (Int64.shru Int64.mone n').
 
-Nondetfunction shrlimm (e1: expr) (n: int) :=
+Nondetfunction shrlimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrlimm e1 n else
   if Int.eq n Int.zero then e1 else
   if negb (Int.ltu n Int64.iwordsize') then
@@ -271,7 +271,7 @@ Definition mullhs (e1: expr) (n2: int64) :=
   if Archi.splitlong then SplitLong.mullhs e1 n2 else
   Eop Omullhs (e1 ::: longconst n2 ::: Enil).
 
-Definition shrxlimm (e: expr) (n: int) :=
+Definition shrxlimm (e: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrxlimm e n else
   if Int.eq n Int.zero then e else Eop (Oshrxlimm n) (e ::: Enil).
 

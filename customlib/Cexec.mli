@@ -25,7 +25,7 @@ open Znumtheory
 
 val is_val : expr -> (coq_val * coq_type) option
 
-val is_loc : expr -> (((block * Ptrofs.int) * bitfield) * coq_type) option
+val is_loc : expr -> (((block * Ptrofs.int_compcert) * bitfield) * coq_type) option
 
 val is_val_list : exprlist -> (coq_val * coq_type) list option
 
@@ -39,22 +39,22 @@ val list_eventval_of_val :
 val val_of_eventval : genv -> eventval -> typ -> coq_val option
 
 val do_volatile_load :
-  genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int ->
+  genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int_compcert ->
   ((world * trace) * coq_val) option
 
 val do_volatile_store :
-  genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int -> coq_val
+  genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int_compcert -> coq_val
   -> (((world * trace) * Mem.mem) * coq_val) option
 
 val do_deref_loc :
-  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield ->
+  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int_compcert -> bitfield ->
   ((world * trace) * coq_val) option
 
 val check_assign_copy :
-  genv -> coq_type -> block -> Ptrofs.int -> block -> Ptrofs.int -> bool
+  genv -> coq_type -> block -> Ptrofs.int_compcert -> block -> Ptrofs.int_compcert -> bool
 
 val do_assign_loc :
-  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield ->
+  genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int_compcert -> bitfield ->
   coq_val -> (((world * trace) * Mem.mem) * coq_val) option
 
 val do_ef_volatile_load :
@@ -65,7 +65,7 @@ val do_ef_volatile_store :
   genv -> memory_chunk -> world -> coq_val list -> Mem.mem ->
   (((world * trace) * coq_val) * Mem.mem) option
 
-val do_alloc_size : coq_val -> Ptrofs.int option
+val do_alloc_size : coq_val -> Ptrofs.int_compcert option
 
 val do_ef_malloc :
   world -> coq_val list -> Mem.mem -> (((world * trace) * coq_val) * Mem.mem)
@@ -156,4 +156,4 @@ val do_step :
 
 val do_initial_state : Csyntax.program -> (genv * state) option
 
-val at_final_state : state -> Int.int option
+val at_final_state : state -> Int.int_compcert option

@@ -65,7 +65,7 @@ Nondetfunction notint (e: expr) :=
 
 (** ** Integer addition and pointer addition *)
 
-Nondetfunction addimm (n: int) (e: expr) :=
+Nondetfunction addimm (n: int_compcert) (e: expr) :=
   if Int.eq n Int.zero then e else
   match e with
   | Eop (Ointconst m) Enil       => Eop (Ointconst(Int.add n m)) Enil
@@ -92,7 +92,7 @@ Nondetfunction add (e1: expr) (e2: expr) :=
 
 (** ** Integer and pointer subtraction *)
 
-Nondetfunction rsubimm (n: int) (e: expr) :=
+Nondetfunction rsubimm (n: int_compcert) (e: expr) :=
   match e with
   | Eop (Ointconst m) Enil => Eop (Ointconst (Int.sub n m)) Enil
   | Eop (Oaddimm m) (t:::Enil) => Eop (Orsubimm (Int.sub n m)) (t:::Enil)
@@ -119,7 +119,7 @@ Definition negint (e: expr) := rsubimm Int.zero e.
 
 (** ** Immediate shifts *)
 
-Nondetfunction shlimm (e1: expr) (n: int) :=
+Nondetfunction shlimm (e1: expr) (n: int_compcert) :=
   if Int.eq n Int.zero then
     e1
   else if negb (Int.ltu n Int.iwordsize) then
@@ -133,7 +133,7 @@ Nondetfunction shlimm (e1: expr) (n: int) :=
     | _ => Eop (Oshift (Slsl (mk_shift_amount n))) (e1:::Enil)
     end.
 
-Nondetfunction shruimm (e1: expr) (n: int) :=
+Nondetfunction shruimm (e1: expr) (n: int_compcert) :=
   if Int.eq n Int.zero then
     e1
   else if negb (Int.ltu n Int.iwordsize) then
@@ -147,7 +147,7 @@ Nondetfunction shruimm (e1: expr) (n: int) :=
     | _ => Eop (Oshift (Slsr (mk_shift_amount n))) (e1:::Enil)
     end.
 
-Nondetfunction shrimm (e1: expr) (n: int) :=
+Nondetfunction shrimm (e1: expr) (n: int_compcert) :=
   if Int.eq n Int.zero then
     e1
   else if negb (Int.ltu n Int.iwordsize) then
@@ -164,7 +164,7 @@ Nondetfunction shrimm (e1: expr) (n: int) :=
 
 (** ** Integer multiply *)
 
-Definition mulimm_base (n1: int) (e2: expr) :=
+Definition mulimm_base (n1: int_compcert) (e2: expr) :=
   match Int.one_bits n1 with
   | i :: nil =>
       shlimm e2 i
@@ -175,7 +175,7 @@ Definition mulimm_base (n1: int) (e2: expr) :=
       Eop Omul (Eop (Ointconst n1) Enil ::: e2 ::: Enil)
   end.
 
-Nondetfunction mulimm (n1: int) (e2: expr) :=
+Nondetfunction mulimm (n1: int_compcert) (e2: expr) :=
   if Int.eq n1 Int.zero then Eop (Ointconst Int.zero) Enil
   else if Int.eq n1 Int.one then e2
   else match e2 with
@@ -196,7 +196,7 @@ Definition mulhu (e1: expr) (e2: expr) := Eop Omulhu (e1 ::: e2 ::: Enil).
 
 (** ** Bitwise and, or, xor *)
 
-Nondetfunction andimm (n1: int) (e2: expr) :=
+Nondetfunction andimm (n1: int_compcert) (e2: expr) :=
   if Int.eq n1 Int.zero then Eop (Ointconst Int.zero) Enil else
   if Int.eq n1 Int.mone then e2 else
   match e2 with
@@ -227,7 +227,7 @@ Definition same_expr_pure (e1 e2: expr) :=
   | _, _ => false
   end.
 
-Nondetfunction orimm (n1: int) (e2: expr) :=
+Nondetfunction orimm (n1: int_compcert) (e2: expr) :=
   if Int.eq n1 Int.zero then e2 else
   if Int.eq n1 Int.mone then Eop (Ointconst Int.mone) Enil else
   match e2 with
@@ -255,7 +255,7 @@ Nondetfunction or (e1: expr) (e2: expr) :=
   | _, _ => Eop Oor (e1:::e2:::Enil)
   end.
 
-Nondetfunction xorimm (n1: int) (e2: expr) :=
+Nondetfunction xorimm (n1: int_compcert) (e2: expr) :=
   if Int.eq n1 Int.zero then e2 else
   if Int.eq n1 Int.mone then notint e2 else
   match e2 with
@@ -290,7 +290,7 @@ Definition mods_base := mod_aux Odiv.
 Definition divu_base (e1: expr) (e2: expr) := Eop Odivu (e1:::e2:::Enil).
 Definition modu_base := mod_aux Odivu.
 
-Definition shrximm (e1: expr) (n2: int) :=
+Definition shrximm (e1: expr) (n2: int_compcert) :=
   if Int.eq n2 Int.zero then e1 else Eop (Oshrximm n2) (e1:::Enil).
 
 (** ** General shifts *)
@@ -329,9 +329,9 @@ Definition mulfs (e1 e2: expr) :=  Eop Omulfs (e1 ::: e2 ::: Enil).
 
 (** ** Comparisons *)
 
-Nondetfunction compimm (default: comparison -> int -> condition)
-                       (sem: comparison -> int -> int -> bool)
-                       (c: comparison) (e1: expr) (n2: int) :=
+Nondetfunction compimm (default: comparison -> int_compcert -> condition)
+                       (sem: comparison -> int_compcert -> int_compcert -> bool)
+                       (c: comparison) (e1: expr) (n2: int_compcert) :=
   match c, e1 with
   | c, Eop (Ointconst n1) Enil =>
       Eop (Ointconst (if sem c n1 n2 then Int.one else Int.zero)) Enil

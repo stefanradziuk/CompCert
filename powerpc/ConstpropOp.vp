@@ -105,12 +105,12 @@ Definition make_select (c: condition) (ty: typ)
       (Osel c' ty, r1 :: r2 :: args')
   end.
 
-Definition make_addimm (n: int) (r: reg) :=
+Definition make_addimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero
   then (Omove, r :: nil)
   else (Oaddimm n, r :: nil).
 
-Definition make_shlimm (n: int) (r1 r2: reg) :=
+Definition make_shlimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else if Int.ltu n Int.iwordsize then
@@ -118,7 +118,7 @@ Definition make_shlimm (n: int) (r1 r2: reg) :=
   else
     (Oshl, r1 :: r2 :: nil).
 
-Definition make_shrimm (n: int) (r1 r2: reg) :=
+Definition make_shrimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else if Int.ltu n Int.iwordsize then
@@ -126,19 +126,19 @@ Definition make_shrimm (n: int) (r1 r2: reg) :=
   else
     (Oshr, r1 :: r2 :: nil).
 
-Definition make_shruimm_aux (n: int) (r1: reg) :=
+Definition make_shruimm_aux (n: int_compcert) (r1: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else
     (Orolm (Int.sub Int.iwordsize n) (Int.shru Int.mone n), r1 :: nil).
 
-Definition make_shruimm (n: int) (r1 r2: reg) :=
+Definition make_shruimm (n: int_compcert) (r1 r2: reg) :=
   if Int.ltu n Int.iwordsize then
     make_shruimm_aux n r1
   else
     (Oshru, r1 :: r2 :: nil).
 
-Definition make_mulimm (n: int) (r1 r2: reg) :=
+Definition make_mulimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Ointconst Int.zero, nil)
   else if Int.eq n Int.one then
@@ -149,7 +149,7 @@ Definition make_mulimm (n: int) (r1 r2: reg) :=
     | None => (Omulimm n, r1 :: nil)
     end.
 
-Definition make_divimm (n: int) (r1 r2: reg) :=
+Definition make_divimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.one then
     (Omove, r1 :: nil)
   else
@@ -160,13 +160,13 @@ Definition make_divimm (n: int) (r1 r2: reg) :=
     | None   => (Odiv, r1 :: r2 :: nil)
     end.
 
-Definition make_divuimm (n: int) (r1 r2: reg) :=
+Definition make_divuimm (n: int_compcert) (r1 r2: reg) :=
   match Int.is_power2 n with
   | Some l => make_shruimm_aux l r1
   | None   => (Odivu, r1 :: r2 :: nil)
   end.
 
-Definition make_andimm (n: int) (r: reg) (a: aval) :=
+Definition make_andimm (n: int_compcert) (r: reg) (a: aval) :=
   if Int.eq n Int.zero then (Ointconst Int.zero, nil)
   else if Int.eq n Int.mone then (Omove, r :: nil)
   else if match a with Uns _ m => Int.eq (Int.zero_ext m (Int.not n)) Int.zero
@@ -174,35 +174,35 @@ Definition make_andimm (n: int) (r: reg) (a: aval) :=
   then (Omove, r :: nil)
   else (Oandimm n, r :: nil).
 
-Definition make_orimm (n: int) (r: reg) :=
+Definition make_orimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero then (Omove, r :: nil)
   else if Int.eq n Int.mone then (Ointconst Int.mone, nil)
   else (Oorimm n, r :: nil).
 
-Definition make_xorimm (n: int) (r: reg) :=
+Definition make_xorimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero then (Omove, r :: nil)
   else if Int.eq n Int.mone then (Onot, r :: nil)
   else (Oxorimm n, r :: nil).
 
-Definition make_shllimm (n: int) (r1 r2: reg) :=
+Definition make_shllimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then (Omove, r1 :: nil)
   else if Int.ltu n Int64.iwordsize' then
     let n' := Int64.repr (Int.unsigned n) in
     (Orolml n (Int64.shl Int64.mone n'), r1::nil)
   else (Oshll, r1 :: r2 :: nil).
 
-Definition make_shrlimm (n: int) (r1 r2: reg) :=
+Definition make_shrlimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then (Omove, r1 :: nil)
   else (Oshrl, r1 :: r2 :: nil).
 
-Definition make_shrluimm_aux (n: int) (r1: reg) :=
+Definition make_shrluimm_aux (n: int_compcert) (r1: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else
     let n' := Int64.repr (Int.unsigned n) in
     (Orolml (Int.sub Int64.iwordsize' n) (Int64.shru Int64.mone n'), r1 :: nil).
 
-Definition make_shrluimm (n: int) (r1 r2: reg) :=
+Definition make_shrluimm (n: int_compcert) (r1 r2: reg) :=
   if Int.ltu n Int64.iwordsize' then
     make_shrluimm_aux n r1
   else

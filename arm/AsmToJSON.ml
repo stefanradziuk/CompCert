@@ -42,14 +42,14 @@ let mnemonic_names = StringSet.of_list
 type instruction_arg =
   | ALabel of positive
   | Atom of positive
-  | Data32 of Integers.Int.int
-  | Data64 of Integers.Int64.int
+  | Data32 of Integers.Int.int_compcert
+  | Data64 of Integers.Int64.int_compcert
   | DFreg of freg
   | Float32 of Floats.float32
   | Float64 of Floats.float
   | Id
   | Ireg of ireg
-  | Long of Integers.Int.int
+  | Long of Integers.Int.int_compcert
   | SFreg of freg
   | SPreg of sreg
   | Shift of shift_op

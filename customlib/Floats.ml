@@ -258,7 +258,7 @@ module Float =
       Coq_xH))))) (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO Coq_xH)))))))) to_single_nan Coq_mode_NE
 
-  (** val to_int : float -> Int.int option **)
+  (** val to_int : float -> Int.int_compcert option **)
 
   let to_int f =
     option_map Int.repr
@@ -267,7 +267,7 @@ module Float =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))))) f Int.min_signed
         Int.max_signed)
 
-  (** val to_intu : float -> Int.int option **)
+  (** val to_intu : float -> Int.int_compcert option **)
 
   let to_intu f =
     option_map Int.repr
@@ -276,7 +276,7 @@ module Float =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))))) f Z0
         Int.max_unsigned)
 
-  (** val to_long : float -> Int64.int option **)
+  (** val to_long : float -> Int64.int_compcert option **)
 
   let to_long f =
     option_map Int64.repr
@@ -285,7 +285,7 @@ module Float =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))))) f Int64.min_signed
         Int64.max_signed)
 
-  (** val to_longu : float -> Int64.int option **)
+  (** val to_longu : float -> Int64.int_compcert option **)
 
   let to_longu f =
     option_map Int64.repr
@@ -294,28 +294,28 @@ module Float =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))))) f Z0
         Int64.max_unsigned)
 
-  (** val of_int : Int.int -> float **)
+  (** val of_int : Int.int_compcert -> float **)
 
   let of_int n =
     coq_BofZ (Zpos (Coq_xI (Coq_xO (Coq_xI (Coq_xO (Coq_xI Coq_xH)))))) (Zpos
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO Coq_xH))))))))))) (Int.signed n)
 
-  (** val of_intu : Int.int -> float **)
+  (** val of_intu : Int.int_compcert -> float **)
 
   let of_intu n =
     coq_BofZ (Zpos (Coq_xI (Coq_xO (Coq_xI (Coq_xO (Coq_xI Coq_xH)))))) (Zpos
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO Coq_xH))))))))))) (Int.unsigned n)
 
-  (** val of_long : Int64.int -> float **)
+  (** val of_long : Int64.int_compcert -> float **)
 
   let of_long n =
     coq_BofZ (Zpos (Coq_xI (Coq_xO (Coq_xI (Coq_xO (Coq_xI Coq_xH)))))) (Zpos
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO Coq_xH))))))))))) (Int64.signed n)
 
-  (** val of_longu : Int64.int -> float **)
+  (** val of_longu : Int64.int_compcert -> float **)
 
   let of_longu n =
     coq_BofZ (Zpos (Coq_xI (Coq_xO (Coq_xI (Coq_xO (Coq_xI Coq_xH)))))) (Zpos
@@ -329,12 +329,12 @@ module Float =
       (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO (Coq_xO Coq_xH))))))))))) base intPart expPart
 
-  (** val to_bits : float -> Int64.int **)
+  (** val to_bits : float -> Int64.int_compcert **)
 
   let to_bits f =
     Int64.repr (bits_of_b64 f)
 
-  (** val of_bits : Int64.int -> float **)
+  (** val of_bits : Int64.int_compcert -> float **)
 
   let of_bits b =
     b64_of_bits (Int64.unsigned b)
@@ -346,7 +346,7 @@ module Float =
       Coq_xH)))))) (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH)))))))))))
 
-  (** val ox8000_0000 : Int.int **)
+  (** val ox8000_0000 : Int.int_compcert **)
 
   let ox8000_0000 =
     Int.repr Int.half_modulus
@@ -442,7 +442,7 @@ module Float32 =
   let cmp c f1 f2 =
     cmp_of_comparison c (compare f1 f2)
 
-  (** val to_int : float32 -> Int.int option **)
+  (** val to_int : float32 -> Int.int_compcert option **)
 
   let to_int f =
     option_map Int.repr
@@ -450,7 +450,7 @@ module Float32 =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
         Coq_xH)))))))) f Int.min_signed Int.max_signed)
 
-  (** val to_intu : float32 -> Int.int option **)
+  (** val to_intu : float32 -> Int.int_compcert option **)
 
   let to_intu f =
     option_map Int.repr
@@ -458,7 +458,7 @@ module Float32 =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
         Coq_xH)))))))) f Z0 Int.max_unsigned)
 
-  (** val to_long : float32 -> Int64.int option **)
+  (** val to_long : float32 -> Int64.int_compcert option **)
 
   let to_long f =
     option_map Int64.repr
@@ -466,7 +466,7 @@ module Float32 =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
         Coq_xH)))))))) f Int64.min_signed Int64.max_signed)
 
-  (** val to_longu : float32 -> Int64.int option **)
+  (** val to_longu : float32 -> Int64.int_compcert option **)
 
   let to_longu f =
     option_map Int64.repr
@@ -474,28 +474,28 @@ module Float32 =
         (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
         Coq_xH)))))))) f Z0 Int64.max_unsigned)
 
-  (** val of_int : Int.int -> float32 **)
+  (** val of_int : Int.int_compcert -> float32 **)
 
   let of_int n =
     coq_BofZ (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xI Coq_xH))))) (Zpos (Coq_xO
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))
       (Int.signed n)
 
-  (** val of_intu : Int.int -> float32 **)
+  (** val of_intu : Int.int_compcert -> float32 **)
 
   let of_intu n =
     coq_BofZ (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xI Coq_xH))))) (Zpos (Coq_xO
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))
       (Int.unsigned n)
 
-  (** val of_long : Int64.int -> float32 **)
+  (** val of_long : Int64.int_compcert -> float32 **)
 
   let of_long n =
     coq_BofZ (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xI Coq_xH))))) (Zpos (Coq_xO
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))
       (Int64.signed n)
 
-  (** val of_longu : Int64.int -> float32 **)
+  (** val of_longu : Int64.int_compcert -> float32 **)
 
   let of_longu n =
     coq_BofZ (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xI Coq_xH))))) (Zpos (Coq_xO
@@ -509,12 +509,12 @@ module Float32 =
       (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))
       base intPart expPart
 
-  (** val to_bits : float32 -> Int.int **)
+  (** val to_bits : float32 -> Int.int_compcert **)
 
   let to_bits f =
     Int.repr (bits_of_b32 f)
 
-  (** val of_bits : Int.int -> float32 **)
+  (** val of_bits : Int.int_compcert -> float32 **)
 
   let of_bits b =
     b32_of_bits (Int.unsigned b)

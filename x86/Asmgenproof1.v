@@ -557,7 +557,7 @@ Proof.
   intros [A [B [C [D E]]]].
   unfold eval_testcond. rewrite A; rewrite B. unfold Val.cmpu, Val.cmp.
   destruct v1; destruct v2; simpl in H; FuncInv; subst.
-- (* int int *)
+- (* int_compcert int_compcert *)
   destruct c; simpl; auto.
   destruct (Int.eq i i0); reflexivity.
   destruct (Int.eq i i0); auto.
@@ -565,12 +565,12 @@ Proof.
   rewrite Int.not_ltu. destruct (Int.ltu i i0); simpl; destruct (Int.eq i i0); auto.
   rewrite (Int.ltu_not i i0). destruct (Int.ltu i i0); destruct (Int.eq i i0); reflexivity.
   destruct (Int.ltu i i0); reflexivity.
-- (* int ptr *)
+- (* int_compcert ptr *)
   unfold Val.cmpu_bool; rewrite Heqb1.
   destruct (Int.eq i Int.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i0) || Mem.valid_pointer m b0 (Ptrofs.unsigned i0 - 1))); try discriminate H.
   destruct c; simpl in *; inv H; reflexivity.
-- (* ptr int *)
+- (* ptr int_compcert *)
   unfold Val.cmpu_bool; rewrite Heqb1.
   destruct (Int.eq i0 Int.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i) || Mem.valid_pointer m b0 (Ptrofs.unsigned i - 1))); try discriminate H.
@@ -660,7 +660,7 @@ Proof.
   intros [A [B [C [D E]]]].
   unfold eval_testcond. rewrite A; rewrite B.
   destruct v1; destruct v2; simpl in H; FuncInv; subst.
-- (* int int *)
+- (* int_compcert int_compcert *)
   destruct c; simpl; auto.
   destruct (Int64.eq i i0); reflexivity.
   destruct (Int64.eq i i0); auto.
@@ -668,12 +668,12 @@ Proof.
   rewrite Int64.not_ltu. destruct (Int64.ltu i i0); simpl; destruct (Int64.eq i i0); auto.
   rewrite (Int64.ltu_not i i0). destruct (Int64.ltu i i0); destruct (Int64.eq i i0); reflexivity.
   destruct (Int64.ltu i i0); reflexivity.
-- (* int ptr *)
+- (* int_compcert ptr *)
   unfold Val.cmplu; simpl; destruct Archi.ptr64; try discriminate.
   destruct (Int64.eq i Int64.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i0) || Mem.valid_pointer m b0 (Ptrofs.unsigned i0 - 1))) eqn:?; try discriminate H.
   destruct c; simpl in *; inv H; auto.
-- (* ptr int *)
+- (* ptr int_compcert *)
   unfold Val.cmplu; simpl; destruct Archi.ptr64; try discriminate.
   destruct (Int64.eq i0 Int64.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i) || Mem.valid_pointer m b0 (Ptrofs.unsigned i - 1))) eqn:?; try discriminate H.

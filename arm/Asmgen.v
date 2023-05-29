@@ -46,7 +46,7 @@ Definition freg_of (r: mreg) : res freg :=
   a given [XY] 8-bit constant.
 *)
 
-Fixpoint is_immed_arith_arm (n: nat) (x: int) {struct n}: bool :=
+Fixpoint is_immed_arith_arm (n: nat) (x: int_compcert) {struct n}: bool :=
   match n with
   | Datatypes.O => false
   | Datatypes.S n =>
@@ -54,7 +54,7 @@ Fixpoint is_immed_arith_arm (n: nat) (x: int) {struct n}: bool :=
       is_immed_arith_arm n (Int.rol x (Int.repr 2))
   end.
 
-Fixpoint is_immed_arith_thumb (n: nat) (x: int) {struct n}: bool :=
+Fixpoint is_immed_arith_thumb (n: nat) (x: int_compcert) {struct n}: bool :=
   match n with
   | Datatypes.O => true
   | Datatypes.S n =>
@@ -63,7 +63,7 @@ Fixpoint is_immed_arith_thumb (n: nat) (x: int) {struct n}: bool :=
        && is_immed_arith_thumb n (Int.shru x Int.one))
   end.
 
-Definition is_immed_arith_thumb_special (x: int): bool :=
+Definition is_immed_arith_thumb_special (x: int_compcert): bool :=
   let l1 := Int.and x (Int.repr 255) in
   let l2 := Int.shl l1 (Int.repr 8) in
   let l3 := Int.shl l2 (Int.repr 8) in
@@ -72,7 +72,7 @@ Definition is_immed_arith_thumb_special (x: int): bool :=
   let l24 := Int.or l2 l4 in
   Int.eq x l13 || Int.eq x l24 || Int.eq x (Int.or l13 l24).
 
-Definition is_immed_arith (x: int): bool :=
+Definition is_immed_arith (x: int_compcert): bool :=
   if thumb tt
   then is_immed_arith_thumb 24%nat x || is_immed_arith_thumb_special x
   else is_immed_arith_arm 16%nat x.
@@ -92,19 +92,19 @@ In particular, if [n] is a representable immediate argument, we should have
 [n' = n].
 *)
 
-Definition mk_immed_mem_word (x: int): int :=
+Definition mk_immed_mem_word (x: int_compcert): int_compcert :=
   if Int.ltu x Int.zero then
     Int.neg (Int.zero_ext (if thumb tt then 8 else 12) (Int.neg x))
   else
     Int.zero_ext 12 x.
 
-Definition mk_immed_mem_small (x: int): int :=
+Definition mk_immed_mem_small (x: int_compcert): int_compcert :=
   if Int.ltu x Int.zero then
     Int.neg (Int.zero_ext 8 (Int.neg x))
   else
     Int.zero_ext 8 x.
 
-Definition mk_immed_mem_float (x: int): int :=
+Definition mk_immed_mem_float (x: int_compcert): int_compcert :=
   let x := Int.and x (Int.repr (-4)) in   (**r mask low 2 bits off *)
   if Int.ltu x Int.zero then
     Int.neg (Int.zero_ext 10 (Int.neg x))
@@ -114,7 +114,7 @@ Definition mk_immed_mem_float (x: int): int :=
 (** Decomposition of a 32-bit integer into a list of immediate arguments,
     whose sum or "or" or "xor" equals the integer. *)
 
-Fixpoint decompose_int_arm (N: nat) (n p: int) : list int :=
+Fixpoint decompose_int_arm (N: nat) (n p: int_compcert) : list int_compcert :=
   match N with
   | Datatypes.O =>
       if Int.eq n Int.zero then nil else n :: nil
@@ -127,7 +127,7 @@ Fixpoint decompose_int_arm (N: nat) (n p: int) : list int :=
         decompose_int_arm M (Int.and n (Int.not m)) (Int.add p (Int.repr 2))
   end.
 
-Fixpoint decompose_int_thumb (N: nat) (n p: int) : list int :=
+Fixpoint decompose_int_thumb (N: nat) (n p: int_compcert) : list int_compcert :=
   match N with
   | Datatypes.O =>
       if Int.eq n Int.zero then nil else n :: nil
@@ -140,20 +140,20 @@ Fixpoint decompose_int_thumb (N: nat) (n p: int) : list int :=
         decompose_int_thumb M (Int.and n (Int.not m)) (Int.add p Int.one)
   end.
 
-Definition decompose_int_base (n: int): list int :=
+Definition decompose_int_base (n: int_compcert): list int_compcert :=
   if thumb tt
   then if is_immed_arith_thumb_special n
        then n :: nil
        else decompose_int_thumb 24%nat n Int.zero
   else decompose_int_arm 12%nat n Int.zero.
 
-Definition decompose_int (n: int) : list int :=
+Definition decompose_int (n: int_compcert) : list int_compcert :=
   match decompose_int_base n with
   | nil => Int.zero :: nil
   | l   => l
   end.
 
-Definition iterate_op (op1 op2: shift_op -> instruction) (l: list int) (k: code) :=
+Definition iterate_op (op1 op2: shift_op -> instruction) (l: list int_compcert) (k: code) :=
   match l with
   | nil =>
       op1 (SOimm Int.zero) :: k                 (**r should never happen *)
@@ -163,13 +163,13 @@ Definition iterate_op (op1 op2: shift_op -> instruction) (l: list int) (k: code)
 
 (** Smart constructors for integer immediate arguments. *)
 
-Definition loadimm_word (r: ireg) (n: int) (k: code) :=
+Definition loadimm_word (r: ireg) (n: int_compcert) (k: code) :=
   let hi := Int.shru n (Int.repr 16) in
   if Int.eq hi Int.zero
   then Pmovw r n :: k
   else Pmovw r (Int.zero_ext 16 n) :: Pmovt r hi :: k.
 
-Definition loadimm (r: ireg) (n: int) (k: code) :=
+Definition loadimm (r: ireg) (n: int_compcert) (k: code) :=
   let d1 := decompose_int n in
   let d2 := decompose_int (Int.not n) in
   let l1 := List.length d1 in
@@ -185,7 +185,7 @@ Definition loadimm (r: ireg) (n: int) (k: code) :=
   else
     iterate_op (Pmvn r) (Pbic r r) d2 k.
 
-Definition addimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition addimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if Int.ltu (Int.repr (-256)) n then
     Psub r1 r2 (SOimm (Int.neg n)) :: k
   else
@@ -195,18 +195,18 @@ Definition addimm (r1 r2: ireg) (n: int) (k: code) :=
     then iterate_op (Padd r1 r2) (Padd r1 r1) d1 k
     else iterate_op (Psub r1 r2) (Psub r1 r1) d2 k).
 
-Definition rsubimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition rsubimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   iterate_op (Prsb r1 r2) (Padd r1 r1) (decompose_int n) k.
 
-Definition andimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition andimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if is_immed_arith n
   then Pand r1 r2 (SOimm n) :: k
   else iterate_op (Pbic r1 r2) (Pbic r1 r1) (decompose_int (Int.not n)) k.
 
-Definition orimm  (r1 r2: ireg) (n: int) (k: code) :=
+Definition orimm  (r1 r2: ireg) (n: int_compcert) (k: code) :=
   iterate_op (Porr r1 r2) (Porr r1 r1) (decompose_int n) k.
 
-Definition xorimm  (r1 r2: ireg) (n: int) (k: code) :=
+Definition xorimm  (r1 r2: ireg) (n: int_compcert) (k: code) :=
   iterate_op (Peor r1 r2) (Peor r1 r1) (decompose_int n) k.
 
 (** Translation of a shift immediate operation (type [Op.shift]) *)
@@ -575,9 +575,9 @@ Definition transl_op
 (** Accessing data in the stack frame. *)
 
 Definition indexed_memory_access
-    (mk_instr: ireg -> int -> instruction)
-    (mk_immed: int -> int)
-    (base: ireg) (n: int) (k: code) :=
+    (mk_instr: ireg -> int_compcert -> instruction)
+    (mk_immed: int_compcert -> int_compcert)
+    (base: ireg) (n: int_compcert) (k: code) :=
   let n1 := mk_immed n in
   if Int.eq n n1
   then mk_instr base n :: k
@@ -639,9 +639,9 @@ Definition save_lr_preserves_R12 (ofs: ptrofs) : bool :=
 (** Translation of memory accesses *)
 
 Definition transl_memory_access
-     (mk_instr_imm: ireg -> int -> instruction)
+     (mk_instr_imm: ireg -> int_compcert -> instruction)
      (mk_instr_gen: option (ireg -> shift_op -> instruction))
-     (mk_immed: int -> int)
+     (mk_immed: int_compcert -> int_compcert)
      (addr: addressing) (args: list mreg) (k: code) :=
   match addr, args with
   | Aindexed n, a1 :: nil =>
@@ -671,7 +671,7 @@ Definition transl_memory_access
 
 Definition transl_memory_access_int
      (mk_instr: ireg -> ireg -> shift_op -> instruction)
-     (mk_immed: int -> int)
+     (mk_immed: int_compcert -> int_compcert)
      (dst: mreg) (addr: addressing) (args: list mreg) (k: code) :=
   do rd <- ireg_of dst;
   transl_memory_access
@@ -680,8 +680,8 @@ Definition transl_memory_access_int
     mk_immed addr args k.
 
 Definition transl_memory_access_float
-     (mk_instr: freg -> ireg -> int -> instruction)
-     (mk_immed: int -> int)
+     (mk_instr: freg -> ireg -> int_compcert -> instruction)
+     (mk_immed: int_compcert -> int_compcert)
      (dst: mreg) (addr: addressing) (args: list mreg) (k: code) :=
   do rd <- freg_of dst;
   transl_memory_access

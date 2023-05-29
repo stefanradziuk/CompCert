@@ -77,31 +77,31 @@ module Float :
 
   val to_single : float -> float32
 
-  val to_int : float -> Int.int option
+  val to_int : float -> Int.int_compcert option
 
-  val to_intu : float -> Int.int option
+  val to_intu : float -> Int.int_compcert option
 
-  val to_long : float -> Int64.int option
+  val to_long : float -> Int64.int_compcert option
 
-  val to_longu : float -> Int64.int option
+  val to_longu : float -> Int64.int_compcert option
 
-  val of_int : Int.int -> float
+  val of_int : Int.int_compcert -> float
 
-  val of_intu : Int.int -> float
+  val of_intu : Int.int_compcert -> float
 
-  val of_long : Int64.int -> float
+  val of_long : Int64.int_compcert -> float
 
-  val of_longu : Int64.int -> float
+  val of_longu : Int64.int_compcert -> float
 
   val from_parsed : positive -> positive -> coq_Z -> float
 
-  val to_bits : float -> Int64.int
+  val to_bits : float -> Int64.int_compcert
 
-  val of_bits : Int64.int -> float
+  val of_bits : Int64.int_compcert -> float
 
   val exact_inverse : float -> float option
 
-  val ox8000_0000 : Int.int
+  val ox8000_0000 : Int.int_compcert
  end
 
 module Float32 :
@@ -134,27 +134,27 @@ module Float32 :
 
   val cmp : comparison -> float32 -> float32 -> bool
 
-  val to_int : float32 -> Int.int option
+  val to_int : float32 -> Int.int_compcert option
 
-  val to_intu : float32 -> Int.int option
+  val to_intu : float32 -> Int.int_compcert option
 
-  val to_long : float32 -> Int64.int option
+  val to_long : float32 -> Int64.int_compcert option
 
-  val to_longu : float32 -> Int64.int option
+  val to_longu : float32 -> Int64.int_compcert option
 
-  val of_int : Int.int -> float32
+  val of_int : Int.int_compcert -> float32
 
-  val of_intu : Int.int -> float32
+  val of_intu : Int.int_compcert -> float32
 
-  val of_long : Int64.int -> float32
+  val of_long : Int64.int_compcert -> float32
 
-  val of_longu : Int64.int -> float32
+  val of_longu : Int64.int_compcert -> float32
 
   val from_parsed : positive -> positive -> coq_Z -> float32
 
-  val to_bits : float32 -> Int.int
+  val to_bits : float32 -> Int.int_compcert
 
-  val of_bits : Int.int -> float32
+  val of_bits : Int.int_compcert -> float32
 
   val exact_inverse : float32 -> float32 option
  end

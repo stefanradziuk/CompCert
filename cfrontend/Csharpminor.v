@@ -33,7 +33,7 @@ Require Import Smallstep.
   constants, arithmetic operations, and dereferencing addresses. *)
 
 Inductive constant : Type :=
-  | Ointconst: int -> constant          (**r integer constant *)
+  | Ointconst: int_compcert -> constant          (**r integer constant *)
   | Ofloatconst: float -> constant      (**r double-precision floating-point constant *)
   | Osingleconst: float32 -> constant   (**r single-precision floating-point constant *)
   | Olongconst: int64 -> constant.      (**r long integer constant *)
@@ -484,7 +484,7 @@ Inductive initial_state (p: program): state -> Prop :=
 
 (** A final state is a [Returnstate] with an empty continuation. *)
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall r m,
       final_state (Returnstate (Vint r) Kstop m) r.
 

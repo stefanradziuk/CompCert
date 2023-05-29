@@ -33,11 +33,11 @@ Local Transparent Archi.ptr64.
 (** Shift amounts *)
 
 Record amount32 : Type := {
-  a32_amount :> int;
+  a32_amount :> int_compcert;
   a32_range  : Int.ltu a32_amount Int.iwordsize = true }.
 
 Record amount64 : Type := {
-  a64_amount :> int;
+  a64_amount :> int_compcert;
   a64_range  : Int.ltu a64_amount Int64.iwordsize' = true }.
 
 (** Shifted operands *)
@@ -60,12 +60,12 @@ Inductive condition: Type :=
 (** Tests over 32-bit integers *)
   | Ccomp (c: comparison)                               (**r signed comparison *)
   | Ccompu (c: comparison)                              (**r unsigned comparison *)
-  | Ccompimm (c: comparison) (n: int)                   (**r signed comparison with constant *)
-  | Ccompuimm (c: comparison) (n: int)                  (**r unsigned comparison with constant *)
+  | Ccompimm (c: comparison) (n: int_compcert)                   (**r signed comparison with constant *)
+  | Ccompuimm (c: comparison) (n: int_compcert)                  (**r unsigned comparison with constant *)
   | Ccompshift (c: comparison) (s: shift) (a: amount32) (**r signed comparison with shift *)
   | Ccompushift (c: comparison) (s: shift) (a: amount32)(**r unsigned comparison width shift *)
-  | Cmaskzero (n: int)                                  (**r test [(arg & n) == 0] *)
-  | Cmasknotzero (n: int)                               (**r test [(arg & n) != 0] *)
+  | Cmaskzero (n: int_compcert)                                  (**r test [(arg & n) == 0] *)
+  | Cmasknotzero (n: int_compcert)                               (**r test [(arg & n) != 0] *)
 (** Tests over 64-bit integers *)
   | Ccompl (c: comparison)                              (**r signed comparison *)
   | Ccomplu (c: comparison)                             (**r unsigned comparison *)
@@ -91,7 +91,7 @@ Inductive condition: Type :=
 
 Inductive operation : Type :=
   | Omove                                               (**r [rd = r1] *)
-  | Ointconst (n: int)                                  (**r [rd] is set to the given integer constant *)
+  | Ointconst (n: int_compcert)                                  (**r [rd] is set to the given integer constant *)
   | Olongconst (n: int64)                               (**r [rd] is set to the given integer constant *)
   | Ofloatconst (n: float)                              (**r [rd] is set to the given float constant *)
   | Osingleconst (n: float32)                           (**r [rd] is set to the given float constant *)
@@ -101,7 +101,7 @@ Inductive operation : Type :=
   | Oshift (s: shift) (a: amount32)                     (**r shift or rotate by immediate quantity *)
   | Oadd                                                (**r [rd = r1 + r2] *)
   | Oaddshift (s: shift) (a: amount32)                  (**r [rd = r1 + shifted r2] *)
-  | Oaddimm (n: int)                                    (**r [rd = r1 + n] *)
+  | Oaddimm (n: int_compcert)                                    (**r [rd = r1 + n] *)
   | Oneg                                                (**r [rd = - r1]   *)                     
   | Onegshift (s: shift) (a: amount32)                  (**r [rd = - shifted r1] *)
   | Osub                                                (**r [rd = r1 - r2] *)
@@ -113,13 +113,13 @@ Inductive operation : Type :=
   | Odivu                                               (**r [rd = r1 / r2] (unsigned) *)
   | Oand                                                (**r [rd = r1 & r2] *)
   | Oandshift (s: shift) (a: amount32)                  (**r [rd = r1 & shifted r2] *)
-  | Oandimm (n: int)                                    (**r [rd = r1 & n] *)
+  | Oandimm (n: int_compcert)                                    (**r [rd = r1 & n] *)
   | Oor                                                 (**r [rd = r1 | r2] *)
   | Oorshift (s: shift) (a: amount32)                   (**r [rd = r1 | shifted r2] *)
-  | Oorimm (n: int)                                     (**r [rd = r1 | n] *)
+  | Oorimm (n: int_compcert)                                     (**r [rd = r1 | n] *)
   | Oxor                                                (**r [rd = r1 ^ r2] *)
   | Oxorshift (s: shift) (a: amount32)                  (**r [rd = r1 ^ shifted r2] *)
-  | Oxorimm (n: int)                                    (**r [rd = r1 ^ n] *)
+  | Oxorimm (n: int_compcert)                                    (**r [rd = r1 ^ n] *)
   | Onot                                                (**r [rd = ~r1] *)
   | Onotshift (s: shift) (a: amount32)                  (**r [rd = ~ shifted r1] *)
   | Obic                                                (**r [rd = r1 & ~r2] *)
@@ -131,7 +131,7 @@ Inductive operation : Type :=
   | Oshl                                                (**r [rd = r1 << r2] *)
   | Oshr                                                (**r [rd = r1 >> r2] (signed) *)
   | Oshru                                               (**r [rd = r1 >> r2] (unsigned) *)
-  | Oshrximm (n: int)                                   (**r [rd = r1 / 2^n] (signed) *)
+  | Oshrximm (n: int_compcert)                                   (**r [rd = r1 / 2^n] (signed) *)
   | Ozext (s: Z)                                        (**r [rd = zero_ext(r1,s)] *)
   | Osext (s: Z)                                        (**r [rd = sign_ext(r1,s)] *)
   | Oshlzext (s: Z) (a: amount32)                       (**r [rd = zero_ext(r1,s) << a] *)
@@ -180,7 +180,7 @@ Inductive operation : Type :=
   | Oshll                                               (**r [rd = r1 << r2] *)
   | Oshrl                                               (**r [rd = r1 >> r2] (signed) *)
   | Oshrlu                                              (**r [rd = r1 >> r2] (unsigned) *)
-  | Oshrlximm (n: int)                                  (**r [rd = r1 / 2^n] (signed) *)
+  | Oshrlximm (n: int_compcert)                                  (**r [rd = r1 / 2^n] (signed) *)
   | Ozextl (s: Z)                                       (**r [rd = zero_ext(r1,s)] *)
   | Osextl (s: Z)                                       (**r [rd = sign_ext(r1,s)] *)
   | Oshllzext (s: Z) (a: amount64)                      (**r [rd = zero_ext(r1,s) << a] *)
@@ -203,7 +203,7 @@ Inductive operation : Type :=
   | Odivfs                                              (**r [rd = r1 / r2] *)
   | Osingleoffloat                                      (**r [rd] is [r1] truncated to single-precision float *)
   | Ofloatofsingle                                      (**r [rd] is [r1] extended to double-precision float *)
-(** Conversions between int and float *)
+(** Conversions between int_compcert and float *)
   | Ointoffloat                                         (**r [rd = signed_int_of_float64(r1)] *)
   | Ointuoffloat                                        (**r [rd = unsigned_int_of_float64(r1)] *)
   | Ofloatofint                                         (**r [rd = float64_of_signed_int(r1)] *)
@@ -931,7 +931,7 @@ Section SHIFT_AMOUNT.
 
 Variable l: Z.
 Hypothesis l_range: 0 <= l < 32.
-Variable N: int.
+Variable N: int_compcert.
 Hypothesis N_eq: Int.unsigned N = two_p l.
 
 Remark mk_amount_range:
@@ -954,7 +954,7 @@ Qed.
 
 End SHIFT_AMOUNT.
 
-Program Definition mk_amount32 (n: int): amount32 :=
+Program Definition mk_amount32 (n: int_compcert): amount32 :=
   {| a32_amount := Int.zero_ext 5 n |}.
 Next Obligation.
   apply mk_amount_range. lia. reflexivity.
@@ -966,7 +966,7 @@ Proof.
   intros. eapply mk_amount_eq; eauto. lia. reflexivity.
 Qed.
 
-Program Definition mk_amount64 (n: int): amount64 :=
+Program Definition mk_amount64 (n: int_compcert): amount64 :=
   {| a64_amount := Int.zero_ext 6 n |}.
 Next Obligation.
   apply mk_amount_range. lia. reflexivity.

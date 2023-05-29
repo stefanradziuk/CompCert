@@ -5,12 +5,12 @@ open Floats
 open Integers
 
 type constant =
-| Ointconst of Int.int
+| Ointconst of Int.int_compcert
 | Ofloatconst of float
 | Osingleconst of float32
-| Olongconst of Int64.int
-| Oaddrsymbol of ident * Ptrofs.int
-| Oaddrstack of Ptrofs.int
+| Olongconst of Int64.int_compcert
+| Oaddrsymbol of ident * Ptrofs.int_compcert
+| Oaddrstack of Ptrofs.int_compcert
 
 type unary_operation =
 | Ocast8unsigned

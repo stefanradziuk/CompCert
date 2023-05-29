@@ -67,7 +67,7 @@ with funspec :=
 (* Type specifier elements. These appear at the start of a declaration *)
 (* Everywhere they appear in this file, they appear as a 'list spec_elem', *)
 (* which is not interpreted by cabs -- rather, this "word soup" is passed *)
-(* on to the compiler.  Thus, we can represent e.g. 'int long float x' even *)
+(* on to the compiler.  Thus, we can represent e.g. 'int_compcert long float x' even *)
 (* though the compiler will of course choke. *)
 with spec_elem :=
   | SpecCV : cvspec -> spec_elem            (* const/volatile *)
@@ -97,7 +97,7 @@ with field_group :=
 
 (* The decl_type is in the order in which they are printed. Only the name of
  * the declared identifier is pulled out. *)
-(* e.g: in "int *x", "*x" is the declarator; "x" will be pulled out as *)
+(* e.g: in "int_compcert *x", "*x" is the declarator; "x" will be pulled out as *)
 (* the string, and decl_type will be PTR([], JUSTBASE) *)
 with name :=
   | Name : string -> decl_type -> list attribute -> loc -> name
@@ -178,12 +178,12 @@ with gcc_attribute_word :=
   | GCC_ATTR_PACKED.
 
 (* like name_group, except the declared variables are allowed to have initializers *)
-(* e.g.: int x=1, y=2; *)
+(* e.g.: int_compcert x=1, y=2; *)
 Definition init_name_group := (list spec_elem * list init_name)%type.
 
 (* The base type and the storage are common to all names. Each name might
  * contain type or storage modifiers *)
-(* e.g.: int x, y; *)
+(* e.g.: int_compcert x, y; *)
 Definition name_group := (list spec_elem * list name)%type.
 
 (* GCC extended asm *)

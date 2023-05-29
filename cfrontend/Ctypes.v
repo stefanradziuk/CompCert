@@ -1103,14 +1103,14 @@ Qed.
   The conversion fails if a type of a member is not complete.  This rules
   out incorrect recursive definitions such as
 <<
-    struct s { int x; struct s next; }
+    struct s { int_compcert x; struct s next; }
 >>
   Here, when we process the definition of [struct s], the identifier [s]
   is not bound yet in the composite environment, hence field [next]
   has an incomplete type.  However, recursions that go through a pointer type
   are correctly handled:
 <<
-    struct s { int x; struct s * next; }
+    struct s { int_compcert x; struct s * next; }
 >>
   Here, [next] has a pointer type, which is always complete, even though
   [s] is not yet bound to a composite.

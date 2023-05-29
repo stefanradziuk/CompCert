@@ -479,7 +479,7 @@ Record semantics : Type := Semantics_gen {
   genvtype: Type;
   step : genvtype -> state -> trace -> state -> Prop;
   initial_state: state -> Prop;
-  final_state: state -> int -> Prop;
+  final_state: state -> int_compcert -> Prop;
   globalenv: genvtype;
   symbolenv: Senv.t
 }.
@@ -489,7 +489,7 @@ Record semantics : Type := Semantics_gen {
 Definition Semantics {state funtype vartype: Type}
                      (step: Genv.t funtype vartype -> state -> trace -> state -> Prop)
                      (initial_state: state -> Prop)
-                     (final_state: state -> int -> Prop)
+                     (final_state: state -> int_compcert -> Prop)
                      (globalenv: Genv.t funtype vartype) :=
   {| state := state;
      genvtype := Genv.t funtype vartype;
@@ -1965,7 +1965,7 @@ Qed.
 
 Record bigstep_semantics : Type :=
   Bigstep_semantics {
-    bigstep_terminates: trace -> int -> Prop;
+    bigstep_terminates: trace -> int_compcert -> Prop;
     bigstep_diverges: traceinf -> Prop
   }.
 

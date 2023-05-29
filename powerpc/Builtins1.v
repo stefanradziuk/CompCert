@@ -59,10 +59,10 @@ Definition platform_builtin_sig (b: platform_builtin) : signature :=
      mksignature (Tlong :: Tlong :: nil) Tlong cc_default
   end.
 
-Definition isel {A: Type} (c: int) (n1 n2: A) : A :=
+Definition isel {A: Type} (c: int_compcert) (n1 n2: A) : A :=
   if Int.eq c Int.zero then n2 else n1.
 
-Program Definition bsel (c n1 n2: int) : { n : int | n = Int.zero_ext 8 n } :=
+Program Definition bsel (c n1 n2: int_compcert) : { n : int_compcert | n = Int.zero_ext 8 n } :=
   Int.zero_ext 8 (isel c n1 n2).
 Next Obligation.
   symmetry. apply Int.zero_ext_idem. lia.

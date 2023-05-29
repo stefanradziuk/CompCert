@@ -376,13 +376,13 @@ Lemma make_cast_correct:
 Proof.
   intros. unfold make_cast, sem_cast in *;
   destruct (classify_cast ty1 ty2); inv H; destruct v; InvEval; eauto with cshm.
-- (* single -> int *)
+- (* single -> int_compcert *)
   unfold make_singleofint, cast_int_float. destruct si1; eauto with cshm.
-- (* float -> int *)
+- (* float -> int_compcert *)
   apply make_cast_int_correct.
   unfold cast_float_int in Heqo. unfold make_intoffloat.
   destruct si2; econstructor; eauto; simpl; rewrite Heqo; auto.
-- (* single -> int *)
+- (* single -> int_compcert *)
   apply make_cast_int_correct.
   unfold cast_single_int in Heqo. unfold make_intofsingle.
   destruct si2; econstructor; eauto with cshm; simpl; rewrite Heqo; auto.
@@ -396,7 +396,7 @@ Proof.
 - (* single -> long *)
   unfold cast_single_long in Heqo. unfold make_longofsingle.
   destruct si2; econstructor; eauto with cshm; simpl; rewrite Heqo; auto.
-- (* int -> bool *)
+- (* int_compcert -> bool *)
   apply make_cmpu_ne_zero_correct; auto.
 - (* pointer (32 bits) -> bool *)
   eapply make_cmpu_ne_zero_correct_ptr; eauto.
@@ -432,7 +432,7 @@ Lemma make_boolean_correct:
 Proof.
   intros. unfold make_boolean. unfold bool_val in H0.
   destruct (classify_bool ty); destruct v; InvEval.
-- (* int *)
+- (* int_compcert *)
   econstructor; split. apply make_cmpu_ne_zero_correct with (n := i); auto.
   destruct (Int.eq i Int.zero); simpl; constructor.
 - (* ptr 32 bits *)
@@ -540,7 +540,7 @@ Definition shift_constructor_correct
 
 Section MAKE_BIN.
 
-Variable sem_int: signedness -> int -> int -> option val.
+Variable sem_int: signedness -> int_compcert -> int_compcert -> option val.
 Variable sem_long: signedness -> int64 -> int64 -> option val.
 Variable sem_float: float -> float -> option val.
 Variable sem_single: float32 -> float32 -> option val.
@@ -1304,7 +1304,7 @@ Lemma transl_expr_lvalue_correct:
    bf = bf' /\ Csharpminor.eval_expr tge te le m ta (Vptr b ofs)).
 Proof.
   apply eval_expr_lvalue_ind; intros; try (monadInv TR).
-- (* const int *)
+- (* const int_compcert *)
   apply make_intconst_correct.
 - (* const float *)
   apply make_floatconst_correct.

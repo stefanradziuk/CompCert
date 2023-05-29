@@ -16,11 +16,11 @@ let eq_block =
 
 type coq_val =
 | Vundef
-| Vint of Int.int
-| Vlong of Int64.int
+| Vint of Int.int_compcert
+| Vlong of Int64.int_compcert
 | Vfloat of float
 | Vsingle of float32
-| Vptr of block * Ptrofs.int
+| Vptr of block * Ptrofs.int_compcert
 
 (** val coq_Vzero : coq_val **)
 
@@ -42,7 +42,7 @@ let coq_Vtrue =
 let coq_Vfalse =
   Vint Int.zero
 
-(** val coq_Vptrofs : Ptrofs.int -> coq_val **)
+(** val coq_Vptrofs : Ptrofs.int_compcert -> coq_val **)
 
 let coq_Vptrofs n =
   if ptr64 then Vlong (Ptrofs.to_int64 n) else Vint (Ptrofs.to_int n)

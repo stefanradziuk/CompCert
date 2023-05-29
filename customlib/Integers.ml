@@ -685,37 +685,37 @@ module Int64 =
     | Cgt -> ltu y x
     | Cge -> negb (ltu x y)
 
-  (** val iwordsize' : Int.int **)
+  (** val iwordsize' : Int.int_compcert **)
 
   let iwordsize' =
     Int.repr zwordsize
 
-  (** val shl' : int -> Int.int -> int **)
+  (** val shl' : int -> Int.int_compcert -> int **)
 
   let shl' x y =
     repr (Z.shiftl (unsigned x) (Int.unsigned y))
 
-  (** val shru' : int -> Int.int -> int **)
+  (** val shru' : int -> Int.int_compcert -> int **)
 
   let shru' x y =
     repr (Z.shiftr (unsigned x) (Int.unsigned y))
 
-  (** val shr' : int -> Int.int -> int **)
+  (** val shr' : int -> Int.int_compcert -> int **)
 
   let shr' x y =
     repr (Z.shiftr (signed x) (Int.unsigned y))
 
-  (** val shrx' : int -> Int.int -> int **)
+  (** val shrx' : int -> Int.int_compcert -> int **)
 
   let shrx' x y =
     divs x (shl' one y)
 
-  (** val one_bits' : int -> Int.int list **)
+  (** val one_bits' : int -> Int.int_compcert list **)
 
   let one_bits' x =
     map Int.repr (coq_Z_one_bits wordsize (unsigned x) Z0)
 
-  (** val is_power2' : int -> Int.int option **)
+  (** val is_power2' : int -> Int.int_compcert option **)
 
   let is_power2' x =
     match coq_Z_one_bits wordsize (unsigned x) Z0 with
@@ -724,23 +724,23 @@ module Int64 =
                  | [] -> Some (Int.repr i)
                  | _ :: _ -> None)
 
-  (** val loword : int -> Int.int **)
+  (** val loword : int -> Int.int_compcert **)
 
   let loword n =
     Int.repr (unsigned n)
 
-  (** val hiword : int -> Int.int **)
+  (** val hiword : int -> Int.int_compcert **)
 
   let hiword n =
     Int.repr (unsigned (shru n (repr Int.zwordsize)))
 
-  (** val ofwords : Int.int -> Int.int -> int **)
+  (** val ofwords : Int.int_compcert -> Int.int_compcert -> int **)
 
   let ofwords hi lo =
     coq_or (shl (repr (Int.unsigned hi)) (repr Int.zwordsize))
       (repr (Int.unsigned lo))
 
-  (** val mul' : Int.int -> Int.int -> int **)
+  (** val mul' : Int.int_compcert -> Int.int_compcert -> int **)
 
   let mul' x y =
     repr (Z.mul (Int.unsigned x) (Int.unsigned y))
@@ -870,32 +870,32 @@ module Ptrofs =
     | Cgt -> ltu y x
     | Cge -> negb (ltu x y)
 
-  (** val to_int : int -> Int.int **)
+  (** val to_int : int -> Int.int_compcert **)
 
   let to_int x =
     Int.repr (unsigned x)
 
-  (** val to_int64 : int -> Int64.int **)
+  (** val to_int64 : int -> Int64.int_compcert **)
 
   let to_int64 x =
     Int64.repr (unsigned x)
 
-  (** val of_int : Int.int -> int **)
+  (** val of_int : Int.int_compcert -> int **)
 
   let of_int x =
     repr (Int.unsigned x)
 
-  (** val of_intu : Int.int -> int **)
+  (** val of_intu : Int.int_compcert -> int **)
 
   let of_intu =
     of_int
 
-  (** val of_ints : Int.int -> int **)
+  (** val of_ints : Int.int_compcert -> int **)
 
   let of_ints x =
     repr (Int.signed x)
 
-  (** val of_int64 : Int64.int -> int **)
+  (** val of_int64 : Int64.int_compcert -> int **)
 
   let of_int64 x =
     repr (Int64.unsigned x)

@@ -328,7 +328,7 @@ Inductive initial_state (p: program): state -> Prop :=
 
 (** A final state is a [Returnstate] with an empty call stack. *)
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall r m,
       final_state (Returnstate nil (Vint r) m) r.
 

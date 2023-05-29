@@ -53,10 +53,10 @@ Definition freg_of (r: mreg) : res freg :=
 - [(high_s n) << 16 + low_s n] equals [n].
 *)
 
-Definition low_u (n: int) := Int.and n (Int.repr 65535).
-Definition high_u (n: int) := Int.shru n (Int.repr 16).
-Definition low_s (n: int) := Int.sign_ext 16 n.
-Definition high_s (n: int) := Int.shru (Int.sub n (low_s n)) (Int.repr 16).
+Definition low_u (n: int_compcert) := Int.and n (Int.repr 65535).
+Definition high_u (n: int_compcert) := Int.shru n (Int.repr 16).
+Definition low_s (n: int_compcert) := Int.sign_ext 16 n.
+Definition high_s (n: int_compcert) := Int.shru (Int.sub n (low_s n)) (Int.repr 16).
 
 (** Smart constructors for arithmetic operations involving
   a 32-bit integer constant.  Depending on whether the
@@ -64,7 +64,7 @@ Definition high_s (n: int) := Int.shru (Int.sub n (low_s n)) (Int.repr 16).
   are generated as required to perform the operation
   and prepended to the given instruction sequence [k]. *)
 
-Definition loadimm (r: ireg) (n: int) (k: code) :=
+Definition loadimm (r: ireg) (n: int_compcert) (k: code) :=
   if Int.eq (high_s n) Int.zero then
     Paddi r GPR0 (Cint n) :: k
   else if Int.eq (low_s n) Int.zero then
@@ -73,7 +73,7 @@ Definition loadimm (r: ireg) (n: int) (k: code) :=
     Paddis r GPR0 (Cint (high_u n)) ::
     Pori r r (Cint (low_u n)) :: k.
 
-Definition addimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition addimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if Int.eq (high_s n) Int.zero then
     Paddi r1 r2 (Cint n) :: k
   else if Int.eq (low_s n) Int.zero then
@@ -82,7 +82,7 @@ Definition addimm (r1 r2: ireg) (n: int) (k: code) :=
     Paddis r1 r2 (Cint (high_s n)) ::
     Paddi r1 r1 (Cint (low_s n)) :: k.
 
-Definition andimm_base (r1 r2: ireg) (n: int) (k: code) :=
+Definition andimm_base (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if Int.eq (high_u n) Int.zero then
     Pandi_ r1 r2 (Cint n) :: k
   else if Int.eq (low_u n) Int.zero then
@@ -90,13 +90,13 @@ Definition andimm_base (r1 r2: ireg) (n: int) (k: code) :=
   else
     loadimm GPR0 n (Pand_ r1 r2 GPR0 :: k).
 
-Definition andimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition andimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if is_rlw_mask n then
     Prlwinm r1 r2 Int.zero n :: k
   else
     andimm_base r1 r2 n k.
 
-Definition orimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition orimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if Int.eq (high_u n) Int.zero then
     Pori r1 r2 (Cint n) :: k
   else if Int.eq (low_u n) Int.zero then
@@ -105,7 +105,7 @@ Definition orimm (r1 r2: ireg) (n: int) (k: code) :=
     Poris r1 r2 (Cint (high_u n)) ::
     Pori r1 r1 (Cint (low_u n)) :: k.
 
-Definition xorimm (r1 r2: ireg) (n: int) (k: code) :=
+Definition xorimm (r1 r2: ireg) (n: int_compcert) (k: code) :=
   if Int.eq (high_u n) Int.zero then
     Pxori r1 r2 (Cint n) :: k
   else if Int.eq (low_u n) Int.zero then
@@ -114,7 +114,7 @@ Definition xorimm (r1 r2: ireg) (n: int) (k: code) :=
     Pxoris r1 r2 (Cint (high_u n)) ::
     Pxori r1 r1 (Cint (low_u n)) :: k.
 
-Definition rolm (r1 r2: ireg) (amount mask: int) (k: code) :=
+Definition rolm (r1 r2: ireg) (amount mask: int_compcert) (k: code) :=
   if is_rlw_mask mask then
     Prlwinm r1 r2 amount mask :: k
   else
@@ -182,7 +182,7 @@ Definition andimm64 (r1 r2: ireg) (n: int64) (k : code) :=
   else
     andimm64_base r1 r2 n k.
 
-Definition rolm64 (r1 r2: ireg) (amount: int) (mask: int64) (k: code) :=
+Definition rolm64 (r1 r2: ireg) (amount: int_compcert) (mask: int64) (k: code) :=
   if is_rldl_mask mask || is_rldr_mask mask
   || (let mask' := Int64.shru' mask amount in
       Int64.eq mask (Int64.shl' mask' amount) && is_rldl_mask mask') then
@@ -735,7 +735,7 @@ Definition symbol_ofs_word_aligned symb ofs :=
 Definition aindexed
      (mk1: constant -> ireg -> code -> code)
      (mk2: ireg -> ireg -> code -> code)
-     (unaligned : bool) (r1 temp: ireg) (ofs: int) (k: code) :=
+     (unaligned : bool) (r1 temp: ireg) (ofs: int_compcert) (k: code) :=
   if unaligned || Int.eq (Int.mods ofs (Int.repr 4)) Int.zero then
     if Int.eq (high_s ofs) Int.zero then
       mk1 (Cint ofs) r1 k

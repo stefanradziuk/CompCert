@@ -44,10 +44,10 @@ Definition freg_of (r: mreg) : res freg :=
   into a (20-bit hi, 12-bit lo) pair where lo is sign-extended. *)
 
 Inductive immed32 : Type :=
-  | Imm32_single (imm: int)
-  | Imm32_pair   (hi: int) (lo: int).
+  | Imm32_single (imm: int_compcert)
+  | Imm32_pair   (hi: int_compcert) (lo: int_compcert).
 
-Definition make_immed32 (val: int) :=
+Definition make_immed32 (val: int_compcert) :=
   let lo := Int.sign_ext 12 val in
   if Int.eq val lo
   then Imm32_single val
@@ -81,19 +81,19 @@ Definition make_immed64 (val: int64) :=
   are generated as required to perform the operation
   and prepended to the given instruction sequence [k]. *)
 
-Definition load_hilo32 (r: ireg) (hi lo: int) k :=
+Definition load_hilo32 (r: ireg) (hi lo: int_compcert) k :=
   if Int.eq lo Int.zero then Pluiw r hi :: k
   else Pluiw r hi :: Paddiw r r lo :: k.
   
-Definition loadimm32 (r: ireg) (n: int) (k: code) :=
+Definition loadimm32 (r: ireg) (n: int_compcert) (k: code) :=
   match make_immed32 n with
   | Imm32_single imm => Paddiw r X0 imm :: k
   | Imm32_pair hi lo => load_hilo32 r hi lo k
   end.
 
 Definition opimm32 (op: ireg -> ireg0 -> ireg0 -> instruction)
-                   (opimm: ireg -> ireg0 -> int -> instruction)
-                   (rd rs: ireg) (n: int) (k: code) :=
+                   (opimm: ireg -> ireg0 -> int_compcert -> instruction)
+                   (rd rs: ireg) (n: int_compcert) (k: code) :=
   match make_immed32 n with
   | Imm32_single imm => opimm rd rs imm :: k
   | Imm32_pair hi lo => load_hilo32 X31 hi lo (op rd rs X31 :: k)
@@ -306,7 +306,7 @@ Definition transl_cond_int64u (cmp: comparison) (rd: ireg) (r1 r2: ireg0) (k: co
   | Cge => Psltul rd r1 r2 :: Pxoriw rd rd Int.one :: k
   end.
 
-Definition transl_condimm_int32s (cmp: comparison) (rd: ireg) (r1: ireg) (n: int) (k: code) :=
+Definition transl_condimm_int32s (cmp: comparison) (rd: ireg) (r1: ireg) (n: int_compcert) (k: code) :=
   if Int.eq n Int.zero then transl_cond_int32s cmp rd r1 X0 k else
   match cmp with
   | Ceq | Cne => xorimm32 rd r1 n (transl_cond_int32s cmp rd rd X0 k)
@@ -317,7 +317,7 @@ Definition transl_condimm_int32s (cmp: comparison) (rd: ireg) (r1: ireg) (n: int
   | _   => loadimm32 X31 n (transl_cond_int32s cmp rd r1 X31 k)
   end.
 
-Definition transl_condimm_int32u (cmp: comparison) (rd: ireg) (r1: ireg) (n: int) (k: code) :=
+Definition transl_condimm_int32u (cmp: comparison) (rd: ireg) (r1: ireg) (n: int_compcert) (k: code) :=
   if Int.eq n Int.zero then transl_cond_int32u cmp rd r1 X0 k else
   match cmp with
   | Clt => sltuimm32 rd r1 n k

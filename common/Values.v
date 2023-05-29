@@ -36,7 +36,7 @@ Definition eq_block := peq.
 
 Inductive val: Type :=
   | Vundef: val
-  | Vint: int -> val
+  | Vint: int_compcert -> val
   | Vlong: int64 -> val
   | Vfloat: float -> val
   | Vsingle: float32 -> val
@@ -467,7 +467,7 @@ Definition rol (v1 v2: val): val :=
   | _, _ => Vundef
   end.
 
-Definition rolm (v: val) (amount mask: int): val :=
+Definition rolm (v: val) (amount mask: int_compcert): val :=
   match v with
   | Vint n => Vint(Int.rolm n amount mask)
   | _ => Vundef
@@ -795,7 +795,7 @@ Definition rorl (v1 v2: val): val :=
   | _, _ => Vundef
   end.
 
-Definition rolml (v: val) (amount: int) (mask: int64): val :=
+Definition rolml (v: val) (amount: int_compcert) (mask: int64): val :=
   match v with
   | Vlong n => Vlong(Int64.rolm n (Int64.repr (Int.unsigned amount)) mask)
   | _ => Vundef
@@ -929,7 +929,7 @@ Definition cmpl (c: comparison) (v1 v2: val): option val :=
 Definition cmplu (c: comparison) (v1 v2: val): option val :=
   option_map of_bool (cmplu_bool c v1 v2).
 
-Definition maskzero_bool (v: val) (mask: int): option bool :=
+Definition maskzero_bool (v: val) (mask: int_compcert): option bool :=
   match v with
   | Vint n => Some (Int.eq (Int.and n mask) Int.zero)
   | _ => None

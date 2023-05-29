@@ -2306,7 +2306,7 @@ Definition do_initial_state (p: program): option (genv * state) :=
   check (type_eq (type_of_fundef f) (Tfunction Tnil type_int32s cc_default));
   Some (ge, Callstate f nil Kstop m0).
 
-Definition at_final_state (S: state): option int :=
+Definition at_final_state (S: state): option int_compcert :=
   match S with
   | Returnstate (Vint r) Kstop m => Some r
   | _ => None

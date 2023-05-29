@@ -75,23 +75,23 @@ Inductive incr_or_decr : Type := Incr | Decr.
 
 Inductive classify_cast_cases : Type :=
   | cast_case_pointer                              (**r between pointer types or intptr_t types *)
-  | cast_case_i2i (sz2:intsize) (si2:signedness)   (**r int -> int *)
+  | cast_case_i2i (sz2:intsize) (si2:signedness)   (**r int_compcert -> int_compcert *)
   | cast_case_f2f                                  (**r double -> double *)
   | cast_case_s2s                                  (**r single -> single *)
   | cast_case_f2s                                  (**r double -> single *)
   | cast_case_s2f                                  (**r single -> double *)
-  | cast_case_i2f (si1: signedness)                (**r int -> double *)
-  | cast_case_i2s (si1: signedness)                (**r int -> single *)
-  | cast_case_f2i (sz2:intsize) (si2:signedness)   (**r double -> int *)
-  | cast_case_s2i (sz2:intsize) (si2:signedness)   (**r single -> int *)
+  | cast_case_i2f (si1: signedness)                (**r int_compcert -> double *)
+  | cast_case_i2s (si1: signedness)                (**r int_compcert -> single *)
+  | cast_case_f2i (sz2:intsize) (si2:signedness)   (**r double -> int_compcert *)
+  | cast_case_s2i (sz2:intsize) (si2:signedness)   (**r single -> int_compcert *)
   | cast_case_l2l                       (**r long -> long *)
-  | cast_case_i2l (si1: signedness)     (**r int -> long *)
-  | cast_case_l2i (sz2: intsize) (si2: signedness) (**r long -> int *)
+  | cast_case_i2l (si1: signedness)     (**r int_compcert -> long *)
+  | cast_case_l2i (sz2: intsize) (si2: signedness) (**r long -> int_compcert *)
   | cast_case_l2f (si1: signedness)                (**r long -> double *)
   | cast_case_l2s (si1: signedness)                (**r long -> single *)
   | cast_case_f2l (si2:signedness)                 (**r double -> long *)
   | cast_case_s2l (si2:signedness)                 (**r single -> long *)
-  | cast_case_i2bool                               (**r int -> bool *)
+  | cast_case_i2bool                               (**r int_compcert -> bool *)
   | cast_case_l2bool                               (**r long -> bool *)
   | cast_case_f2bool                               (**r double -> bool *)
   | cast_case_s2bool                               (**r single -> bool *)
@@ -111,7 +111,7 @@ Definition classify_cast (tfrom tto: type) : classify_cast_cases :=
   | Tint IBool _ _, Tfloat F32 _ => cast_case_s2bool
   | Tint IBool _ _, (Tpointer _ _ | Tarray _ _ _ | Tfunction _ _ _) => 
       if Archi.ptr64 then cast_case_l2bool else cast_case_i2bool
-  (* To [int] other than [_Bool] *)
+  (* To [int_compcert] other than [_Bool] *)
   | Tint sz2 si2 _, Tint _ _ _ =>
       if Archi.ptr64 then cast_case_i2i sz2 si2
       else if intsize_eq sz2 I32 then cast_case_pointer
@@ -157,7 +157,7 @@ Definition classify_cast (tfrom tto: type) : classify_cast_cases :=
   viewed with static type [t1], can be converted  to type [t2],
   resulting in value [v2].  *)
 
-Definition cast_int_int (sz: intsize) (sg: signedness) (i: int) : int :=
+Definition cast_int_int (sz: intsize) (sg: signedness) (i: int_compcert) : int_compcert :=
   match sz, sg with
   | I8, Signed => Int.sign_ext 8 i
   | I8, Unsigned => Int.zero_ext 8 i
@@ -167,31 +167,31 @@ Definition cast_int_int (sz: intsize) (sg: signedness) (i: int) : int :=
   | IBool, _ => if Int.eq i Int.zero then Int.zero else Int.one
   end.
 
-Definition cast_int_float (si: signedness) (i: int) : float :=
+Definition cast_int_float (si: signedness) (i: int_compcert) : float :=
   match si with
   | Signed => Float.of_int i
   | Unsigned => Float.of_intu i
   end.
 
-Definition cast_float_int (si : signedness) (f: float) : option int :=
+Definition cast_float_int (si : signedness) (f: float) : option int_compcert :=
   match si with
   | Signed => Float.to_int f
   | Unsigned => Float.to_intu f
   end.
 
-Definition cast_int_single (si: signedness) (i: int) : float32 :=
+Definition cast_int_single (si: signedness) (i: int_compcert) : float32 :=
   match si with
   | Signed => Float32.of_int i
   | Unsigned => Float32.of_intu i
   end.
 
-Definition cast_single_int (si : signedness) (f: float32) : option int :=
+Definition cast_single_int (si : signedness) (f: float32) : option int_compcert :=
   match si with
   | Signed => Float32.to_int f
   | Unsigned => Float32.to_intu f
   end.
 
-Definition cast_int_long (si: signedness) (i: int) : int64 :=
+Definition cast_int_long (si: signedness) (i: int_compcert) : int64 :=
   match si with
   | Signed => Int64.repr (Int.signed i)
   | Unsigned => Int64.repr (Int.unsigned i)
@@ -443,7 +443,7 @@ Definition sem_notbool (v: val) (ty: type) (m: mem): option val :=
 (** *** Opposite and absolute value *)
 
 Inductive classify_neg_cases : Type :=
-  | neg_case_i(s: signedness)              (**r int *)
+  | neg_case_i(s: signedness)              (**r int_compcert *)
   | neg_case_f                             (**r double float *)
   | neg_case_s                             (**r single float *)
   | neg_case_l(s: signedness)              (**r long *)
@@ -512,7 +512,7 @@ Definition sem_absfloat (v: val) (ty: type) : option val :=
 (** *** Bitwise complement *)
 
 Inductive classify_notint_cases : Type :=
-  | notint_case_i(s: signedness)              (**r int *)
+  | notint_case_i(s: signedness)              (**r int_compcert *)
   | notint_case_l(s: signedness)              (**r long *)
   | notint_default.
 
@@ -549,8 +549,8 @@ Definition sem_notint (v: val) (ty: type): option val :=
 *)
 
 Inductive binarith_cases: Type :=
-  | bin_case_i (s: signedness)         (**r at int type *)
-  | bin_case_l (s: signedness)         (**r at long int type *)
+  | bin_case_i (s: signedness)         (**r at int_compcert type *)
+  | bin_case_l (s: signedness)         (**r at long int_compcert type *)
   | bin_case_f                         (**r at double float type *)
   | bin_case_s                         (**r at single float type *)
   | bin_default.                       (**r error *)
@@ -586,7 +586,7 @@ Definition binarith_type (c: binarith_cases) : type :=
   end.
 
 Definition sem_binarith
-    (sem_int: signedness -> int -> int -> option val)
+    (sem_int: signedness -> int_compcert -> int_compcert -> option val)
     (sem_long: signedness -> int64 -> int64 -> option val)
     (sem_float: float -> float -> option val)
     (sem_single: float32 -> float32 -> option val)
@@ -626,9 +626,9 @@ Definition sem_binarith
 (** *** Addition *)
 
 Inductive classify_add_cases : Type :=
-  | add_case_pi (ty: type) (si: signedness)     (**r pointer, int *)
+  | add_case_pi (ty: type) (si: signedness)     (**r pointer, int_compcert *)
   | add_case_pl (ty: type)     (**r pointer, long *)
-  | add_case_ip (si: signedness) (ty: type)     (**r int, pointer *)
+  | add_case_ip (si: signedness) (ty: type)     (**r int_compcert, pointer *)
   | add_case_lp (ty: type)     (**r long, pointer *)
   | add_default.               (**r numerical type, numerical type *)
 
@@ -641,7 +641,7 @@ Definition classify_add (ty1: type) (ty2: type) :=
   | _, _ => add_default
   end.
 
-Definition ptrofs_of_int (si: signedness) (n: int) : ptrofs :=
+Definition ptrofs_of_int (si: signedness) (n: int_compcert) : ptrofs :=
   match si with
   | Signed => Ptrofs.of_ints n
   | Unsigned => Ptrofs.of_intu n
@@ -695,7 +695,7 @@ Definition sem_add (cenv: composite_env) (v1:val) (t1:type) (v2: val) (t2:type) 
 (** *** Subtraction *)
 
 Inductive classify_sub_cases : Type :=
-  | sub_case_pi (ty: type) (si: signedness)  (**r pointer, int *)
+  | sub_case_pi (ty: type) (si: signedness)  (**r pointer, int_compcert *)
   | sub_case_pp (ty: type)               (**r pointer, pointer *)
   | sub_case_pl (ty: type)               (**r pointer, long *)
   | sub_default.                         (**r numerical type, numerical type *)
@@ -847,10 +847,10 @@ Definition sem_xor (v1:val) (t1:type) (v2: val) (t2:type) (m:mem) : option val :
   of the result is always that of the first argument. *)
 
 Inductive classify_shift_cases : Type:=
-  | shift_case_ii(s: signedness)         (**r int , int *)
+  | shift_case_ii(s: signedness)         (**r int_compcert , int_compcert *)
   | shift_case_ll(s: signedness)         (**r long, long *)
-  | shift_case_il(s: signedness)         (**r int, long *)
-  | shift_case_li(s: signedness)         (**r long, int *)
+  | shift_case_il(s: signedness)         (**r int_compcert, long *)
+  | shift_case_li(s: signedness)         (**r long, int_compcert *)
   | shift_default.
 
 Definition classify_shift (ty1: type) (ty2: type) :=
@@ -865,7 +865,7 @@ Definition classify_shift (ty1: type) (ty2: type) :=
   end.
 
 Definition sem_shift
-    (sem_int: signedness -> int -> int -> int)
+    (sem_int: signedness -> int_compcert -> int_compcert -> int_compcert)
     (sem_long: signedness -> int64 -> int64 -> int64)
     (v1: val) (t1: type) (v2: val) (t2: type) : option val :=
   match classify_shift t1 t2 with
@@ -916,8 +916,8 @@ Definition sem_shr (v1:val) (t1:type) (v2: val) (t2:type) : option val :=
 
 Inductive classify_cmp_cases : Type :=
   | cmp_case_pp                       (**r pointer, pointer *)
-  | cmp_case_pi (si: signedness)      (**r pointer, int *)
-  | cmp_case_ip (si: signedness)      (**r int, pointer *)
+  | cmp_case_pi (si: signedness)      (**r pointer, int_compcert *)
+  | cmp_case_ip (si: signedness)      (**r int_compcert, pointer *)
   | cmp_case_pl                       (**r pointer, long *)
   | cmp_case_lp                       (**r long, pointer *)
   | cmp_default.                      (**r numerical, numerical *)
@@ -1110,12 +1110,12 @@ Definition first_bit (sz: intsize) (pos width: Z) : Z :=
   then bitsize_carrier sz - pos - width
   else pos.
 
-Definition bitfield_extract (sz: intsize) (sg: signedness) (pos width: Z) (c: int) : int :=
+Definition bitfield_extract (sz: intsize) (sg: signedness) (pos width: Z) (c: int_compcert) : int_compcert :=
   if intsize_eq sz IBool || signedness_eq sg Unsigned
   then Int.unsigned_bitfield_extract (first_bit sz pos width) width c
   else Int.signed_bitfield_extract (first_bit sz pos width) width c.
 
-Definition bitfield_normalize (sz: intsize) (sg: signedness) (width: Z) (n: int) : int :=
+Definition bitfield_normalize (sz: intsize) (sg: signedness) (width: Z) (n: int_compcert) : int_compcert :=
   if intsize_eq sz IBool || signedness_eq sg Unsigned
   then Int.zero_ext width n
   else Int.sign_ext width n.
@@ -1322,9 +1322,9 @@ Proof.
   unfold sem_cmp in *; destruct (classify_cmp ty1 ty2).
 - (* pointer - pointer *)
   eapply sem_cmp_ptr_inj; eauto.
-- (* pointer - int *)
+- (* pointer - int_compcert *)
   inversion H1; subst; TrivialInject; eapply sem_cmp_ptr_inj; eauto.
-- (* int - pointer *)
+- (* int_compcert - pointer *)
   inversion H0; subst; TrivialInject; eapply sem_cmp_ptr_inj; eauto.
 - (* pointer - long *)
   inversion H1; subst; TrivialInject; eapply sem_cmp_ptr_inj; eauto.

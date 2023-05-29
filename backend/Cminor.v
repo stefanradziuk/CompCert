@@ -35,7 +35,7 @@ Require Import Switch.
   and operators that occur within expressions. *)
 
 Inductive constant : Type :=
-  | Ointconst: int -> constant     (**r integer constant *)
+  | Ointconst: int_compcert -> constant     (**r integer constant *)
   | Ofloatconst: float -> constant (**r double-precision floating-point constant *)
   | Osingleconst: float32 -> constant (**r single-precision floating-point constant *)
   | Olongconst: int64 -> constant  (**r long integer constant *)
@@ -65,9 +65,9 @@ Inductive unary_operation : Type :=
   | Osingleofintu: unary_operation         (**r float32 to unsigned integer *)
   | Onegl: unary_operation                 (**r long integer opposite *)
   | Onotl: unary_operation                 (**r long bitwise complement *)
-  | Ointoflong: unary_operation            (**r long to int *)
-  | Olongofint: unary_operation            (**r signed int to long *)
-  | Olongofintu: unary_operation           (**r unsigned int to long *)
+  | Ointoflong: unary_operation            (**r long to int_compcert *)
+  | Olongofint: unary_operation            (**r signed int_compcert to long *)
+  | Olongofintu: unary_operation           (**r unsigned int_compcert to long *)
   | Olongoffloat: unary_operation          (**r float64 to signed long *)
   | Olonguoffloat: unary_operation         (**r float64 to unsigned long *)
   | Ofloatoflong: unary_operation          (**r signed long to float64 *)
@@ -565,7 +565,7 @@ Inductive initial_state (p: program): state -> Prop :=
 
 (** A final state is a [Returnstate] with an empty continuation. *)
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall r m,
       final_state (Returnstate (Vint r) Kstop m) r.
 
@@ -909,7 +909,7 @@ End NATURALSEM.
 
 (** Big-step execution of a whole program *)
 
-Inductive bigstep_program_terminates (p: program): trace -> int -> Prop :=
+Inductive bigstep_program_terminates (p: program): trace -> int_compcert -> Prop :=
   | bigstep_program_terminates_intro:
       forall b f m0 t m r,
       let ge := Genv.globalenv p in

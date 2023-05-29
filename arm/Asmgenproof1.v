@@ -204,7 +204,7 @@ Proof.
 Qed.
 
 Lemma decompose_int_general:
-  forall (f: val -> int -> val) (g: int -> int -> int),
+  forall (f: val -> int_compcert -> val) (g: int_compcert -> int_compcert -> int_compcert),
   (forall v1 n2 n3, f (f v1 n2) n3 = f v1 (g n2 n3)) ->
   (forall n1 n2 n3, g (g n1 n2) n3 = g n1 (g n2 n3)) ->
   (forall n, g Int.zero n = n) ->
@@ -292,7 +292,7 @@ Proof.
 Qed.
 
 Lemma iterate_op_correct:
-  forall op1 op2 (f: val -> int -> val) (rs: regset) (r: ireg) m v0 n k,
+  forall op1 op2 (f: val -> int_compcert -> val) (rs: regset) (r: ireg) m v0 n k,
   (forall (rs:regset) n,
     exec_instr ge fn (op2 (SOimm n)) rs m =
     Next (nextinstr_nf (rs#r <- (f (rs#r) n))) m) ->
@@ -493,8 +493,8 @@ Qed.
 (** Indexed memory loads. *)
 
 Lemma indexed_memory_access_correct:
-  forall (P: regset -> Prop) (mk_instr: ireg -> int -> instruction)
-         (mk_immed: int -> int) (base: ireg) n k (rs: regset) m m',
+  forall (P: regset -> Prop) (mk_instr: ireg -> int_compcert -> instruction)
+         (mk_immed: int_compcert -> int_compcert) (base: ireg) n k (rs: regset) m m',
   (forall (r1: ireg) (rs1: regset) n1 k,
     Val.add rs1#r1 (Vint n1) = Val.add rs#base (Vint n) ->
     (forall (r: preg), if_preg r = true -> r <> IR14 -> rs1 r = rs r) ->
@@ -551,7 +551,7 @@ Proof.
   assert (Val.offset_ptr (rs base) ofs = Val.add (rs base) (Vint (Ptrofs.to_int ofs))).
   { destruct (rs base); try discriminate. simpl. f_equal; f_equal. symmetry; auto with ptrofs. }
   destruct ty; destruct (preg_of dst); inv H; simpl in H0.
-- (* int *)
+- (* int_compcert *)
   apply loadind_int_correct; auto.
 - (* float *)
   apply indexed_memory_access_correct; intros.
@@ -590,7 +590,7 @@ Proof.
   assert (Val.offset_ptr (rs base) ofs = Val.add (rs base) (Vint (Ptrofs.to_int ofs))).
   { destruct (rs base); try discriminate. simpl. f_equal; f_equal. symmetry; auto with ptrofs. }
   destruct ty; destruct (preg_of src); inv H; simpl in H0.
-- (* int *)
+- (* int_compcert *)
   apply indexed_memory_access_correct; intros.
   econstructor; split.
   apply exec_straight_one. simpl. unfold exec_store. rewrite H, <- H1, H2, H0 by auto with asmgen; eauto. auto.
@@ -758,7 +758,7 @@ Proof.
   intros [A [B [C D]]].
   unfold eval_testcond. rewrite B; rewrite C. unfold Val.cmpu, Val.cmp.
   destruct v1; destruct v2; simpl in H; inv H.
-(* int int *)
+(* int_compcert int_compcert *)
   destruct c; simpl; auto.
   destruct (Int.eq i i0); reflexivity.
   destruct (Int.eq i i0); auto.
@@ -766,13 +766,13 @@ Proof.
   rewrite (int_not_ltu i i0).  destruct (Int.ltu i i0); destruct (Int.eq i i0); auto.
   rewrite (int_ltu_not i i0). destruct (Int.ltu i i0); destruct (Int.eq i i0); reflexivity.
   destruct (Int.ltu i i0); reflexivity.
-(* int ptr *)
+(* int_compcert ptr *)
   destruct (Int.eq i Int.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i0) || Mem.valid_pointer m b0 (Ptrofs.unsigned i0 - 1))) eqn:?; try discriminate.
   destruct c; simpl in *; inv H1.
   rewrite Heqb1; reflexivity.
   rewrite Heqb1; reflexivity.
-(* ptr int *)
+(* ptr int_compcert *)
   destruct (Int.eq i0 Int.zero &&
     (Mem.valid_pointer m b0 (Ptrofs.unsigned i) || Mem.valid_pointer m b0 (Ptrofs.unsigned i - 1))) eqn:?; try discriminate.
   destruct c; simpl in *; inv H1.
@@ -1406,9 +1406,9 @@ Proof.
 Qed.
 
 Lemma transl_memory_access_correct:
-  forall (P: regset -> Prop) (mk_instr_imm: ireg -> int -> instruction)
+  forall (P: regset -> Prop) (mk_instr_imm: ireg -> int_compcert -> instruction)
          (mk_instr_gen: option (ireg -> shift_op -> instruction))
-         (mk_immed: int -> int)
+         (mk_immed: int_compcert -> int_compcert)
          addr args k c (rs: regset) a m m',
   transl_memory_access mk_instr_imm mk_instr_gen mk_immed addr args k = OK c ->
   eval_addressing ge (rs#SP) addr (map rs (map preg_of args)) = Some a ->
@@ -1474,7 +1474,7 @@ Lemma transl_load_float_correct:
   transl_memory_access_float mk_instr is_immed dst addr args k = OK c ->
   eval_addressing ge (rs#SP) addr (map rs (map preg_of args)) = Some a ->
   Mem.loadv chunk m a = Some v ->
-  (forall (r1: freg) (r2: ireg) (n: int) (rs1: regset),
+  (forall (r1: freg) (r2: ireg) (n: int_compcert) (rs1: regset),
     exec_instr ge fn (mk_instr r1 r2 n) rs1 m =
     exec_load chunk (Val.add rs1#r2 (Vint n)) r1 rs1 m) ->
   exists rs',
@@ -1522,7 +1522,7 @@ Lemma transl_store_float_correct:
   transl_memory_access_float mk_instr is_immed src addr args k = OK c ->
   eval_addressing ge (rs#SP) addr (map rs (map preg_of args)) = Some a ->
   Mem.storev chunk m a rs#(preg_of src) = Some m' ->
-  (forall (r1: freg) (r2: ireg) (n: int) (rs1: regset),
+  (forall (r1: freg) (r2: ireg) (n: int_compcert) (rs1: regset),
     exec_instr ge fn (mk_instr r1 r2 n) rs1 m =
     exec_store chunk (Val.add rs1#r2 (Vint n)) r1 rs1 m) ->
   exists rs',

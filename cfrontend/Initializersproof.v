@@ -516,7 +516,7 @@ Proof.
   intros. rewrite boidl_app. simpl. rewrite <- app_nil_end. auto.
 Qed. 
 
-Definition byte_of_int (n: int) := Byte.repr (Int.unsigned n).
+Definition byte_of_int (n: int_compcert) := Byte.repr (Int.unsigned n).
 
 Lemma byte_of_int_of_byte: forall b, byte_of_int (int_of_byte b) = b.
 Proof.
@@ -594,9 +594,9 @@ Proof.
                        /\ List.length nl = Z.to_nat depth).
   { induction il as [ | i il ]; intros until il'; intros D; simpl in D.
   - destruct (zle depth 0); inv D.
-    exists (@nil int); simpl. rewrite Z_to_nat_neg by auto. auto.
+    exists (@nil int_compcert); simpl. rewrite Z_to_nat_neg by auto. auto.
   - destruct (zle depth 0). 
-    + inv D. exists (@nil int); simpl. rewrite Z_to_nat_neg by auto. auto.
+    + inv D. exists (@nil int_compcert); simpl. rewrite Z_to_nat_neg by auto. auto.
     + destruct i; try discriminate.
       apply IHil in D; destruct D as (nl & P & Q & R).
       exists (i :: nl); simpl; split. congruence. split.
@@ -1152,7 +1152,7 @@ Proof.
   exploit constval_steps; eauto. intros [A [B C]]. subst m' ty1.
   exploit sem_cast_match; eauto. intros D.
   inv ASG. rename H into A. unfold Genv.store_init_data. inv D.
-- (* int *)
+- (* int_compcert *)
   remember Archi.ptr64 as ptr64.  destruct ty; try discriminate EQ0.
 + destruct i0; inv EQ0.
   destruct s; simpl in A; inv A. rewrite <- Mem.store_signed_unsigned_8; auto. auto.

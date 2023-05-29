@@ -30,7 +30,7 @@ let is_val = function
 | _ -> None
 
 (** val is_loc :
-    expr -> (((block * Ptrofs.int) * bitfield) * coq_type) option **)
+    expr -> (((block * Ptrofs.int_compcert) * bitfield) * coq_type) option **)
 
 let is_loc = function
 | Eloc (b, ofs, bf, ty) -> Some (((b, ofs), bf), ty)
@@ -108,7 +108,7 @@ let val_of_eventval ge ev t0 =
     else None
 
 (** val do_volatile_load :
-    genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int ->
+    genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int_compcert ->
     ((world * trace) * coq_val) option **)
 
 let do_volatile_load ge w chunk m b ofs =
@@ -130,7 +130,7 @@ let do_volatile_load ge w chunk m b ofs =
         | None -> None)
 
 (** val do_volatile_store :
-    genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int ->
+    genv -> world -> memory_chunk -> Mem.mem -> block -> Ptrofs.int_compcert ->
     coq_val -> (((world * trace) * Mem.mem) * coq_val) option **)
 
 let do_volatile_store ge w chunk m b ofs v =
@@ -152,7 +152,7 @@ let do_volatile_store ge w chunk m b ofs v =
         | None -> None)
 
 (** val do_deref_loc :
-    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield
+    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int_compcert -> bitfield
     -> ((world * trace) * coq_val) option **)
 
 let do_deref_loc ge w ty m b ofs = function
@@ -192,7 +192,7 @@ let do_deref_loc ge w ty m b ofs = function
    | _ -> None)
 
 (** val check_assign_copy :
-    genv -> coq_type -> block -> Ptrofs.int -> block -> Ptrofs.int -> bool **)
+    genv -> coq_type -> block -> Ptrofs.int_compcert -> block -> Ptrofs.int_compcert -> bool **)
 
 let check_assign_copy ge ty b ofs b' ofs' =
   let s =
@@ -225,7 +225,7 @@ let check_assign_copy ge ty b ofs b' ofs' =
   else false
 
 (** val do_assign_loc :
-    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int -> bitfield
+    genv -> world -> coq_type -> Mem.mem -> block -> Ptrofs.int_compcert -> bitfield
     -> coq_val -> (((world * trace) * Mem.mem) * coq_val) option **)
 
 let do_assign_loc ge w ty m b ofs bf v =
@@ -328,7 +328,7 @@ let do_ef_volatile_store ge chunk w vargs m =
            | _ :: _ -> None))
      | _ -> None)
 
-(** val do_alloc_size : coq_val -> Ptrofs.int option **)
+(** val do_alloc_size : coq_val -> Ptrofs.int_compcert option **)
 
 let do_alloc_size = function
 | Vint n -> if ptr64 then None else Some (Ptrofs.of_int n)
@@ -1293,7 +1293,7 @@ let do_initial_state p =
       | None -> None)
    | None -> None)
 
-(** val at_final_state : state -> Int.int option **)
+(** val at_final_state : state -> Int.int_compcert option **)
 
 let at_final_state = function
 | Returnstate (res, k, _) ->

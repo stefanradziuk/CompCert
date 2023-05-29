@@ -109,12 +109,12 @@ Notation "'RA'" := IR14 (only parsing) : asm.
 Definition label := positive.
 
 Inductive shift_op : Type :=
-  | SOimm: int -> shift_op
+  | SOimm: int_compcert -> shift_op
   | SOreg: ireg -> shift_op
-  | SOlsl: ireg -> int -> shift_op
-  | SOlsr: ireg -> int -> shift_op
-  | SOasr: ireg -> int -> shift_op
-  | SOror: ireg -> int -> shift_op.
+  | SOlsl: ireg -> int_compcert -> shift_op
+  | SOlsr: ireg -> int_compcert -> shift_op
+  | SOasr: ireg -> int_compcert -> shift_op
+  | SOror: ireg -> int_compcert -> shift_op.
 
 Inductive testcond : Type :=
   | TCeq: testcond    (**r equal *)
@@ -151,7 +151,7 @@ Inductive instruction : Type :=
   | Pcmn: ireg -> shift_op -> instruction         (**r integer comparison with opposite *)
   | Peor: ireg -> ireg -> shift_op -> instruction (**r bitwise exclusive or *)
   | Pldr: ireg -> ireg -> shift_op -> instruction (**r int32 load *)
-  | Pldr_a: ireg -> ireg -> shift_op -> instruction (**r any32 load to int register *)
+  | Pldr_a: ireg -> ireg -> shift_op -> instruction (**r any32 load to int_compcert register *)
   | Pldrb: ireg -> ireg -> shift_op -> instruction (**r unsigned int8 load *)
   | Pldrh: ireg -> ireg -> shift_op -> instruction (**r unsigned int16 load *)
   | Pldrsb: ireg -> ireg -> shift_op -> instruction (**r signed int8 load *)
@@ -160,16 +160,16 @@ Inductive instruction : Type :=
   | Plsr: ireg -> ireg -> ireg -> instruction       (**r logical shift right *)
   | Pmla: ireg -> ireg -> ireg -> ireg -> instruction      (**r integer multiply-add *)
   | Pmov: ireg -> shift_op -> instruction          (**r integer move *)
-  | Pmovw: ireg -> int -> instruction              (**r move 16-bit immediate *)
-  | Pmovt: ireg -> int -> instruction              (**r set high 16 bits *)
+  | Pmovw: ireg -> int_compcert -> instruction              (**r move 16-bit immediate *)
+  | Pmovt: ireg -> int_compcert -> instruction              (**r set high 16 bits *)
   | Pmul: ireg -> ireg -> ireg -> instruction      (**r integer multiplication *)
   | Pmvn: ireg -> shift_op -> instruction          (**r integer complement *)
   | Porr: ireg -> ireg -> shift_op -> instruction  (**r bitwise or *)
   | Ppush: list ireg -> instruction (** push registers on the stack instruction *)
   | Prsb: ireg -> ireg -> shift_op -> instruction  (**r integer reverse subtraction *)
-  | Psbfx: ireg -> ireg -> int -> int -> instruction (**r signed bitfield extract *)
+  | Psbfx: ireg -> ireg -> int_compcert -> int_compcert -> instruction (**r signed bitfield extract *)
   | Pstr: ireg -> ireg -> shift_op -> instruction (**r int32 store *)
-  | Pstr_a: ireg -> ireg -> shift_op -> instruction (**r any32 store from int register *)
+  | Pstr_a: ireg -> ireg -> shift_op -> instruction (**r any32 store from int_compcert register *)
   | Pstrb: ireg -> ireg -> shift_op -> instruction (**r int8 store *)
   | Pstrh: ireg -> ireg -> shift_op -> instruction (**r int16 store *)
   | Psdiv: instruction                              (**r signed division *)
@@ -188,10 +188,10 @@ Inductive instruction : Type :=
   | Pflid: freg -> float -> instruction             (**r load float constant *)
   | Pfcmpd: freg -> freg -> instruction             (**r float comparison *)
   | Pfcmpzd: freg -> instruction                    (**r float comparison with 0.0 *)
-  | Pfsitod: freg -> ireg -> instruction            (**r signed int to float *)
-  | Pfuitod: freg -> ireg -> instruction            (**r unsigned int to float *)
-  | Pftosizd: ireg -> freg -> instruction           (**r float to signed int *)
-  | Pftouizd: ireg -> freg -> instruction           (**r float to unsigned int *)
+  | Pfsitod: freg -> ireg -> instruction            (**r signed int_compcert to float *)
+  | Pfuitod: freg -> ireg -> instruction            (**r unsigned int_compcert to float *)
+  | Pftosizd: ireg -> freg -> instruction           (**r float to signed int_compcert *)
+  | Pftouizd: ireg -> freg -> instruction           (**r float to unsigned int_compcert *)
   | Pfabss: freg -> freg -> instruction             (**r float absolute value *)
   | Pfnegs: freg -> freg -> instruction             (**r float opposite *)
   | Pfadds: freg -> freg -> freg -> instruction     (**r float addition *)
@@ -201,18 +201,18 @@ Inductive instruction : Type :=
   | Pflis: freg -> float32 -> instruction           (**r load float constant *)
   | Pfcmps: freg -> freg -> instruction             (**r float comparison *)
   | Pfcmpzs: freg -> instruction                    (**r float comparison with 0.0 *)
-  | Pfsitos: freg -> ireg -> instruction            (**r signed int to float *)
-  | Pfuitos: freg -> ireg -> instruction            (**r unsigned int to float *)
-  | Pftosizs: ireg -> freg -> instruction           (**r float to signed int *)
-  | Pftouizs: ireg -> freg -> instruction           (**r float to unsigned int *)
+  | Pfsitos: freg -> ireg -> instruction            (**r signed int_compcert to float *)
+  | Pfuitos: freg -> ireg -> instruction            (**r unsigned int_compcert to float *)
+  | Pftosizs: ireg -> freg -> instruction           (**r float to signed int_compcert *)
+  | Pftouizs: ireg -> freg -> instruction           (**r float to unsigned int_compcert *)
   | Pfcvtsd: freg -> freg -> instruction            (**r round to single precision *)
   | Pfcvtds: freg -> freg -> instruction            (**r expand to double precision *)
-  | Pfldd: freg -> ireg -> int -> instruction       (**r float64 load *)
-  | Pfldd_a: freg -> ireg -> int -> instruction     (**r any64 load to FP reg *)
-  | Pflds: freg -> ireg -> int -> instruction       (**r float32 load *)
-  | Pfstd: freg -> ireg -> int -> instruction       (**r float64 store *)
-  | Pfstd_a: freg -> ireg -> int -> instruction     (**r any64 store from FP reg *)
-  | Pfsts: freg -> ireg -> int -> instruction       (**r float32 store *)
+  | Pfldd: freg -> ireg -> int_compcert -> instruction       (**r float64 load *)
+  | Pfldd_a: freg -> ireg -> int_compcert -> instruction     (**r any64 load to FP reg *)
+  | Pflds: freg -> ireg -> int_compcert -> instruction       (**r float32 load *)
+  | Pfstd: freg -> ireg -> int_compcert -> instruction       (**r float64 store *)
+  | Pfstd_a: freg -> ireg -> int_compcert -> instruction     (**r any64 store from FP reg *)
+  | Pfsts: freg -> ireg -> int_compcert -> instruction       (**r float32 store *)
 
   (* Pseudo-instructions *)
   | Pallocframe: Z -> ptrofs -> instruction         (**r allocate new stack frame *)
@@ -224,8 +224,8 @@ Inductive instruction : Type :=
   | Pbtbl: ireg -> list label -> instruction       (**r N-way branch through a jump table *)
   | Pbuiltin: external_function -> list (builtin_arg preg) -> builtin_res preg -> instruction (**r built-in function (pseudo) *)
   | Padc: ireg -> ireg -> shift_op -> instruction     (**r add with carry *)
-  | Pcfi_adjust: int -> instruction                   (**r .cfi_adjust debug directive *)
-  | Pcfi_rel_offset: int -> instruction               (**r .cfi_rel_offset debug directive *)
+  | Pcfi_adjust: int_compcert -> instruction                   (**r .cfi_adjust debug directive *)
+  | Pcfi_rel_offset: int_compcert -> instruction               (**r .cfi_rel_offset debug directive *)
   | Pclz: ireg -> ireg -> instruction                 (**r count leading zeros. *)
   | Pfsqrt: freg -> freg -> instruction               (**r floating-point square root. *)
   | Prev: ireg -> ireg -> instruction                 (**r reverse bytes and reverse bits. *)
@@ -949,7 +949,7 @@ Inductive initial_state (p: program): state -> Prop :=
       Genv.init_mem p = Some m0 ->
       initial_state p (State rs0 m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall rs m r,
       rs#PC = Vzero ->
       rs#IR0 = Vint r ->

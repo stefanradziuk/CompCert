@@ -38,10 +38,10 @@ Set Implicit Arguments.
 Local Transparent Archi.ptr64.
 
 Record shift_amount: Type :=
-  { s_amount: int;
+  { s_amount: int_compcert;
     s_range: Int.ltu s_amount Int.iwordsize = true }.
 
-Coercion s_amount: shift_amount >-> int.
+Coercion s_amount: shift_amount >-> int_compcert.
 
 Inductive shift : Type :=
   | Slsl: shift_amount -> shift
@@ -56,8 +56,8 @@ Inductive condition : Type :=
   | Ccompu: comparison -> condition (**r unsigned integer comparison *)
   | Ccompshift: comparison -> shift -> condition  (**r signed integer comparison *)
   | Ccompushift: comparison -> shift -> condition (**r unsigned integer comparison *)
-  | Ccompimm: comparison -> int -> condition (**r signed integer comparison with a constant *)
-  | Ccompuimm: comparison -> int -> condition (**r unsigned integer comparison with a constant *)
+  | Ccompimm: comparison -> int_compcert -> condition (**r signed integer comparison with a constant *)
+  | Ccompuimm: comparison -> int_compcert -> condition (**r unsigned integer comparison with a constant *)
   | Ccompf: comparison -> condition     (**r 64-bit floating-point comparison *)
   | Cnotcompf: comparison -> condition (**r negation of a floating-point comparison *)
   | Ccompfzero: comparison -> condition     (**r floating-point comparison with 0.0 *)
@@ -72,7 +72,7 @@ Inductive condition : Type :=
 
 Inductive operation : Type :=
   | Omove: operation                    (**r [rd = r1] *)
-  | Ointconst: int -> operation         (**r [rd] is set to the given integer constant *)
+  | Ointconst: int_compcert -> operation         (**r [rd] is set to the given integer constant *)
   | Ofloatconst: float -> operation     (**r [rd] is set to the given 64-bit float constant *)
   | Osingleconst: float32 -> operation  (**r [rd] is set to the given 32-bit float constant *)
   | Oaddrsymbol: ident -> ptrofs -> operation (**r [rd] is set to the the address of the symbol plus the offset *)
@@ -82,11 +82,11 @@ Inductive operation : Type :=
   | Ocast16signed: operation            (**r [rd] is 16-bit sign extension of [r1] *)
   | Oadd: operation                     (**r [rd = r1 + r2] *)
   | Oaddshift: shift -> operation       (**r [rd = r1 + shifted r2] *)
-  | Oaddimm: int -> operation           (**r [rd = r1 + n] *)
+  | Oaddimm: int_compcert -> operation           (**r [rd = r1 + n] *)
   | Osub: operation                     (**r [rd = r1 - r2] *)
   | Osubshift: shift -> operation       (**r [rd = r1 - shifted r2] *)
   | Orsubshift: shift -> operation      (**r [rd = shifted r2 - r1] *)
-  | Orsubimm: int -> operation          (**r [rd = n - r1] *)
+  | Orsubimm: int_compcert -> operation          (**r [rd = n - r1] *)
   | Omul: operation                     (**r [rd = r1 * r2] *)
   | Omla: operation                     (**r [rd = r1 * r2 + r3] *)
   | Omulhs: operation                   (**r [rd = high part of r1 * r2, signed] *)
@@ -95,13 +95,13 @@ Inductive operation : Type :=
   | Odivu: operation                    (**r [rd = r1 / r2] (unsigned) *)
   | Oand: operation                     (**r [rd = r1 & r2] *)
   | Oandshift: shift -> operation       (**r [rd = r1 & shifted r2] *)
-  | Oandimm: int -> operation           (**r [rd = r1 & n] *)
+  | Oandimm: int_compcert -> operation           (**r [rd = r1 & n] *)
   | Oor: operation                      (**r [rd = r1 | r2] *)
   | Oorshift: shift -> operation        (**r [rd = r1 | shifted r2] *)
-  | Oorimm: int -> operation            (**r [rd = r1 | n] *)
+  | Oorimm: int_compcert -> operation            (**r [rd = r1 | n] *)
   | Oxor: operation                     (**r [rd = r1 ^ r2] *)
   | Oxorshift: shift -> operation       (**r [rd = r1 ^ shifted r2] *)
-  | Oxorimm: int -> operation           (**r [rd = r1 ^ n] *)
+  | Oxorimm: int_compcert -> operation           (**r [rd = r1 ^ n] *)
   | Obic: operation                     (**r [rd = r1 & ~r2] *)
   | Obicshift: shift -> operation       (**r [rd = r1 & ~(shifted r2)] *)
   | Onot: operation                     (**r [rd = ~r1] *)
@@ -110,7 +110,7 @@ Inductive operation : Type :=
   | Oshr: operation                     (**r [rd = r1 >> r2] (signed) *)
   | Oshru: operation                    (**r [rd = r1 >> r2] (unsigned) *)
   | Oshift: shift -> operation          (**r [rd = shifted r1] *)
-  | Oshrximm: int -> operation          (**r [rd = r1 / 2^n] (signed) *)
+  | Oshrximm: int_compcert -> operation          (**r [rd = r1 / 2^n] (signed) *)
 (*c Floating-point arithmetic: *)
   | Onegf: operation                    (**r [rd = - r1] *)
   | Oabsf: operation                    (**r [rd = abs(r1)] *)
@@ -126,7 +126,7 @@ Inductive operation : Type :=
   | Odivfs: operation                   (**r [rd = r1 / r2] *)
   | Osingleoffloat: operation           (**r [rd] is [r1] truncated to single-precision float *)
   | Ofloatofsingle: operation           (**r [rd] is [r1] expanded to double-precision float *)
-(*c Conversions between int and float: *)
+(*c Conversions between int_compcert and float: *)
   | Ointoffloat: operation              (**r [rd = signed_int_of_float(r1)] *)
   | Ointuoffloat: operation             (**r [rd = unsigned_int_of_float(r1)] *)
   | Ofloatofint: operation              (**r [rd = float_of_signed_int(r1)] *)
@@ -148,7 +148,7 @@ Inductive operation : Type :=
   addressing. *)
 
 Inductive addressing: Type :=
-  | Aindexed: int -> addressing         (**r Address is [r1 + offset] *)
+  | Aindexed: int_compcert -> addressing         (**r Address is [r1 + offset] *)
   | Aindexed2: addressing               (**r Address is [r1 + r2] *)
   | Aindexed2shift: shift -> addressing (**r Address is [r1 + shifted r2] *)
   | Ainstack: ptrofs -> addressing.        (**r Address is [stack_pointer + offset] *)
@@ -524,7 +524,7 @@ End SOUNDNESS.
 
 (** Constructing shift amounts. *)
 
-Program Definition mk_shift_amount (n: int) : shift_amount :=
+Program Definition mk_shift_amount (n: int_compcert) : shift_amount :=
   {| s_amount := Int.modu n Int.iwordsize; s_range := _ |}.
 Next Obligation.
   assert (0 <= Z.modulo (Int.unsigned n) 32 < 32). apply Z_mod_lt. lia.

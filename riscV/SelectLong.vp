@@ -116,7 +116,7 @@ Definition negl (e: expr) :=
 
 (** ** Immediate shifts *)
 
-Nondetfunction shllimm (e1: expr) (n: int) :=
+Nondetfunction shllimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shllimm e1 n else
   if Int.eq n Int.zero then
     e1
@@ -133,7 +133,7 @@ Nondetfunction shllimm (e1: expr) (n: int) :=
         Eop (Oshllimm n) (e1:::Enil)
   end.
 
-Nondetfunction shrluimm (e1: expr) (n: int) :=
+Nondetfunction shrluimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrluimm e1 n else
   if Int.eq n Int.zero then e1 else
   if negb (Int.ltu n Int64.iwordsize') then
@@ -150,7 +150,7 @@ Nondetfunction shrluimm (e1: expr) (n: int) :=
         Eop (Oshrluimm n) (e1:::Enil)
     end.
 
-Nondetfunction shrlimm (e1: expr) (n: int) :=
+Nondetfunction shrlimm (e1: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrlimm e1 n else
   if Int.eq n Int.zero then e1 else
   if negb (Int.ltu n Int64.iwordsize') then
@@ -301,7 +301,7 @@ Definition divls_base (e1: expr) (e2: expr) :=
 Definition modls_base (e1: expr) (e2: expr) :=
   if Archi.splitlong then SplitLong.modls_base e1 e2 else Eop Omodl (e1:::e2:::Enil).
 
-Definition shrxlimm (e: expr) (n: int) :=
+Definition shrxlimm (e: expr) (n: int_compcert) :=
   if Archi.splitlong then SplitLong.shrxlimm e n else
   if Int.eq n Int.zero then e else Eop (Oshrxlimm n) (e ::: Enil).
 

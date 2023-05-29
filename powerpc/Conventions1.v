@@ -275,7 +275,7 @@ Opaque list_nth_z.
   induction tyl; simpl loc_arguments_rec; intros.
   elim H.
   destruct a.
-- (* int *)
+- (* int_compcert *)
   destruct (list_nth_z int_param_regs ir) as [r|] eqn:E; destruct H.
   subst. left. eapply list_nth_z_in; eauto.
   eapply IHtyl; eauto.

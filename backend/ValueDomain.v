@@ -528,7 +528,7 @@ Qed.
 
 Inductive aval : Type :=
   | Vbot                     (**r bottom (empty set of values) *)
-  | I (n: int)               (**r exactly [Vint n] *)
+  | I (n: int_compcert)               (**r exactly [Vint n] *)
   | Uns (p: aptr) (n: Z)     (**r a [n]-bit unsigned integer, or [Vundef] *)
   | Sgn (p: aptr) (n: Z)     (**r a [n]-bit signed integer, or [Vundef] *)
   | L (n: int64)             (**r exactly [Vlong n] *)
@@ -553,9 +553,9 @@ Proof.
   decide equality.
 Defined.
 
-Definition is_uns (n: Z) (i: int) : Prop :=
+Definition is_uns (n: Z) (i: int_compcert) : Prop :=
   forall m, 0 <= m < Int.zwordsize -> m >= n -> Int.testbit i m = false.
-Definition is_sgn (n: Z) (i: int) : Prop :=
+Definition is_sgn (n: Z) (i: int_compcert) : Prop :=
   forall m, 0 <= m < Int.zwordsize -> m >= n - 1 -> Int.testbit i m = Int.testbit i (Int.zwordsize - 1).
 
 Inductive vmatch : val -> aval -> Prop :=
@@ -610,7 +610,7 @@ Qed.
 
 Definition usize := Int.size.
 
-Definition ssize (i: int) := Int.size (if Int.lt i Int.zero then Int.not i else i) + 1.
+Definition ssize (i: int_compcert) := Int.size (if Int.lt i Int.zero then Int.not i else i) + 1.
 
 Lemma is_uns_usize:
   forall i, is_uns (usize i) i.
@@ -1152,7 +1152,7 @@ Qed.
 
 (** Generic operations that just do constant propagation. *)
 
-Definition unop_int (sem: int -> int) (x: aval) :=
+Definition unop_int (sem: int_compcert -> int_compcert) (x: aval) :=
   match x with I n => I (sem n) | _ => ntop1 x end.
 
 Lemma unop_int_sound:
@@ -1163,7 +1163,7 @@ Proof.
   intros. unfold unop_int; inv H; auto with va.
 Qed.
 
-Definition binop_int (sem: int -> int -> int) (x y: aval) :=
+Definition binop_int (sem: int_compcert -> int_compcert -> int_compcert) (x y: aval) :=
   match x, y with I n, I m => I (sem n m) | _, _ => ntop2 x y end.
 
 Lemma binop_int_sound:
@@ -1520,7 +1520,7 @@ Proof.
   inv H; auto with va.
 Qed.
 
-Definition rolm (x: aval) (amount mask: int) :=
+Definition rolm (x: aval) (amount mask: int_compcert) :=
   and (rol x (I amount)) (I mask).
 
 Lemma rolm_sound:
@@ -1701,7 +1701,7 @@ Qed.
 
 (** 64-bit integer operations *)
 
-Definition shift_long (sem: int64 -> int -> int64) (v w: aval) :=
+Definition shift_long (sem: int64 -> int_compcert -> int64) (v w: aval) :=
   match w with
   | I amount =>
       if Int.ltu amount Int64.iwordsize' then
@@ -1967,7 +1967,7 @@ Proof.
   rewrite LTU; auto with va.
 Qed.
 
-Definition rolml (x: aval) (amount: int) (mask: int64) :=
+Definition rolml (x: aval) (amount: int_compcert) (mask: int64) :=
   andl (roll x (I amount)) (L mask).
 
 Lemma rolml_sound:
@@ -2788,7 +2788,7 @@ Proof.
   intros. inv H; try constructor; inv H0; constructor.
 Qed.
 
-Definition maskzero (x: aval) (mask: int) : abool :=
+Definition maskzero (x: aval) (mask: int_compcert) : abool :=
   match x with
   | I i => Just (Int.eq (Int.and i mask) Int.zero)
   | Uns p n => if Int.eq (Int.zero_ext n mask) Int.zero then Maybe true else Btop

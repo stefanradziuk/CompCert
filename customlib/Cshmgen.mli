@@ -17,9 +17,9 @@ open List0
 open Maps
 open Zpower
 
-val make_intconst : Int.int -> expr
+val make_intconst : Int.int_compcert -> expr
 
-val make_longconst : Int64.int -> expr
+val make_longconst : Int64.int_compcert -> expr
 
 val make_floatconst : float -> expr
 

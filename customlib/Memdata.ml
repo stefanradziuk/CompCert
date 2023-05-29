@@ -59,10 +59,10 @@ let size_quantity_nat = function
 
 type memval =
 | Undef
-| Byte of Byte.int
+| Byte of Byte.int_compcert
 | Fragment of coq_val * quantity * nat
 
-(** val bytes_of_int : nat -> coq_Z -> Byte.int list **)
+(** val bytes_of_int : nat -> coq_Z -> Byte.int_compcert list **)
 
 let rec bytes_of_int n x =
   match n with
@@ -72,7 +72,7 @@ let rec bytes_of_int n x =
                        (Z.div x (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
                          (Coq_xO (Coq_xO (Coq_xO Coq_xH)))))))))))
 
-(** val int_of_bytes : Byte.int list -> coq_Z **)
+(** val int_of_bytes : Byte.int_compcert list -> coq_Z **)
 
 let rec int_of_bytes = function
 | [] -> Z0
@@ -81,27 +81,27 @@ let rec int_of_bytes = function
     (Z.mul (int_of_bytes l') (Zpos (Coq_xO (Coq_xO (Coq_xO (Coq_xO (Coq_xO
       (Coq_xO (Coq_xO (Coq_xO Coq_xH))))))))))
 
-(** val rev_if_be : Byte.int list -> Byte.int list **)
+(** val rev_if_be : Byte.int_compcert list -> Byte.int_compcert list **)
 
 let rev_if_be l =
   if big_endian then rev l else l
 
-(** val encode_int : nat -> coq_Z -> Byte.int list **)
+(** val encode_int : nat -> coq_Z -> Byte.int_compcert list **)
 
 let encode_int sz x =
   rev_if_be (bytes_of_int sz x)
 
-(** val decode_int : Byte.int list -> coq_Z **)
+(** val decode_int : Byte.int_compcert list -> coq_Z **)
 
 let decode_int b =
   int_of_bytes (rev_if_be b)
 
-(** val inj_bytes : Byte.int list -> memval list **)
+(** val inj_bytes : Byte.int_compcert list -> memval list **)
 
 let inj_bytes bl =
   map (fun x -> Byte x) bl
 
-(** val proj_bytes : memval list -> Byte.int list option **)
+(** val proj_bytes : memval list -> Byte.int_compcert list option **)
 
 let rec proj_bytes = function
 | [] -> Some []

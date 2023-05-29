@@ -457,7 +457,7 @@ Inductive initial_state (p: program): state -> Prop :=
       funsig f = signature_main ->
       initial_state p (Callstate f nil Kstop m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall r m,
       final_state (Returnstate (Vint r) Kstop m) r.
 

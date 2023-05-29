@@ -88,7 +88,7 @@ End OrderedZ.
 
 Module OrderedInt <: OrderedType.
 
-Definition t := int.
+Definition t := int_compcert.
 Definition eq (x y: t) := x = y.
 Definition lt (x y: t) := Int.unsigned x < Int.unsigned y.
 

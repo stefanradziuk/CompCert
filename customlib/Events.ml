@@ -3,16 +3,16 @@ open Floats
 open Integers
 
 type eventval =
-| EVint of Int.int
-| EVlong of Int64.int
+| EVint of Int.int_compcert
+| EVlong of Int64.int_compcert
 | EVfloat of float
 | EVsingle of float32
-| EVptr_global of ident * Ptrofs.int
+| EVptr_global of ident * Ptrofs.int_compcert
 
 type event =
 | Event_syscall of char list * eventval list * eventval
-| Event_vload of memory_chunk * ident * Ptrofs.int * eventval
-| Event_vstore of memory_chunk * ident * Ptrofs.int * eventval
+| Event_vload of memory_chunk * ident * Ptrofs.int_compcert * eventval
+| Event_vstore of memory_chunk * ident * Ptrofs.int_compcert * eventval
 | Event_annot of char list * eventval list
 
 type trace = event list

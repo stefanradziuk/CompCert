@@ -267,13 +267,13 @@ end
 
 (* Alternate names *)
 
-let camlint_of_coqint : Integers.Int.int -> int32 = Z.to_int32
-let coqint_of_camlint : int32 -> Integers.Int.int = Z.of_uint32
+let camlint_of_coqint : Integers.Int.int_compcert -> int32 = Z.to_int32
+let coqint_of_camlint : int32 -> Integers.Int.int_compcert = Z.of_uint32
    (* interpret the int32 as unsigned so that result Z is in range for int *)
-let camlint64_of_coqint : Integers.Int64.int -> int64 = Z.to_int64
-let coqint_of_camlint64 : int64 -> Integers.Int64.int = Z.of_uint64
+let camlint64_of_coqint : Integers.Int64.int_compcert -> int64 = Z.to_int64
+let coqint_of_camlint64 : int64 -> Integers.Int64.int_compcert = Z.of_uint64
    (* interpret the int64 as unsigned so that result Z is in range for int *)
-let camlint64_of_ptrofs : Integers.Ptrofs.int -> int64 =
+let camlint64_of_ptrofs : Integers.Ptrofs.int_compcert -> int64 =
   fun x -> Z.to_int64 (Integers.Ptrofs.signed x)
 
 (* Atoms (positive integers representing strings) *)

@@ -236,9 +236,9 @@ Proof. unfold Mptr, Tptr; destruct Archi.ptr64; auto. Qed.
 (** Initialization data for global variables. *)
 
 Inductive init_data: Type :=
-  | Init_int8: int -> init_data
-  | Init_int16: int -> init_data
-  | Init_int32: int -> init_data
+  | Init_int8: int_compcert -> init_data
+  | Init_int16: int_compcert -> init_data
+  | Init_int32: int_compcert -> init_data
   | Init_int64: int64 -> init_data
   | Init_float32: float32 -> init_data
   | Init_float64: float -> init_data
@@ -659,7 +659,7 @@ Definition forall_rpair (A: Type) (P: A -> Prop) (p: rpair A): Prop :=
 
 Inductive builtin_arg (A: Type) : Type :=
   | BA (x: A)
-  | BA_int (n: int)
+  | BA_int (n: int_compcert)
   | BA_long (n: int64)
   | BA_float (f: float)
   | BA_single (f: float32)

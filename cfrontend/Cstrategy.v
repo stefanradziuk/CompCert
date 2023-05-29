@@ -3026,7 +3026,7 @@ End BIGSTEP.
 
 (** ** Whole-program behaviors, big-step style. *)
 
-Inductive bigstep_program_terminates (p: program): trace -> int -> Prop :=
+Inductive bigstep_program_terminates (p: program): trace -> int_compcert -> Prop :=
   | bigstep_program_terminates_intro: forall b f m0 m1 t r,
       let ge := globalenv p in
       Genv.init_mem p = Some m0 ->

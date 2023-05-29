@@ -84,14 +84,14 @@ val rettype_of_chunk : memory_chunk -> rettype
 val chunk_of_type : typ -> memory_chunk
 
 type init_data =
-| Init_int8 of Int.int
-| Init_int16 of Int.int
-| Init_int32 of Int.int
-| Init_int64 of Int64.int
+| Init_int8 of Int.int_compcert
+| Init_int16 of Int.int_compcert
+| Init_int32 of Int.int_compcert
+| Init_int64 of Int64.int_compcert
 | Init_float32 of float32
 | Init_float64 of float
 | Init_space of coq_Z
-| Init_addrof of ident * Ptrofs.int
+| Init_addrof of ident * Ptrofs.int_compcert
 
 val init_data_size : init_data -> coq_Z
 
@@ -169,14 +169,14 @@ val regs_of_rpairs : 'a1 rpair list -> 'a1 list
 
 type 'a builtin_arg =
 | BA of 'a
-| BA_int of Int.int
-| BA_long of Int64.int
+| BA_int of Int.int_compcert
+| BA_long of Int64.int_compcert
 | BA_float of float
 | BA_single of float32
-| BA_loadstack of memory_chunk * Ptrofs.int
-| BA_addrstack of Ptrofs.int
-| BA_loadglobal of memory_chunk * ident * Ptrofs.int
-| BA_addrglobal of ident * Ptrofs.int
+| BA_loadstack of memory_chunk * Ptrofs.int_compcert
+| BA_addrstack of Ptrofs.int_compcert
+| BA_loadglobal of memory_chunk * ident * Ptrofs.int_compcert
+| BA_addrglobal of ident * Ptrofs.int_compcert
 | BA_splitlong of 'a builtin_arg * 'a builtin_arg
 | BA_addptr of 'a builtin_arg * 'a builtin_arg
 

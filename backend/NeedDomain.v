@@ -33,7 +33,7 @@ Require Import RTL.
 
 Inductive nval : Type :=
   | Nothing              (**r value is entirely unused *)
-  | I (m: int)           (**r only need the bits that are 1 in [m] *)
+  | I (m: int_compcert)           (**r only need the bits that are 1 in [m] *)
   | All.                 (**r every bit of the value is used *)
 
 Definition eq_nval (x y: nval) : {x=y} + {x<>y}.
@@ -43,7 +43,7 @@ Defined.
 
 (** ** Agreement between two values relative to a need. *)
 
-Definition iagree (p q mask: int) : Prop :=
+Definition iagree (p q mask: int_compcert) : Prop :=
   forall i, 0 <= i < Int.zwordsize -> Int.testbit mask i = true ->
             Int.testbit p i = Int.testbit q i.
 
@@ -339,7 +339,7 @@ Proof.
   congruence.
 Qed.
 
-Definition complete_mask (m: int) := Int.zero_ext (Int.size m) Int.mone.
+Definition complete_mask (m: int_compcert) := Int.zero_ext (Int.size m) Int.mone.
 
 Lemma iagree_eqmod:
   forall x y m,
@@ -385,7 +385,7 @@ Ltac InvAgree :=
 
 (** And immediate, or immediate *)
 
-Definition andimm (x: nval) (n: int) :=
+Definition andimm (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.and m n)
@@ -403,7 +403,7 @@ Proof.
 - InvAgree. rewrite iagree_and_eq in H. rewrite H; auto.
 Qed.
 
-Definition orimm (x: nval) (n: int) :=
+Definition orimm (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.and m (Int.not n))
@@ -472,7 +472,7 @@ Qed.
 
 (** Shifts and rotates *)
 
-Definition shlimm (x: nval) (n: int) :=
+Definition shlimm (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.shru m n)
@@ -493,7 +493,7 @@ Proof.
 - destruct v; auto with na.
 Qed.
 
-Definition shruimm (x: nval) (n: int) :=
+Definition shruimm (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.shl m n)
@@ -514,7 +514,7 @@ Proof.
 - destruct v; auto with na.
 Qed.
 
-Definition shrimm (x: nval) (n: int) :=
+Definition shrimm (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (let m' := Int.shl m n in
@@ -541,7 +541,7 @@ Proof.
 - destruct v; auto with na.
 Qed.
 
-Definition rol (x: nval) (amount: int) :=
+Definition rol (x: nval) (amount: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.ror m amount)
@@ -560,7 +560,7 @@ Proof.
 - inv H; auto.
 Qed.
 
-Definition ror (x: nval) (amount: int) :=
+Definition ror (x: nval) (amount: int_compcert) :=
   match x with
   | Nothing => Nothing
   | I m => I (Int.rol m amount)
@@ -579,7 +579,7 @@ Proof.
 - inv H; auto.
 Qed.
 
-Definition rolm (x: nval) (amount mask: int) := rol (andimm x mask) amount.
+Definition rolm (x: nval) (amount mask: int_compcert) := rol (andimm x mask) amount.
 
 Lemma rolm_sound:
   forall v w x amount mask,
@@ -787,7 +787,7 @@ Qed.
 
 (** The needs of a comparison *)
 
-Definition maskzero (n: int) := I n.
+Definition maskzero (n: int_compcert) := I n.
 
 Lemma maskzero_sound:
   forall v w n b,
@@ -933,7 +933,7 @@ End DEFAULT.
 
 (** ** Detecting operations that are redundant and can be turned into a move *)
 
-Definition andimm_redundant (x: nval) (n: int) :=
+Definition andimm_redundant (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => true
   | I m => Int.eq_dec (Int.and m (Int.not n)) Int.zero
@@ -956,7 +956,7 @@ Proof.
   rewrite H2, N; auto.
 Qed.
 
-Definition orimm_redundant (x: nval) (n: int) :=
+Definition orimm_redundant (x: nval) (n: int_compcert) :=
   match x with
   | Nothing => true
   | I m => Int.eq_dec (Int.and m n) Int.zero
@@ -978,7 +978,7 @@ Proof.
   simpl. apply iagree_not; auto.
 Qed.
 
-Definition rolm_redundant (x: nval) (amount mask: int) :=
+Definition rolm_redundant (x: nval) (amount mask: int_compcert) :=
   Int.eq_dec amount Int.zero && andimm_redundant x mask.
 
 Lemma rolm_redundant_sound:

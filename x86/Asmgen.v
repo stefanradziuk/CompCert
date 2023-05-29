@@ -46,14 +46,14 @@ Definition mk_mov (rd rs: preg) (k: code) : res code :=
   | _, _ => Error(msg "Asmgen.mk_mov")
   end.
 
-Definition mk_shrximm (n: int) (k: code) : res code :=
+Definition mk_shrximm (n: int_compcert) (k: code) : res code :=
   let p := Int.sub (Int.shl Int.one n) Int.one in
   OK (Ptestl_rr RAX RAX ::
       Pleal RCX (Addrmode (Some RAX) None (inl _ (Int.unsigned p))) ::
       Pcmov Cond_l RAX RCX ::
       Psarl_ri RAX n :: k).
 
-Definition mk_shrxlimm (n: int) (k: code) : res code :=
+Definition mk_shrxlimm (n: int_compcert) (k: code) : res code :=
   OK (if Int.eq n Int.zero then Pmov_rr RAX RAX :: k else
       Pcqto ::
       Pshrq_ri RDX (Int.sub (Int.repr 64) n) ::

@@ -425,7 +425,7 @@ Fixpoint sel_stmt (ki: known_idents) (env: typenv) (s: Cminor.stmt) : res stmt :
       let t := compile_switch Int.modulus dfl cases in
       if validate_switch Int.modulus dfl cases t
       then OK (Sswitch (XElet (sel_expr e) (sel_switch_int O t)))
-      else Error (msg "Selection: bad switch (int)")
+      else Error (msg "Selection: bad switch (int_compcert)")
   | Cminor.Sswitch true e cases dfl =>
       let t := compile_switch Int64.modulus dfl cases in
       if validate_switch Int64.modulus dfl cases t

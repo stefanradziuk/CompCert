@@ -25,22 +25,22 @@ val size_quantity_nat : quantity -> nat
 
 type memval =
 | Undef
-| Byte of Byte.int
+| Byte of Byte.int_compcert
 | Fragment of coq_val * quantity * nat
 
-val bytes_of_int : nat -> coq_Z -> Byte.int list
+val bytes_of_int : nat -> coq_Z -> Byte.int_compcert list
 
-val int_of_bytes : Byte.int list -> coq_Z
+val int_of_bytes : Byte.int_compcert list -> coq_Z
 
-val rev_if_be : Byte.int list -> Byte.int list
+val rev_if_be : Byte.int_compcert list -> Byte.int_compcert list
 
-val encode_int : nat -> coq_Z -> Byte.int list
+val encode_int : nat -> coq_Z -> Byte.int_compcert list
 
-val decode_int : Byte.int list -> coq_Z
+val decode_int : Byte.int_compcert list -> coq_Z
 
-val inj_bytes : Byte.int list -> memval list
+val inj_bytes : Byte.int_compcert list -> memval list
 
-val proj_bytes : memval list -> Byte.int list option
+val proj_bytes : memval list -> Byte.int_compcert list option
 
 val inj_value_rec : nat -> coq_val -> quantity -> memval list
 

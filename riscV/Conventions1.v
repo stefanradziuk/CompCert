@@ -389,7 +389,7 @@ Proof.
   induction tyl as [ | ty1 tyl]; intros until ofs; intros OO; simpl.
 - red; simpl; tauto.
 - destruct ty1.
-+ (* int *) apply A; unfold OKF; auto.
++ (* int_compcert *) apply A; unfold OKF; auto.
 + (* float *) apply B; unfold OKF; auto.
 + (* long *)
   destruct Archi.ptr64.

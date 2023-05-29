@@ -297,7 +297,7 @@ Inductive initial_state (p: program): state -> Prop :=
       funsig f = signature_main ->
       initial_state p (Callstate nil f (Locmap.init Vundef) m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall rs m retcode,
       Locmap.getpair (map_rpair R (loc_result signature_main)) rs = Vint retcode ->
       final_state (Returnstate nil rs m) retcode.

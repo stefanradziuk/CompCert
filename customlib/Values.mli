@@ -13,11 +13,11 @@ val eq_block : positive -> positive -> bool
 
 type coq_val =
 | Vundef
-| Vint of Int.int
-| Vlong of Int64.int
+| Vint of Int.int_compcert
+| Vlong of Int64.int_compcert
 | Vfloat of float
 | Vsingle of float32
-| Vptr of block * Ptrofs.int
+| Vptr of block * Ptrofs.int_compcert
 
 val coq_Vzero : coq_val
 
@@ -27,7 +27,7 @@ val coq_Vtrue : coq_val
 
 val coq_Vfalse : coq_val
 
-val coq_Vptrofs : Ptrofs.int -> coq_val
+val coq_Vptrofs : Ptrofs.int_compcert -> coq_val
 
 module Val :
  sig

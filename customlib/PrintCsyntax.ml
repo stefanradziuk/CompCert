@@ -170,7 +170,7 @@ let rec precedence = function
 (* Expressions *)
 
 let print_pointer_hook
-   : (formatter -> Values.block * Integers.Int.int -> unit) ref
+   : (formatter -> Values.block * Integers.Int.int_compcert -> unit) ref
    = ref (fun p (b, ofs) -> ())
 
 let print_typed_value p v ty =

@@ -6,10 +6,10 @@ open Floats
 open Integers
 
 type constant =
-| Ointconst of Int.int
+| Ointconst of Int.int_compcert
 | Ofloatconst of float
 | Osingleconst of float32
-| Olongconst of Int64.int
+| Olongconst of Int64.int_compcert
 
 type unary_operation = Cminor.unary_operation
 

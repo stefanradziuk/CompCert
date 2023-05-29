@@ -427,7 +427,7 @@ Inductive initial_state (p: program): state -> Prop :=
       Genv.find_symbol ge p.(prog_main) = Some fb ->
       initial_state p (Callstate nil fb (Regmap.init Vundef) m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall rs m r retcode,
       loc_result signature_main = One r ->
       rs r = Vint retcode ->

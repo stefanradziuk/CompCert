@@ -746,7 +746,7 @@ Qed.
 
 (** Extended right shift *)
 
-Lemma exec_shrx32: forall (rd r1: ireg) (n: int) k v (rs: regset) m,
+Lemma exec_shrx32: forall (rd r1: ireg) (n: int_compcert) k v (rs: regset) m,
   Val.shrx rs#r1 (Vint n) = Some v ->
   r1 <> X16 ->
   exists rs',
@@ -766,7 +766,7 @@ Proof.
   split. subst v; Simpl. intros; Simpl.
 Qed.
  
-Lemma exec_shrx64: forall (rd r1: ireg) (n: int) k v (rs: regset) m,
+Lemma exec_shrx64: forall (rd r1: ireg) (n: int_compcert) k v (rs: regset) m,
   Val.shrxl rs#r1 (Vint n) = Some v ->
   r1 <> X16 ->
   exists rs',
@@ -891,7 +891,7 @@ Proof.
   set (rs' := compare_long rs v1 v2 m). intros (B & C & D & E).
   unfold eval_testcond; rewrite B, C, D, E; unfold Val.cmplu.
   destruct v1; try discriminate; destruct v2; try discriminate; simpl in H.
-- (* int-int *)
+- (* int_compcert-int_compcert *)
   inv H. destruct c; simpl.
 + destruct (Int64.eq i i0); auto.
 + destruct (Int64.eq i i0); auto.
@@ -899,13 +899,13 @@ Proof.
 + rewrite (Int64.not_ltu i). destruct (Int64.eq i i0), (Int64.ltu i i0); auto.
 + rewrite (Int64.ltu_not i). destruct (Int64.eq i i0), (Int64.ltu i i0); auto.
 + destruct (Int64.ltu i i0); auto.
-- (* int-ptr *)
+- (* int_compcert-ptr *)
   simpl.
   destruct (Int64.eq i Int64.zero &&
             (Mem.valid_pointer m b0 (Ptrofs.unsigned i0)
               || Mem.valid_pointer m b0 (Ptrofs.unsigned i0 - 1))); try discriminate.
   destruct c; simpl in H; inv H; reflexivity.
-- (* ptr-int *)
+- (* ptr-int_compcert *)
   simpl.
   destruct (Int64.eq i0 Int64.zero &&
             (Mem.valid_pointer m b0 (Ptrofs.unsigned i)

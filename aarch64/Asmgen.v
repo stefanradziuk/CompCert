@@ -114,7 +114,7 @@ Definition logical_imm_length (x: Z) (sixtyfour: bool) : nat :=
 - the low [e] bits of the number, that is, [B], match [0*1*0*] or [1*0*1*].
 *)
 
-Definition is_logical_imm32 (x: int) : bool :=
+Definition is_logical_imm32 (x: int_compcert) : bool :=
   negb (Int.eq x Int.zero) && negb (Int.eq x Int.mone) &&
   Automaton.run (logical_imm_length (Int.unsigned x) false)
                 Automaton.start (Int.unsigned x).
@@ -126,7 +126,7 @@ Definition is_logical_imm64 (x: int64) : bool :=
 
 (** Arithmetic immediates are 12-bit unsigned numbers, possibly shifted left 12 bits *)
 
-Definition is_arith_imm32 (x: int) : bool :=
+Definition is_arith_imm32 (x: int_compcert) : bool :=
   Int.eq x (Int.zero_ext 12 x)
   || Int.eq x (Int.shl (Int.zero_ext 12 (Int.shru x (Int.repr 12))) (Int.repr 12)).
 
@@ -173,7 +173,7 @@ Definition loadimm (sz: isize) (rd: ireg) (n: Z) (k: code) : code :=
   then loadimm_z sz rd dz k
   else loadimm_n sz rd dn k.
 
-Definition loadimm32 (rd: ireg) (n: int) (k: code) : code :=
+Definition loadimm32 (rd: ireg) (n: int_compcert) (k: code) : code :=
   if is_logical_imm32 n
   then Porrimm W rd XZR (Int.unsigned n) :: k
   else loadimm W rd (Int.unsigned n) k.
@@ -196,7 +196,7 @@ Definition addimm_aux (insn: iregsp -> iregsp -> Z -> instruction)
   else
     insn rd r1 nhi :: insn rd rd nlo :: k.
 
-Definition addimm32 (rd r1: ireg) (n: int) (k: code) : code :=
+Definition addimm32 (rd r1: ireg) (n: int_compcert) (k: code) : code :=
   let m := Int.neg n in
   if Int.eq n (Int.zero_ext 24 n) then
     addimm_aux (Paddimm W) rd r1 (Int.unsigned n) k
@@ -223,7 +223,7 @@ Definition addimm64 (rd r1: iregsp) (n: int64) (k: code) : code :=
 Definition logicalimm32
               (insn1: ireg -> ireg0 -> Z -> instruction)
               (insn2: ireg -> ireg0 -> ireg -> shift_op -> instruction)
-              (rd r1: ireg) (n: int) (k: code) : code :=
+              (rd r1: ireg) (n: int_compcert) (k: code) : code :=
   if is_logical_imm32 n
   then insn1 rd r1 (Int.unsigned n) :: k
   else loadimm32 X16 n (insn2 rd r1 X16 SOnone :: k).
@@ -238,7 +238,7 @@ Definition logicalimm64
 
 (** Sign- or zero-extended arithmetic *)
 
-Definition transl_extension (ex: extension) (a: int) : extend_op :=
+Definition transl_extension (ex: extension) (a: int_compcert) : extend_op :=
   match ex with Xsgn32 => EOsxtw a | Xuns32 => EOuxtw a end.
 
 Definition move_extended_base
@@ -249,7 +249,7 @@ Definition move_extended_base
   end.
 
 Definition move_extended
-              (rd: ireg) (r1: ireg) (ex: extension) (a: int) (k: code) : code :=
+              (rd: ireg) (r1: ireg) (ex: extension) (a: int_compcert) (k: code) : code :=
   if Int.eq a Int.zero then
     move_extended_base rd r1 ex k
   else
@@ -258,7 +258,7 @@ Definition move_extended
 Definition arith_extended 
               (insnX: iregsp -> iregsp -> ireg -> extend_op -> instruction)
               (insnS: ireg -> ireg0 -> ireg -> shift_op -> instruction)
-              (rd r1 r2: ireg) (ex: extension) (a: int) (k: code) : code :=
+              (rd r1 r2: ireg) (ex: extension) (a: int_compcert) (k: code) : code :=
   if Int.ltu a (Int.repr 5) then
     insnX rd r1 r2 (transl_extension ex a) :: k
   else
@@ -266,7 +266,7 @@ Definition arith_extended
 
 (** Extended right shift *)
 
-Definition shrx32 (rd r1: ireg) (n: int) (k: code) : code :=
+Definition shrx32 (rd r1: ireg) (n: int_compcert) (k: code) : code :=
   if Int.eq n Int.zero then
     Pmov rd r1 :: k
   else
@@ -274,7 +274,7 @@ Definition shrx32 (rd r1: ireg) (n: int) (k: code) : code :=
     Padd W X16 r1 X16 (SOlsr (Int.sub Int.iwordsize n)) ::
     Porr W rd XZR X16 (SOasr n) :: k.
 
-Definition shrx64 (rd r1: ireg) (n: int) (k: code) : code :=
+Definition shrx64 (rd r1: ireg) (n: int_compcert) (k: code) : code :=
   if Int.eq n Int.zero then
     Pmov rd r1 :: k
   else
@@ -295,7 +295,7 @@ Definition loadsymbol (rd: ireg) (id: ident) (ofs: ptrofs) (k: code) : code :=
 
 (** Translate a shifted operand *)
 
-Definition transl_shift (s: Op.shift) (a: int): Asm.shift_op :=
+Definition transl_shift (s: Op.shift) (a: int_compcert): Asm.shift_op :=
   match s with
   | Slsl => SOlsl a
   | Slsr => SOlsr a
@@ -839,7 +839,7 @@ Definition transl_op
   | Ofloatofsingle, a1 :: nil =>
       do rd <- freg_of res; do rs <- freg_of a1;
       OK (Pfcvtds rd rs :: k)
-(** Conversions between int and float *)
+(** Conversions between int_compcert and float *)
   | Ointoffloat, a1 :: nil =>
       do rd <- ireg_of res; do rs <- freg_of a1;
       OK (Pfcvtzs W D rd rs :: k)

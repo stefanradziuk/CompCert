@@ -274,9 +274,9 @@ Opaque Int.eq.
 Qed.
 
 Remark transl_memory_access_label:
-  forall (mk_instr_imm: ireg -> int -> instruction)
+  forall (mk_instr_imm: ireg -> int_compcert -> instruction)
          (mk_instr_gen: option (ireg -> shift_op -> instruction))
-         (mk_immed: int -> int)
+         (mk_immed: int_compcert -> int_compcert)
          (addr: addressing) (args: list mreg) c k,
   transl_memory_access mk_instr_imm mk_instr_gen mk_immed addr args k = OK c ->
   (forall r n, nolabel (mk_instr_imm r n)) ->

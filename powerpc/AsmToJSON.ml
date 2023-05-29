@@ -62,7 +62,7 @@ type instruction_arg =
   | Ireg of ireg
   | Freg of freg
   | Constant of constant
-  | Long of Integers.Int.int
+  | Long of Integers.Int.int_compcert
   | Id
   | Crbit of crbit
   | ALabel of positive

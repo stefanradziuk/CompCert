@@ -315,7 +315,7 @@ Proof.
   induction tyl; simpl loc_arguments_hf; intros.
   elim H.
   destruct a.
-- (* int *)
+- (* int_compcert *)
   destruct (zlt ir 4); destruct H.
   subst. apply ireg_param_caller_save.
   eapply IHtyl; eauto.
@@ -366,7 +366,7 @@ Proof.
   induction tyl; simpl loc_arguments_sf; intros.
   elim H.
   destruct a.
-- (* int *)
+- (* int_compcert *)
   destruct H.
   destruct (zlt ofs 0); subst p.
   apply ireg_param_caller_save.

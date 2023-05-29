@@ -57,7 +57,7 @@ Require Import Builtins.
 *)
 
 Inductive eventval: Type :=
-  | EVint: int -> eventval
+  | EVint: int_compcert -> eventval
   | EVlong: int64 -> eventval
   | EVfloat: float -> eventval
   | EVsingle: float32 -> eventval

@@ -142,16 +142,16 @@ Inductive instruction : Type :=
   | Pmv     (rd: ireg) (rs: ireg)                    (**r integer move *)
 
 (** 32-bit integer register-immediate instructions *)
-  | Paddiw  (rd: ireg) (rs: ireg0) (imm: int)        (**r add immediate *)
-  | Psltiw  (rd: ireg) (rs: ireg0) (imm: int)        (**r set-less-than immediate *)
-  | Psltiuw (rd: ireg) (rs: ireg0) (imm: int)        (**r set-less-than unsigned immediate *)
-  | Pandiw  (rd: ireg) (rs: ireg0) (imm: int)        (**r and immediate *)
-  | Poriw   (rd: ireg) (rs: ireg0) (imm: int)        (**r or immediate *)
-  | Pxoriw  (rd: ireg) (rs: ireg0) (imm: int)        (**r xor immediate *)
-  | Pslliw  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-left-logical immediate *)
-  | Psrliw  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-right-logical immediate *)
-  | Psraiw  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-right-arith immediate *)
-  | Pluiw   (rd: ireg)             (imm: int)        (**r load upper-immediate *)
+  | Paddiw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r add immediate *)
+  | Psltiw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r set-less-than immediate *)
+  | Psltiuw (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r set-less-than unsigned immediate *)
+  | Pandiw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r and immediate *)
+  | Poriw   (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r or immediate *)
+  | Pxoriw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r xor immediate *)
+  | Pslliw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-left-logical immediate *)
+  | Psrliw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-right-logical immediate *)
+  | Psraiw  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-right-arith immediate *)
+  | Pluiw   (rd: ireg)             (imm: int_compcert)        (**r load upper-immediate *)
 (** 32-bit integer register-register instructions *)
   | Paddw   (rd: ireg) (rs1 rs2: ireg0)              (**r integer addition *)
   | Psubw   (rd: ireg) (rs1 rs2: ireg0)              (**r integer subtraction *)
@@ -181,9 +181,9 @@ Inductive instruction : Type :=
   | Pandil  (rd: ireg) (rs: ireg0) (imm: int64)      (**r and immediate *)
   | Poril   (rd: ireg) (rs: ireg0) (imm: int64)      (**r or immediate *)
   | Pxoril  (rd: ireg) (rs: ireg0) (imm: int64)      (**r xor immediate *)
-  | Psllil  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-left-logical immediate *)
-  | Psrlil  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-right-logical immediate *)
-  | Psrail  (rd: ireg) (rs: ireg0) (imm: int)        (**r shift-right-arith immediate *)
+  | Psllil  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-left-logical immediate *)
+  | Psrlil  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-right-logical immediate *)
+  | Psrail  (rd: ireg) (rs: ireg0) (imm: int_compcert)        (**r shift-right-arith immediate *)
   | Pluil   (rd: ireg)             (imm: int64)      (**r load upper-immediate *)
 (** 64-bit integer register-register instructions *)
   | Paddl   (rd: ireg) (rs1 rs2: ireg0)              (**r integer addition *)
@@ -293,7 +293,7 @@ Inductive instruction : Type :=
   | Pfcvtls  (rd: ireg) (rs: freg)                  (**r float32 -> int64 conversion *)
   | Pfcvtlus (rd: ireg) (rs: freg)                  (**r float32 -> unsigned int64 conversion *)
   | Pfcvtsl  (rd: freg) (rs: ireg0)                 (**r int64 -> float32 conversion *)
-  | Pfcvtslu (rd: freg) (rs: ireg0)                 (**r unsigned int 64-> float32 conversion *)
+  | Pfcvtslu (rd: freg) (rs: ireg0)                 (**r unsigned int_compcert 64-> float32 conversion *)
 
   (* 64-bit (double-precision) floating point *)
   | Pfld     (rd: freg) (ra: ireg) (ofs: offset)    (**r load 64-bit float *)
@@ -1106,7 +1106,7 @@ Inductive initial_state (p: program): state -> Prop :=
       Genv.init_mem p = Some m0 ->
       initial_state p (State rs0 m0).
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall rs m r,
       rs PC = Vnullptr ->
       rs X10 = Vint r ->

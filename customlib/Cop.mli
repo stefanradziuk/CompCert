@@ -67,25 +67,25 @@ type classify_cast_cases =
 
 val classify_cast : coq_type -> coq_type -> classify_cast_cases
 
-val cast_int_int : intsize -> signedness -> Int.int -> Int.int
+val cast_int_int : intsize -> signedness -> Int.int_compcert -> Int.int_compcert
 
-val cast_int_float : signedness -> Int.int -> float
+val cast_int_float : signedness -> Int.int_compcert -> float
 
-val cast_float_int : signedness -> float -> Int.int option
+val cast_float_int : signedness -> float -> Int.int_compcert option
 
-val cast_int_single : signedness -> Int.int -> float32
+val cast_int_single : signedness -> Int.int_compcert -> float32
 
-val cast_single_int : signedness -> float32 -> Int.int option
+val cast_single_int : signedness -> float32 -> Int.int_compcert option
 
-val cast_int_long : signedness -> Int.int -> Int64.int
+val cast_int_long : signedness -> Int.int_compcert -> Int64.int_compcert
 
-val cast_long_float : signedness -> Int64.int -> float
+val cast_long_float : signedness -> Int64.int_compcert -> float
 
-val cast_long_single : signedness -> Int64.int -> float32
+val cast_long_single : signedness -> Int64.int_compcert -> float32
 
-val cast_float_long : signedness -> float -> Int64.int option
+val cast_float_long : signedness -> float -> Int64.int_compcert option
 
-val cast_single_long : signedness -> float32 -> Int64.int option
+val cast_single_long : signedness -> float32 -> Int64.int_compcert option
 
 val sem_cast : coq_val -> coq_type -> coq_type -> Mem.mem -> coq_val option
 
@@ -136,8 +136,8 @@ val classify_binarith : coq_type -> coq_type -> binarith_cases
 val binarith_type : binarith_cases -> coq_type
 
 val sem_binarith :
-  (signedness -> Int.int -> Int.int -> coq_val option) -> (signedness ->
-  Int64.int -> Int64.int -> coq_val option) -> (float -> float -> coq_val
+  (signedness -> Int.int_compcert -> Int.int_compcert -> coq_val option) -> (signedness ->
+  Int64.int_compcert -> Int64.int_compcert -> coq_val option) -> (float -> float -> coq_val
   option) -> (float32 -> float32 -> coq_val option) -> coq_val -> coq_type ->
   coq_val -> coq_type -> Mem.mem -> coq_val option
 
@@ -150,7 +150,7 @@ type classify_add_cases =
 
 val classify_add : coq_type -> coq_type -> classify_add_cases
 
-val ptrofs_of_int : signedness -> Int.int -> Ptrofs.int
+val ptrofs_of_int : signedness -> Int.int_compcert -> Ptrofs.int_compcert
 
 val sem_add_ptr_int :
   composite_env -> coq_type -> signedness -> coq_val -> coq_val -> coq_val
@@ -203,8 +203,8 @@ type classify_shift_cases =
 val classify_shift : coq_type -> coq_type -> classify_shift_cases
 
 val sem_shift :
-  (signedness -> Int.int -> Int.int -> Int.int) -> (signedness -> Int64.int
-  -> Int64.int -> Int64.int) -> coq_val -> coq_type -> coq_val -> coq_type ->
+  (signedness -> Int.int_compcert -> Int.int_compcert -> Int.int_compcert) -> (signedness -> Int64.int_compcert
+  -> Int64.int_compcert -> Int64.int_compcert) -> coq_val -> coq_type -> coq_val -> coq_type ->
   coq_val option
 
 val sem_shl : coq_val -> coq_type -> coq_val -> coq_type -> coq_val option
@@ -258,6 +258,6 @@ val bitsize_carrier : intsize -> coq_Z
 val first_bit : intsize -> coq_Z -> coq_Z -> coq_Z
 
 val bitfield_extract :
-  intsize -> signedness -> coq_Z -> coq_Z -> Int.int -> Int.int
+  intsize -> signedness -> coq_Z -> coq_Z -> Int.int_compcert -> Int.int_compcert
 
-val bitfield_normalize : intsize -> signedness -> coq_Z -> Int.int -> Int.int
+val bitfield_normalize : intsize -> signedness -> coq_Z -> Int.int_compcert -> Int.int_compcert

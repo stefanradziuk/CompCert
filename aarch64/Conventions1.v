@@ -167,7 +167,7 @@ In the standard AAPCS64, all stack slots are 8-byte wide (2 words).
 In the Apple variant, a stack slot has the size of the type of the
 corresponding argument, and is aligned accordingly.  We use 8-byte
 slots (2 words) for C types [long] and [double], and 4-byte slots
-(1 word) for C types [int] and [float].  For full conformance, we should
+(1 word) for C types [int_compcert] and [float].  For full conformance, we should
 use 1-byte slots for [char] types and 2-byte slots for [short] types,
 but this cannot be expressed in CompCert's type algebra, so we
 incorrectly use 4-byte slots.

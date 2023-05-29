@@ -43,7 +43,7 @@ let distance_to_emit_constants () =
 let float_labels = (Hashtbl.create 39 : (Floats.float, label) Hashtbl.t)
 let float32_labels = (Hashtbl.create 39 : (Floats.float32, label) Hashtbl.t)
 let symbol_labels =
-  (Hashtbl.create 39 : (ident * Integers.Int.int, label) Hashtbl.t)
+  (Hashtbl.create 39 : (ident * Integers.Int.int_compcert, label) Hashtbl.t)
 
 let get_label tbl sz pinc bf =
   try

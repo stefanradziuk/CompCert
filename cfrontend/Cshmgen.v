@@ -42,7 +42,7 @@ Local Open Scope error_monad_scope.
    denoting a case where the operation is not defined at the given types.
 *)
 
-Definition make_intconst (n: int) :=  Econst (Ointconst n).
+Definition make_intconst (n: int_compcert) :=  Econst (Ointconst n).
 
 Definition make_longconst (f: int64) :=  Econst (Olongconst f).
 

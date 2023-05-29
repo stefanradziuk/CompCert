@@ -47,7 +47,7 @@ Require Import Cop.
   as needed to resolve operator overloading and type-dependent behaviors. *)
 
 Inductive expr : Type :=
-  | Econst_int: int -> type -> expr       (**r integer literal *)
+  | Econst_int: int_compcert -> type -> expr       (**r integer literal *)
   | Econst_float: float -> type -> expr   (**r double float literal *)
   | Econst_single: float32 -> type -> expr (**r single float literal *)
   | Econst_long: int64 -> type -> expr    (**r long integer literal *)
@@ -692,7 +692,7 @@ Inductive initial_state (p: program): state -> Prop :=
 
 (** A final state is a [Returnstate] with an empty continuation. *)
 
-Inductive final_state: state -> int -> Prop :=
+Inductive final_state: state -> int_compcert -> Prop :=
   | final_state_intro: forall r m,
       final_state (Returnstate (Vint r) Kstop m) r.
 

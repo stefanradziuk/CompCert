@@ -677,8 +677,8 @@ Qed.
 
 Section COMP_IMM.
 
-Variable default: comparison -> int -> condition.
-Variable intsem: comparison -> int -> int -> bool.
+Variable default: comparison -> int_compcert -> condition.
+Variable intsem: comparison -> int_compcert -> int_compcert -> bool.
 Variable sem: comparison -> val -> val -> val.
 
 Hypothesis sem_int: forall c x y, sem c (Vint x) (Vint y) = Val.of_bool (intsem c x y).

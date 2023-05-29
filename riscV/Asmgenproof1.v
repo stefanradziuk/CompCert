@@ -147,7 +147,7 @@ Qed.
 
 Lemma opimm32_correct:
   forall (op: ireg -> ireg0 -> ireg0 -> instruction)
-         (opi: ireg -> ireg0 -> int -> instruction)
+         (opi: ireg -> ireg0 -> int_compcert -> instruction)
          (sem: val -> val -> val) m,
   (forall d s1 s2 rs,
    exec_instr ge fn (op d s1 s2) rs m = Next (nextinstr (rs#d <- (sem rs##s1 rs##s2))) m) ->

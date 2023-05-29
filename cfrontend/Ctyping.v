@@ -184,7 +184,7 @@ Fixpoint type_combine (ty1 ty2: type) : res type :=
   | Tint sz1 sg1 a1, Tint sz2 sg2 a2 =>
       if intsize_eq sz1 sz2 && signedness_eq sg1 sg2
       then OK (Tint sz1 sg1 (attr_combine a1 a2))
-      else Error (msg "incompatible int types")
+      else Error (msg "incompatible int_compcert types")
   | Tlong sg1 a1, Tlong sg2 a2 =>
       if signedness_eq sg1 sg2
       then OK (Tlong sg1 (attr_combine a1 a2))
@@ -267,7 +267,7 @@ Definition wt_cast (from to: type) : Prop :=
 Definition wt_bool (ty: type) : Prop :=
   classify_bool ty <> bool_default.
 
-Definition wt_int (n: int) (sz: intsize) (sg: signedness) : Prop :=
+Definition wt_int (n: int_compcert) (sz: intsize) (sg: signedness) : Prop :=
   match sz, sg with
   | IBool, _ => Int.zero_ext 8 n = n
   | I8, Unsigned => Int.zero_ext 8 n = n
@@ -645,10 +645,10 @@ Definition efield (ce: composite_env) (r: expr) (f: ident) : res expr :=
       Error (MSG "argument of ." :: CTX f :: MSG " is not a struct or union" :: nil)
   end.
 
-Definition econst_int (n: int) (sg: signedness) : expr :=
+Definition econst_int (n: int_compcert) (sg: signedness) : expr :=
   (Eval (Vint n) (Tint I32 sg noattr)).
 
-Definition econst_ptr_int (n: int) (ty: type) : expr :=
+Definition econst_ptr_int (n: int_compcert) (ty: type) : expr :=
   (Eval (if Archi.ptr64 then Vlong (Int64.repr (Int.unsigned n)) else Vint n) (Tpointer ty noattr)).
 
 Definition econst_long (n: int64) (sg: signedness) : expr :=
@@ -1451,7 +1451,7 @@ Qed.
 
 Lemma pres_sem_binarith:
   forall
-    (sem_int: signedness -> int -> int -> option val)
+    (sem_int: signedness -> int_compcert -> int_compcert -> option val)
     (sem_long: signedness -> int64 -> int64 -> option val)
     (sem_float: float -> float -> option val)
     (sem_single: float32 -> float32 -> option val)
@@ -1485,7 +1485,7 @@ Qed.
 
 Lemma pres_sem_binarith_int:
   forall
-    (sem_int: signedness -> int -> int -> option val)
+    (sem_int: signedness -> int_compcert -> int_compcert -> option val)
     (sem_long: signedness -> int64 -> int64 -> option val)
     v1 ty1 v2 ty2 m v ty msg,
     (forall sg n1 n2,

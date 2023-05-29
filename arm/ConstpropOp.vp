@@ -43,7 +43,7 @@ Definition const_for_result (a: aval) : option operation :=
 
 Section STRENGTH_REDUCTION.
 
-Definition eval_static_shift (s: shift) (n: int) : int :=
+Definition eval_static_shift (s: shift) (n: int_compcert) : int_compcert :=
   match s with
   | Slsl x => Int.shl n x
   | Slsr x => Int.shru n x
@@ -106,13 +106,13 @@ Definition make_cmp_base (c: condition) (args: list reg) (vl: list aval) :=
   let (c', args') := cond_strength_reduction c args vl in (Ocmp c', args').
 
 Definition make_cmp_imm_eq (c: condition) (args: list reg) (vl: list aval) 
-                           (n: int) (r1: reg) (v1: aval) :=
+                           (n: int_compcert) (r1: reg) (v1: aval) :=
   if Int.eq_dec n Int.one && vincl v1 (Uns Ptop 1) then (Omove, r1 :: nil)
   else if Int.eq_dec n Int.zero && vincl v1 (Uns Ptop 1) then (Oxorimm Int.one, r1 :: nil)
   else make_cmp_base c args vl.
 
 Definition make_cmp_imm_ne (c: condition) (args: list reg) (vl: list aval) 
-                           (n: int) (r1: reg) (v1: aval) :=
+                           (n: int_compcert) (r1: reg) (v1: aval) :=
   if Int.eq_dec n Int.zero && vincl v1 (Uns Ptop 1) then (Omove, r1 :: nil)
   else if Int.eq_dec n Int.one && vincl v1 (Uns Ptop 1) then (Oxorimm Int.one, r1 :: nil)
   else make_cmp_base c args vl.
@@ -140,12 +140,12 @@ Definition make_select (c: condition) (ty: typ)
       (Osel c' ty, r1 :: r2 :: args')
   end.
 
-Definition make_addimm (n: int) (r: reg) :=
+Definition make_addimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero
   then (Omove, r :: nil)
   else (Oaddimm n, r :: nil).
 
-Definition make_shlimm (n: int) (r1 r2: reg) :=
+Definition make_shlimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else if Int.ltu n Int.iwordsize then
@@ -153,7 +153,7 @@ Definition make_shlimm (n: int) (r1 r2: reg) :=
   else
     (Oshl, r1 :: r2 :: nil).
 
-Definition make_shrimm (n: int) (r1 r2: reg) :=
+Definition make_shrimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else if Int.ltu n Int.iwordsize then
@@ -161,7 +161,7 @@ Definition make_shrimm (n: int) (r1 r2: reg) :=
   else
     (Oshr, r1 :: r2 :: nil).
 
-Definition make_shruimm (n: int) (r1 r2: reg) :=
+Definition make_shruimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Omove, r1 :: nil)
   else if Int.ltu n Int.iwordsize then
@@ -169,7 +169,7 @@ Definition make_shruimm (n: int) (r1 r2: reg) :=
   else
     (Oshru, r1 :: r2 :: nil).
 
-Definition make_mulimm (n: int) (r1 r2: reg) :=
+Definition make_mulimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.zero then
     (Ointconst Int.zero, nil)
   else if Int.eq n Int.one then
@@ -180,7 +180,7 @@ Definition make_mulimm (n: int) (r1 r2: reg) :=
     | None => (Omul, r1 :: r2 :: nil)
     end.
 
-Definition make_divimm (n: int) (r1 r2: reg) :=
+Definition make_divimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.one then
     (Omove, r1 :: nil)
   else
@@ -191,7 +191,7 @@ Definition make_divimm (n: int) (r1 r2: reg) :=
     | None   => (Odiv, r1 :: r2 :: nil)
     end.
 
-Definition make_divuimm (n: int) (r1 r2: reg) :=
+Definition make_divuimm (n: int_compcert) (r1 r2: reg) :=
   if Int.eq n Int.one then
     (Omove, r1 :: nil)
   else
@@ -200,7 +200,7 @@ Definition make_divuimm (n: int) (r1 r2: reg) :=
     | None   => (Odivu, r1 :: r2 :: nil)
     end.
 
-Definition make_andimm (n: int) (r: reg) (a: aval) :=
+Definition make_andimm (n: int_compcert) (r: reg) (a: aval) :=
   if Int.eq n Int.zero then (Ointconst Int.zero, nil)
   else if Int.eq n Int.mone then (Omove, r :: nil)
   else if match a with Uns _ m => Int.eq (Int.zero_ext m (Int.not n)) Int.zero
@@ -208,12 +208,12 @@ Definition make_andimm (n: int) (r: reg) (a: aval) :=
   then (Omove, r :: nil)
   else (Oandimm n, r :: nil).
 
-Definition make_orimm (n: int) (r: reg) :=
+Definition make_orimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero then (Omove, r :: nil)
   else if Int.eq n Int.mone then (Ointconst Int.mone, nil)
   else (Oorimm n, r :: nil).
 
-Definition make_xorimm (n: int) (r: reg) :=
+Definition make_xorimm (n: int_compcert) (r: reg) :=
   if Int.eq n Int.zero then (Omove, r :: nil)
   else if Int.eq n Int.mone then (Onot, r :: nil)
   else (Oxorimm n, r :: nil).
@@ -233,7 +233,7 @@ Definition make_cast8signed (r: reg) (a: aval) :=
 Definition make_cast16signed (r: reg) (a: aval) :=
   if vincl a (Sgn Ptop 16) then (Omove, r :: nil) else (Ocast16signed, r :: nil).
 
-Definition make_mla_mulimm (n1: int) (r1 r2 r3: reg) :=
+Definition make_mla_mulimm (n1: int_compcert) (r1 r2 r3: reg) :=
   if Int.eq n1 Int.zero then
     (Omove, r3 :: nil)
   else if Int.eq n1 Int.one then
@@ -241,13 +241,13 @@ Definition make_mla_mulimm (n1: int) (r1 r2 r3: reg) :=
   else
     (Omla, r1 :: r2 :: r3 :: nil).
 
-Definition make_mla_addimm (n3: int) (r1 r2 r3: reg) :=
+Definition make_mla_addimm (n3: int_compcert) (r1 r2 r3: reg) :=
   if Int.eq n3 Int.zero then
     (Omul, r1 :: r2 :: nil)
   else
     (Omla, r1 :: r2 :: r3 :: nil).
 
-Definition make_mla_bothimm (n1 n3: int) (r1 r2 r3: reg) :=
+Definition make_mla_bothimm (n1 n3: int_compcert) (r1 r2 r3: reg) :=
   if Int.eq n1 Int.zero then
     (Ointconst n3, nil)
   else if Int.eq n1 Int.one then

@@ -43,7 +43,7 @@ Set Asymmetric Patterns.
 *)
 
 Inductive program_behavior: Type :=
-  | Terminates: trace -> int -> program_behavior
+  | Terminates: trace -> int_compcert -> program_behavior
   | Diverges: trace -> program_behavior
   | Reacts: traceinf -> program_behavior
   | Goes_wrong: trace -> program_behavior.

@@ -7,10 +7,10 @@ open Integers
 open List0
 
 type expr =
-| Econst_int of Int.int * coq_type
+| Econst_int of Int.int_compcert * coq_type
 | Econst_float of float * coq_type
 | Econst_single of float32 * coq_type
-| Econst_long of Int64.int * coq_type
+| Econst_long of Int64.int_compcert * coq_type
 | Evar of ident * coq_type
 | Etempvar of ident * coq_type
 | Ederef of expr * coq_type

@@ -160,7 +160,7 @@ let classify_cast tfrom = function
    | _ -> Coq_cast_case_default)
 | _ -> Coq_cast_case_default
 
-(** val cast_int_int : intsize -> signedness -> Int.int -> Int.int **)
+(** val cast_int_int : intsize -> signedness -> Int.int_compcert -> Int.int_compcert **)
 
 let cast_int_int sz sg i =
   match sz with
@@ -177,63 +177,63 @@ let cast_int_int sz sg i =
   | I32 -> i
   | IBool -> if Int.eq i Int.zero then Int.zero else Int.one
 
-(** val cast_int_float : signedness -> Int.int -> float **)
+(** val cast_int_float : signedness -> Int.int_compcert -> float **)
 
 let cast_int_float si i =
   match si with
   | Signed -> Float.of_int i
   | Unsigned -> Float.of_intu i
 
-(** val cast_float_int : signedness -> float -> Int.int option **)
+(** val cast_float_int : signedness -> float -> Int.int_compcert option **)
 
 let cast_float_int si f =
   match si with
   | Signed -> Float.to_int f
   | Unsigned -> Float.to_intu f
 
-(** val cast_int_single : signedness -> Int.int -> float32 **)
+(** val cast_int_single : signedness -> Int.int_compcert -> float32 **)
 
 let cast_int_single si i =
   match si with
   | Signed -> Float32.of_int i
   | Unsigned -> Float32.of_intu i
 
-(** val cast_single_int : signedness -> float32 -> Int.int option **)
+(** val cast_single_int : signedness -> float32 -> Int.int_compcert option **)
 
 let cast_single_int si f =
   match si with
   | Signed -> Float32.to_int f
   | Unsigned -> Float32.to_intu f
 
-(** val cast_int_long : signedness -> Int.int -> Int64.int **)
+(** val cast_int_long : signedness -> Int.int_compcert -> Int64.int_compcert **)
 
 let cast_int_long si i =
   match si with
   | Signed -> Int64.repr (Int.signed i)
   | Unsigned -> Int64.repr (Int.unsigned i)
 
-(** val cast_long_float : signedness -> Int64.int -> float **)
+(** val cast_long_float : signedness -> Int64.int_compcert -> float **)
 
 let cast_long_float si i =
   match si with
   | Signed -> Float.of_long i
   | Unsigned -> Float.of_longu i
 
-(** val cast_long_single : signedness -> Int64.int -> float32 **)
+(** val cast_long_single : signedness -> Int64.int_compcert -> float32 **)
 
 let cast_long_single si i =
   match si with
   | Signed -> Float32.of_long i
   | Unsigned -> Float32.of_longu i
 
-(** val cast_float_long : signedness -> float -> Int64.int option **)
+(** val cast_float_long : signedness -> float -> Int64.int_compcert option **)
 
 let cast_float_long si f =
   match si with
   | Signed -> Float.to_long f
   | Unsigned -> Float.to_longu f
 
-(** val cast_single_long : signedness -> float32 -> Int64.int option **)
+(** val cast_single_long : signedness -> float32 -> Int64.int_compcert option **)
 
 let cast_single_long si f =
   match si with
@@ -620,8 +620,8 @@ let binarith_type = function
 | Coq_bin_default -> Tvoid
 
 (** val sem_binarith :
-    (signedness -> Int.int -> Int.int -> coq_val option) -> (signedness ->
-    Int64.int -> Int64.int -> coq_val option) -> (float -> float -> coq_val
+    (signedness -> Int.int_compcert -> Int.int_compcert -> coq_val option) -> (signedness ->
+    Int64.int_compcert -> Int64.int_compcert -> coq_val option) -> (float -> float -> coq_val
     option) -> (float32 -> float32 -> coq_val option) -> coq_val -> coq_type
     -> coq_val -> coq_type -> Mem.mem -> coq_val option **)
 
@@ -691,7 +691,7 @@ let classify_add ty1 ty2 =
      | _ -> Coq_add_default)
   | _ -> Coq_add_default
 
-(** val ptrofs_of_int : signedness -> Int.int -> Ptrofs.int **)
+(** val ptrofs_of_int : signedness -> Int.int_compcert -> Ptrofs.int_compcert **)
 
 let ptrofs_of_int si n =
   match si with
@@ -990,8 +990,8 @@ let classify_shift ty1 ty2 =
   | _ -> Coq_shift_default
 
 (** val sem_shift :
-    (signedness -> Int.int -> Int.int -> Int.int) -> (signedness -> Int64.int
-    -> Int64.int -> Int64.int) -> coq_val -> coq_type -> coq_val -> coq_type
+    (signedness -> Int.int_compcert -> Int.int_compcert -> Int.int_compcert) -> (signedness -> Int64.int_compcert
+    -> Int64.int_compcert -> Int64.int_compcert) -> coq_val -> coq_type -> coq_val -> coq_type
     -> coq_val option **)
 
 let sem_shift sem_int sem_long v1 t1 v2 t2 =
@@ -1242,7 +1242,7 @@ let first_bit sz pos width =
   if big_endian then Z.sub (Z.sub (bitsize_carrier sz) pos) width else pos
 
 (** val bitfield_extract :
-    intsize -> signedness -> coq_Z -> coq_Z -> Int.int -> Int.int **)
+    intsize -> signedness -> coq_Z -> coq_Z -> Int.int_compcert -> Int.int_compcert **)
 
 let bitfield_extract sz sg pos width c =
   if (||) ((fun x -> x) (intsize_eq sz IBool))
@@ -1251,7 +1251,7 @@ let bitfield_extract sz sg pos width c =
   else Int.signed_bitfield_extract (first_bit sz pos width) width c
 
 (** val bitfield_normalize :
-    intsize -> signedness -> coq_Z -> Int.int -> Int.int **)
+    intsize -> signedness -> coq_Z -> Int.int_compcert -> Int.int_compcert **)
 
 let bitfield_normalize sz sg width n =
   if (||) ((fun x -> x) (intsize_eq sz IBool))

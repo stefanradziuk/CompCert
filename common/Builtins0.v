@@ -135,7 +135,7 @@ Qed.
 
 Definition valty (t: typ) : Type :=
   match t with
-  | Tint => int
+  | Tint => int_compcert
   | Tlong => int64
   | Tfloat => float
   | Tsingle => float32
@@ -145,10 +145,10 @@ Definition valty (t: typ) : Type :=
 Definition valretty (t: rettype) : Type :=
   match t with
   | Tret t => valty t
-  | Tint8signed => { n: int | n = Int.sign_ext 8 n }
-  | Tint8unsigned => { n: int | n = Int.zero_ext 8 n }
-  | Tint16signed => { n: int | n = Int.sign_ext 16 n }
-  | Tint16unsigned => { n: int | n = Int.zero_ext 16 n }
+  | Tint8signed => { n: int_compcert | n = Int.sign_ext 8 n }
+  | Tint8unsigned => { n: int_compcert | n = Int.zero_ext 8 n }
+  | Tint16signed => { n: int_compcert | n = Int.sign_ext 16 n }
+  | Tint16unsigned => { n: int_compcert | n = Int.zero_ext 16 n }
   | Tvoid => unit
   end.
 

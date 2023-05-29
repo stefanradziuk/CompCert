@@ -198,17 +198,17 @@ type state = { init : init_data list; curr : coq_Z; total_size : coq_Z }
 let initial_state sz =
   { init = []; curr = Z0; total_size = sz }
 
-(** val int_of_byte : Byte.int -> Int.int **)
+(** val int_of_byte : Byte.int_compcert -> Int.int_compcert **)
 
 let int_of_byte b =
   Int.repr (Byte.unsigned b)
 
-(** val coq_Init_byte : Byte.int -> init_data **)
+(** val coq_Init_byte : Byte.int_compcert -> init_data **)
 
 let coq_Init_byte b =
   Init_int8 (int_of_byte b)
 
-(** val add_rev_bytes : Byte.int list -> init_data list -> init_data list **)
+(** val add_rev_bytes : Byte.int_compcert list -> init_data list -> init_data list **)
 
 let rec add_rev_bytes l il =
   match l with
@@ -289,7 +289,7 @@ let rec normalize il depth =
                  ('n'::('o'::('r'::('m'::('a'::('l'::('i'::('z'::('e'::(':'::(' '::('I'::('n'::('i'::('t'::('_'::('a'::('d'::('d'::('r'::('o'::('f'::[])))))))))))))))))))))))))
 
 (** val decompose_rec :
-    Byte.int list -> init_data list -> coq_Z -> (Byte.int list * init_data
+    Byte.int_compcert list -> init_data list -> coq_Z -> (Byte.int_compcert list * init_data
     list) res **)
 
 let rec decompose_rec accu il depth =
@@ -311,13 +311,13 @@ let rec decompose_rec accu il depth =
                  ('d'::('e'::('c'::('o'::('m'::('p'::('o'::('s'::('e'::(':'::(' '::('w'::('r'::('o'::('n'::('g'::(' '::('s'::('h'::('a'::('p'::('e'::[])))))))))))))))))))))))))
 
 (** val decompose :
-    init_data list -> coq_Z -> (Byte.int list * init_data list) res **)
+    init_data list -> coq_Z -> (Byte.int_compcert list * init_data list) res **)
 
 let decompose il depth =
   decompose_rec [] il depth
 
 (** val trisection :
-    init_data list -> coq_Z -> coq_Z -> ((Byte.int list * Byte.int
+    init_data list -> coq_Z -> coq_Z -> ((Byte.int_compcert list * Byte.int_compcert
     list) * init_data list) res **)
 
 let trisection il depth sz =
@@ -362,7 +362,7 @@ let store_data s pos i =
              | Error msg0 -> Error msg0)
   else assertion_failed
 
-(** val init_data_for_carrier : intsize -> Int.int -> init_data **)
+(** val init_data_for_carrier : intsize -> Int.int_compcert -> init_data **)
 
 let init_data_for_carrier isz n =
   match isz with
@@ -370,12 +370,12 @@ let init_data_for_carrier isz n =
   | I32 -> Init_int32 n
   | _ -> Init_int8 n
 
-(** val store_int : state -> coq_Z -> intsize -> Int.int -> state res **)
+(** val store_int : state -> coq_Z -> intsize -> Int.int_compcert -> state res **)
 
 let store_int s pos isz n =
   store_data s pos (init_data_for_carrier isz n)
 
-(** val load_int : state -> coq_Z -> intsize -> Int.int res **)
+(** val load_int : state -> coq_Z -> intsize -> Int.int_compcert res **)
 
 let load_int s pos isz =
   let chunk = chunk_for_carrier isz in

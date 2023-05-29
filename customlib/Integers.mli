@@ -523,27 +523,27 @@ module Int64 :
 
   val cmpu : comparison -> int -> int -> bool
 
-  val iwordsize' : Int.int
+  val iwordsize' : Int.int_compcert
 
-  val shl' : int -> Int.int -> int
+  val shl' : int -> Int.int_compcert -> int
 
-  val shru' : int -> Int.int -> int
+  val shru' : int -> Int.int_compcert -> int
 
-  val shr' : int -> Int.int -> int
+  val shr' : int -> Int.int_compcert -> int
 
-  val shrx' : int -> Int.int -> int
+  val shrx' : int -> Int.int_compcert -> int
 
-  val one_bits' : int -> Int.int list
+  val one_bits' : int -> Int.int_compcert list
 
-  val is_power2' : int -> Int.int option
+  val is_power2' : int -> Int.int_compcert option
 
-  val loword : int -> Int.int
+  val loword : int -> Int.int_compcert
 
-  val hiword : int -> Int.int
+  val hiword : int -> Int.int_compcert
 
-  val ofwords : Int.int -> Int.int -> int
+  val ofwords : Int.int_compcert -> Int.int_compcert -> int
 
-  val mul' : Int.int -> Int.int -> int
+  val mul' : Int.int_compcert -> Int.int_compcert -> int
  end
 
 module Wordsize_Ptrofs :
@@ -594,15 +594,15 @@ module Ptrofs :
 
   val cmpu : comparison -> int -> int -> bool
 
-  val to_int : int -> Int.int
+  val to_int : int -> Int.int_compcert
 
-  val to_int64 : int -> Int64.int
+  val to_int64 : int -> Int64.int_compcert
 
-  val of_int : Int.int -> int
+  val of_int : Int.int_compcert -> int
 
-  val of_intu : Int.int -> int
+  val of_intu : Int.int_compcert -> int
 
-  val of_ints : Int.int -> int
+  val of_ints : Int.int_compcert -> int
 
-  val of_int64 : Int64.int -> int
+  val of_int64 : Int64.int_compcert -> int
  end

@@ -11,33 +11,33 @@ open Integers
 type condition =
 | Ccomp of comparison
 | Ccompu of comparison
-| Ccompimm of comparison * Int.int
-| Ccompuimm of comparison * Int.int
+| Ccompimm of comparison * Int.int_compcert
+| Ccompuimm of comparison * Int.int_compcert
 | Ccompl of comparison
 | Ccomplu of comparison
-| Ccomplimm of comparison * Int64.int
-| Ccompluimm of comparison * Int64.int
+| Ccomplimm of comparison * Int64.int_compcert
+| Ccompluimm of comparison * Int64.int_compcert
 | Ccompf of comparison
 | Cnotcompf of comparison
 | Ccompfs of comparison
 | Cnotcompfs of comparison
-| Cmaskzero of Int.int
-| Cmasknotzero of Int.int
+| Cmaskzero of Int.int_compcert
+| Cmasknotzero of Int.int_compcert
 
 type addressing =
 | Aindexed of coq_Z
 | Aindexed2 of coq_Z
 | Ascaled of coq_Z * coq_Z
 | Aindexed2scaled of coq_Z * coq_Z
-| Aglobal of ident * Ptrofs.int
-| Abased of ident * Ptrofs.int
-| Abasedscaled of coq_Z * ident * Ptrofs.int
-| Ainstack of Ptrofs.int
+| Aglobal of ident * Ptrofs.int_compcert
+| Abased of ident * Ptrofs.int_compcert
+| Abasedscaled of coq_Z * ident * Ptrofs.int_compcert
+| Ainstack of Ptrofs.int_compcert
 
 type operation =
 | Omove
-| Ointconst of Int.int
-| Olongconst of Int64.int
+| Ointconst of Int.int_compcert
+| Olongconst of Int64.int_compcert
 | Ofloatconst of float
 | Osingleconst of float32
 | Oindirectsymbol of ident
@@ -48,7 +48,7 @@ type operation =
 | Oneg
 | Osub
 | Omul
-| Omulimm of Int.int
+| Omulimm of Int.int_compcert
 | Omulhs
 | Omulhu
 | Odiv
@@ -56,21 +56,21 @@ type operation =
 | Omod
 | Omodu
 | Oand
-| Oandimm of Int.int
+| Oandimm of Int.int_compcert
 | Oor
-| Oorimm of Int.int
+| Oorimm of Int.int_compcert
 | Oxor
-| Oxorimm of Int.int
+| Oxorimm of Int.int_compcert
 | Onot
 | Oshl
-| Oshlimm of Int.int
+| Oshlimm of Int.int_compcert
 | Oshr
-| Oshrimm of Int.int
-| Oshrximm of Int.int
+| Oshrimm of Int.int_compcert
+| Oshrximm of Int.int_compcert
 | Oshru
-| Oshruimm of Int.int
-| Ororimm of Int.int
-| Oshldimm of Int.int
+| Oshruimm of Int.int_compcert
+| Ororimm of Int.int_compcert
+| Oshldimm of Int.int_compcert
 | Olea of addressing
 | Omakelong
 | Olowlong
@@ -78,10 +78,10 @@ type operation =
 | Ocast32signed
 | Ocast32unsigned
 | Onegl
-| Oaddlimm of Int64.int
+| Oaddlimm of Int64.int_compcert
 | Osubl
 | Omull
-| Omullimm of Int64.int
+| Omullimm of Int64.int_compcert
 | Omullhs
 | Omullhu
 | Odivl
@@ -89,20 +89,20 @@ type operation =
 | Omodl
 | Omodlu
 | Oandl
-| Oandlimm of Int64.int
+| Oandlimm of Int64.int_compcert
 | Oorl
-| Oorlimm of Int64.int
+| Oorlimm of Int64.int_compcert
 | Oxorl
-| Oxorlimm of Int64.int
+| Oxorlimm of Int64.int_compcert
 | Onotl
 | Oshll
-| Oshllimm of Int.int
+| Oshllimm of Int.int_compcert
 | Oshrl
-| Oshrlimm of Int.int
-| Oshrxlimm of Int.int
+| Oshrlimm of Int.int_compcert
+| Oshrxlimm of Int.int_compcert
 | Oshrlu
-| Oshrluimm of Int.int
-| Ororlimm of Int.int
+| Oshrluimm of Int.int_compcert
+| Ororlimm of Int.int_compcert
 | Oleal of addressing
 | Onegf
 | Oabsf
@@ -609,7 +609,7 @@ let ptroffset_max =
     (Coq_xI (Coq_xI (Coq_xI (Coq_xI (Coq_xI (Coq_xI
     Coq_xH)))))))))))))))))))))))
 
-(** val ptroffset_in_range : Ptrofs.int -> bool **)
+(** val ptroffset_in_range : Ptrofs.int_compcert -> bool **)
 
 let ptroffset_in_range n =
   let n0 = Ptrofs.signed n in

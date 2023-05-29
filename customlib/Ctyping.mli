@@ -80,11 +80,11 @@ val ederef : expr -> expr res
 
 val efield : composite_env -> expr -> ident -> expr res
 
-val econst_int : Int.int -> signedness -> expr
+val econst_int : Int.int_compcert -> signedness -> expr
 
-val econst_ptr_int : Int.int -> coq_type -> expr
+val econst_ptr_int : Int.int_compcert -> coq_type -> expr
 
-val econst_long : Int64.int -> signedness -> expr
+val econst_long : Int64.int_compcert -> signedness -> expr
 
 val econst_float : float -> expr
 

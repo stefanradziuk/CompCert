@@ -1,3 +1,7 @@
+This is a fork of CompCert that renames `int` to `int_compcert` to enable
+use of `ExtrOcamlNatInt` (see disclaimer at
+https://coq.inria.fr/library/Coq.extraction.ExtrOcamlNatInt.html).
+
 # CompCert
 The formally-verified C compiler.
 
